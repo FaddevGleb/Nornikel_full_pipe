@@ -1,0 +1,9 @@
+{
+  "graph_path": "Examples_prev_step/LearningChunkGraphNORNIKEL_EXAMPLE (2).json",
+  "goal": "Снизить риск коррозии сплава Ni-W при сохранении технологичности производства.",
+  "constraints": [
+    "Себестоимость не должна расти более чем на 10%"
+  ],
+  "max_refinement_iterations": 1,
+  "num_hypotheses": 3
+}
