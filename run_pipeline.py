@@ -10,7 +10,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# When launched from the web dashboard, Node may inject stale/empty YANDEX_* into
+# process.env; override=True ensures ACCELMAT's local .env always wins.
+load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
 
 from logging_utils import setup_logging
 from pipeline import load_pipeline_request, run_pipeline, save_pipeline_result
