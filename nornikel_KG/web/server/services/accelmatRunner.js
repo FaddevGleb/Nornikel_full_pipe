@@ -37,9 +37,11 @@ export function getAccelmatPythonExecutable() {
 }
 
 export function getAccelmatDefaults() {
+  const enrichment = configManager.settings?.feynmanEnrichment ?? {};
   return {
     maxRefinementIterations: 1,
     numHypotheses: 5,
+    feynmanEnrichment: enrichment.enabledByDefault ?? false,
     ...(getAccelmatSettings().defaults ?? {}),
   };
 }
@@ -70,6 +72,13 @@ export async function writeRequest(slug, { graphPath, goal, constraints, maxRefi
 export async function readResult(slug) {
   const raw = await fs.readFile(resultPath(slug), 'utf8');
   return JSON.parse(raw);
+}
+
+export async function writeResult(slug, result) {
+  const target = resultPath(slug);
+  await fs.mkdir(path.dirname(target), { recursive: true });
+  await fs.writeFile(target, JSON.stringify(result, null, 2), 'utf8');
+  return { outputPath: target };
 }
 
 export async function listResults() {

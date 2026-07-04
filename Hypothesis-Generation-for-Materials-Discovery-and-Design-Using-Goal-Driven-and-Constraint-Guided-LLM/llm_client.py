@@ -1,25 +1,30 @@
 import os
 import time
+from pathlib import Path
 from typing import Any
 
 import requests
-from openai import OpenAI
+from dotenv import load_dotenv
+from openai import OpenAI, PermissionDeniedError
 
 from logging_utils import get_logger
 
 logger = get_logger("llm_client")
 
-YANDEX_BASE_URL = os.getenv("YANDEX_BASE_URL", "https://ai.api.cloud.yandex.net/v1")
+# Ensure local .env is loaded even when this module is imported outside run_pipeline.py
+load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
+
+YANDEX_BASE_URL = os.getenv("YANDEX_BASE_URL", "https://llm.api.cloud.yandex.net/v1")
 YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
 YANDEX_FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 
 MODEL_HGA = os.getenv("YANDEX_MODEL_HGA", "yandexgpt/rc")
 MODEL_CRITIC = os.getenv("YANDEX_MODEL_CRITIC", "qwen3-235b-a22b-fp8/latest")
 MODEL_CRITIC_2 = os.getenv("YANDEX_MODEL_CRITIC_2", "gpt-oss-120b/latest")
-MODEL_CRITIC_3 = os.getenv("YANDEX_MODEL_CRITIC_3", "aliceai-llm/latest")
+MODEL_CRITIC_3 = os.getenv("YANDEX_MODEL_CRITIC_3", "qwen3-235b-a22b-fp8/latest")
 MODEL_SUMMARIZER = os.getenv("YANDEX_MODEL_SUMMARIZER", "yandexgpt/rc")
 MODEL_EVALUATION = os.getenv("YANDEX_MODEL_EVALUATION", "yandexgpt/latest")
-MODEL_KG = os.getenv("YANDEX_MODEL_KG", "aliceai-llm-flash/latest")
+MODEL_KG = os.getenv("YANDEX_MODEL_KG", "qwen3-235b-a22b-fp8/latest")
 
 _client: OpenAI | None = None
 
@@ -48,8 +53,10 @@ def get_client() -> OpenAI:
     _client = OpenAI(
         api_key=api_key,
         base_url=os.getenv("YANDEX_BASE_URL", YANDEX_BASE_URL),
-        project=folder_id,
-        default_headers={"x-data-logging-enabled": "false"},
+        default_headers={
+            "x-folder-id": folder_id,
+            "x-data-logging-enabled": "false",
+        },
     )
     return _client
 
@@ -105,5 +112,14 @@ def llm_completion(
             time.sleep(retry_delay)
 
     if last_error is not None:
+        if isinstance(last_error, PermissionDeniedError):
+            raise PermissionDeniedError(
+                "Yandex AI Studio returned 403 Permission denied. "
+                "Regenerate the API key in https://aistudio.yandex.ru/ and verify YANDEX_FOLDER_ID "
+                f"({os.getenv('YANDEX_FOLDER_ID', 'unset')}) matches the folder where the key was issued. "
+                "The service account/user needs the ai.languageModels.user role on that folder.",
+                response=getattr(last_error, "response", None),
+                body=getattr(last_error, "body", None),
+            ) from last_error
         raise last_error
     raise RuntimeError("LLM completion failed without an error")

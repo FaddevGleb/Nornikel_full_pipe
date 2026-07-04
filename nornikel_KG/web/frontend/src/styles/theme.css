@@ -1,23 +1,40 @@
 :root {
-  --bg-primary: #fafafa;
-  --bg-secondary: #ffffff;
-  --bg-panel: #f5f5f5;
-  --text-primary: #1a1a1a;
-  --text-secondary: #666666;
-  --accent-blue: #2563eb;
-  --accent-copper: #b45309;
-  --accent-green: #16a34a;
-  --accent-orange: #ea580c;
-  --accent-purple: #7c3aed;
-  --border: #e0e0e0;
-  --danger: #dc2626;
-  --shadow: none;
-  --radius: 0;
-  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono: "Cascadia Code", "Fira Code", monospace;
+  /* Nornickel corporate palette (standart_firmennyj_stil.pdf, p.35) */
+  --nn-blue: #0077C8;
+  --nn-blue-dark: #004C97;
+  --nn-white: #FFFFFF;
+  --nn-gray-10: #626262;
+  --nn-gray-3: #C8C8C8;
+  --nn-black: #000000;
+
+  /* Semantic tokens */
+  --bg-primary: #F5F7FA;
+  --bg-secondary: var(--nn-white);
+  --bg-panel: #EEF2F6;
+  --text-primary: var(--nn-gray-10);
+  --text-secondary: #8A8A8A;
+  --accent-primary: var(--nn-blue);
+  --accent-secondary: var(--nn-blue-dark);
+  --accent-blue: var(--nn-blue);
+  --accent-copper: var(--nn-blue-dark);
+  --accent-green: #2E8B57;
+  --accent-orange: #D97706;
+  --accent-purple: var(--nn-blue-dark);
+  --border: var(--nn-gray-3);
+  --danger: #C62828;
+  --shadow: 0 4px 16px rgba(0, 77, 151, 0.08);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius: var(--radius-md);
+
+  --font-sans: "Proxima Nova", Tahoma, system-ui, -apple-system, sans-serif;
+  --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
   --font-size-base: 15px;
   --font-size-sm: 14px;
   --font-size-xs: 13px;
+
+  --header-height: 64px;
+  --sidebar-width: 240px;
 }
 
 [data-theme="dark"] {
@@ -27,5 +44,5 @@
   --text-primary: #e8edf5;
   --text-secondary: #9fb0c8;
   --border: #334155;
-  --shadow: none;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }

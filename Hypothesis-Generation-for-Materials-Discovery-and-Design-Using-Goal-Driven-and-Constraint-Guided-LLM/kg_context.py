@@ -37,10 +37,26 @@ def get_known_applications(graph: dict[str, Any]) -> list[str]:
     return applications
 
 
+def _match_known_in_goal(goal: str, known: list[str]) -> list[str]:
+    """Heuristic fallback: pick known graph entities mentioned in the goal text."""
+    goal_lower = goal.lower()
+    matched: list[str] = []
+    for name in known:
+        if name.lower() in goal_lower:
+            matched.append(name)
+    return matched
+
+
 def extract_applications_from_goal(
     goal: str,
     known_applications: list[str] | None = None,
 ) -> list[str]:
+    if known_applications:
+        heuristic = _match_known_in_goal(goal, known_applications)
+        if heuristic:
+            logger.info("[KG] Matched applications from goal without LLM: %s", heuristic)
+            return heuristic
+
     known_hint = ""
     if known_applications:
         known_hint = (
@@ -55,7 +71,14 @@ Provided Goal Statement:
 {goal}
 """
     logger.info("[KG] Extracting applications from goal via %s (%d known applications)", MODEL_KG, len(known_applications or []))
-    extracted = llm_completion(prompt, model=MODEL_KG)
+    try:
+        extracted = llm_completion(prompt, model=MODEL_KG)
+    except Exception as exc:
+        if known_applications:
+            fallback = _match_known_in_goal(goal, known_applications) or list(known_applications)
+            logger.warning("[KG] LLM application extraction failed (%s); using fallback: %s", exc, fallback)
+            return fallback
+        raise
     apl_list = [item.strip() for item in extracted.split(",") if item.strip()]
     logger.info("[KG] Extracted applications: %s", apl_list)
     return apl_list

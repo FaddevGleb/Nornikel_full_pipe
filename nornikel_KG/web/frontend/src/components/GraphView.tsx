@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { api, type GraphBundle, type GraphNode } from '../api/client';
 import { useCytoscapeGraph, EDGE_STYLES } from '../hooks/useCytoscapeGraph';
 import { formatNumber } from '../utils/format';
+import { PageHeader } from './PageHeader';
+import { Button, Spinner } from './ui';
 
 interface Props {
   active: boolean;
@@ -19,6 +21,7 @@ export function GraphView({ active }: Props) {
   const [enabledTypes, setEnabledTypes] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState({ total: 0, visible: 0, edges: 0 });
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [graphReady, setGraphReady] = useState(false);
 
   const colors = vizConfig?.nodeColors;
@@ -37,13 +40,15 @@ export function GraphView({ active }: Props) {
   useEffect(() => {
     if (!active) return;
     setLoadError(null);
+    setLoading(true);
     Promise.all([api.getGraph(), api.getVizConfig()])
       .then(([graphBundle, viz]) => {
         setBundle(graphBundle);
         setVizConfig(viz);
         setEnabledTypes(new Set(Object.keys(graphBundle.loadStatus.nodeTypes)));
       })
-      .catch((err) => setLoadError(err instanceof Error ? err.message : 'load_failed'));
+      .catch((err) => setLoadError(err instanceof Error ? err.message : 'load_failed'))
+      .finally(() => setLoading(false));
   }, [active]);
 
   useEffect(() => {
@@ -90,14 +95,18 @@ export function GraphView({ active }: Props) {
 
   return (
     <div className="graph-view">
+      <PageHeader title={t('graph.title')} description={t('graph.page_desc')} />
+
       {loadError && (
         <div className="status-banner warn">{t('errors.load_graph')}: {loadError}</div>
       )}
 
+      {loading && <Spinner />}
+
       <div className="graph-layout">
         <aside className="graph-sidebar">
           <h3>{t('graph.filters')}</h3>
-          <select value={viewMode} onChange={(e) => setViewMode(e.target.value)} className="graph-select">
+          <select value={viewMode} onChange={(e) => setViewMode(e.target.value)} className="graph-select" aria-label={t('graph.filters')}>
             <option value="all">{t('graph.view_all')}</option>
             <option value="materials">{t('graph.view_materials')}</option>
             <option value="properties">{t('graph.view_properties')}</option>
@@ -160,9 +169,9 @@ export function GraphView({ active }: Props) {
                 ? t('graph.empty_graph')
                 : t('graph.loaded_from', { count: loadStatus.nodeCount, path: shortPath })}
               {loadStatus.warnings?.includes('missing_wow_files') && (
-                <button type="button" className="btn-secondary btn-inline" onClick={() => api.runStage('metrics')}>
+                <Button variant="secondary" className="btn-inline" onClick={() => api.runStage('metrics')}>
                   {t('graph.run_metrics')}
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -173,6 +182,7 @@ export function GraphView({ active }: Props) {
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('graph.search_placeholder')}
               className="graph-search"
+              aria-label={t('graph.search_placeholder')}
             />
             <span className="graph-stats">
               {t('graph.stats', { visible: stats.visible, total: stats.total, edges: stats.edges })}

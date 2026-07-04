@@ -66,6 +66,9 @@ viz/logs/*
 web/runtime/jobs/*
 web/runtime/sessions/*
 web/runtime/feynman-sessions/
+web/runtime/feynman-turn-sessions/
+web/runtime/feynman-accelmat-logs/*
+!web/runtime/feynman-accelmat-logs/.gitkeep
 !web/runtime/jobs/.gitkeep
 !web/runtime/sessions/.gitkeep
 

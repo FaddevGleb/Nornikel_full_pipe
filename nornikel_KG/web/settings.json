@@ -42,6 +42,12 @@
     "idleTimeoutMs": 900000,
     "model": "yandex-ai-studio/gpt://b1ggusvist6c2sia1dno/qwen3-235b-a22b-fp8/latest"
   },
+  "feynmanEnrichment": {
+    "enabledByDefault": false,
+    "timeoutMs": 900000,
+    "maxSearchesPerHypothesis": 2,
+    "autoRerunOnReject": true
+  },
   "security": {
     "apiKey": ""
   },

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 24" aria-hidden="true">
+  <defs>
+    <linearGradient id="lenta-grad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#0077C8"/>
+      <stop offset="100%" stop-color="#004C97"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#lenta-grad)" d="M0 12c20-8 40 8 60 0s40-8 60 0v4c-20 8-40-8-60 0S20 24 0 16v-4z" opacity="0.85"/>
+</svg>

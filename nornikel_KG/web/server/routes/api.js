@@ -329,15 +329,24 @@ router.get('/accelmat/results/:slug', async (req, res, next) => {
 
 router.post('/accelmat/run', accelmatRunLimiter, async (req, res, next) => {
   try {
-    const { goal, constraints, graphPath, maxRefinementIterations, numHypotheses } = req.body ?? {};
+    const { goal, constraints, graphPath, maxRefinementIterations, numHypotheses, feynmanEnrichment } = req.body ?? {};
     if (!goal || !graphPath) {
       res.status(400).json({ error: 'goal and graphPath are required' });
       return;
     }
     const slug = sanitizeSlug(req.body?.slug || goal.slice(0, 40));
+    const enrichmentDefault = configManager.settings?.feynmanEnrichment?.enabledByDefault ?? false;
     const job = jobQueue.createJob({
       type: 'accelmat',
-      payload: { slug, goal, constraints: constraints ?? [], graphPath, maxRefinementIterations, numHypotheses },
+      payload: {
+        slug,
+        goal,
+        constraints: constraints ?? [],
+        graphPath,
+        maxRefinementIterations,
+        numHypotheses,
+        feynmanEnrichment: feynmanEnrichment ?? enrichmentDefault,
+      },
     });
     await auditLog.record('accelmat_started', {
       jobId: job.id,

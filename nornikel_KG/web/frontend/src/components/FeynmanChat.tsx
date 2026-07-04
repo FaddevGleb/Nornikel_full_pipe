@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PageHeader } from './PageHeader';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -47,6 +48,14 @@ function sortedSuggestionKeys(result: AccelmatResult): string[] {
   const keys = Object.keys(result.hypotheses ?? {});
   const scores = result.evaluation?.scores ?? {};
   return keys.slice().sort((a, b) => (scores[b] ?? 0) - (scores[a] ?? 0));
+}
+
+function feynmanVerdictForSuggestion(result: AccelmatResult, suggestionKey: string): string | null {
+  const match = suggestionKey.match(/Suggestion_(\d+)/i);
+  if (!match || !result.feynman_enrichment?.critic) return null;
+  const entry = result.feynman_enrichment.critic[`Feedback_for_suggestion_${match[1]}`];
+  if (!entry || typeof entry !== 'object') return null;
+  return entry.Meets_the_goal_statement_and_satisfies_all_constraints_strictly ?? null;
 }
 
 function ThinkingDots() {
@@ -270,7 +279,9 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
   const sidebarDisabled = connecting || isStreaming || !latestResult;
 
   return (
-    <div className="feynman-layout">
+    <>
+      <PageHeader title={t('chat.title')} description={t('chat.page_desc')} />
+      <div className="feynman-layout">
       <aside className="feynman-sidebar">
         <h3>{t('chat.latest_run')}</h3>
         {loadingResult && <p className="hint">{t('common.loading')}</p>}
@@ -294,10 +305,16 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
               {hypothesisKeys.map((key) => {
                 const hypothesis = latestResult.hypotheses[key];
                 const score = latestResult.evaluation?.scores?.[key];
+                const feynmanVerdict = feynmanVerdictForSuggestion(latestResult, key);
                 return (
                   <li key={key}>
                     <button type="button" onClick={() => discussHypothesis(key)} disabled={sidebarDisabled}>
                       <span className="feynman-hypothesis-score">{score ?? '—'}/10</span>
+                      {feynmanVerdict && (
+                        <span className={`feynman-hypothesis-feynman feynman-hypothesis-feynman--${feynmanVerdict === 'YES' ? 'yes' : 'no'}`}>
+                          F:{feynmanVerdict}
+                        </span>
+                      )}
                       <span className="feynman-hypothesis-name">{hypothesis.Materials}</span>
                     </button>
                   </li>
@@ -364,5 +381,6 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
         </div>
       </div>
     </div>
+    </>
   );
 }

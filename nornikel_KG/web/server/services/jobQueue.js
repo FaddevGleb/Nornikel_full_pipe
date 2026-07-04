@@ -6,7 +6,15 @@ import { configManager } from './configManager.js';
 import { PipelineRunner, STAGE_LABELS } from './pipelineRunner.js';
 import { runOfflineDiagnostics } from './diagnosticsService.js';
 import { stateStore } from './stateStore.js';
-import { writeRequest as writeAccelmatRequest, runAccelmat, readResult as readAccelmatResult } from './accelmatRunner.js';
+import {
+  writeRequest as writeAccelmatRequest,
+  runAccelmat,
+  readResult as readAccelmatResult,
+  writeResult as writeAccelmatResult,
+} from './accelmatRunner.js';
+import { enrichAccelmatResult } from './feynmanEnrichment.js';
+import { getFeynmanEnrichmentSettings } from './feynmanShared.js';
+import { createAccelmatFeynmanLogger, getFeynmanAccelmatLogPath } from './feynmanAccelmatLogger.js';
 
 const JOBS_DIR = path.join(configManager.getWebRoot(), 'runtime', 'jobs');
 const CHECKPOINTS_DIR = path.join(configManager.getWebRoot(), 'runtime', 'checkpoints');
@@ -246,12 +254,21 @@ export class JobQueue extends EventEmitter {
   }
 
   async runAccelmatJob(job) {
-    const { slug, graphPath, goal, constraints, maxRefinementIterations, numHypotheses } = job.payload ?? {};
+    const {
+      slug,
+      graphPath,
+      goal,
+      constraints,
+      maxRefinementIterations,
+      numHypotheses,
+      feynmanEnrichment,
+    } = job.payload ?? {};
     if (!slug) {
       throw new Error('accelmat job payload is missing "slug"');
     }
 
     job.progress = 5;
+    job.stage = 'accelmat';
     this.appendLog(job, { level: 'info', message: `Writing ACCELMAT request for slug "${slug}"` });
     await writeAccelmatRequest(slug, { graphPath, goal, constraints, maxRefinementIterations, numHypotheses });
     await this.persistJob(job);
@@ -260,9 +277,102 @@ export class JobQueue extends EventEmitter {
     await this.persistJob(job);
     await runAccelmat(slug, (entry) => this.appendLog(job, entry));
 
-    job.progress = 95;
+    job.progress = 50;
     this.appendLog(job, { level: 'info', message: 'ACCELMAT run finished, reading result JSON' });
-    job.result = await readAccelmatResult(slug);
+    let result = await readAccelmatResult(slug);
+
+    const enrichmentSettings = getFeynmanEnrichmentSettings();
+    const shouldEnrich = feynmanEnrichment === true;
+
+    if (!shouldEnrich) {
+      this.appendLog(job, {
+        level: 'info',
+        stage: 'accelmat',
+        message: 'Feynman enrichment skipped (checkbox off)',
+      });
+    }
+
+    if (shouldEnrich) {
+      job.stage = 'feynman_critic';
+      job.progress = 60;
+      await this.persistJob(job);
+      const feynmanLog = createAccelmatFeynmanLogger(slug, (entry) => this.appendLog(job, entry));
+      feynmanLog({
+        level: 'info',
+        stage: 'feynman_critic',
+        message: `Feynman enrichment enabled — log file: ${getFeynmanAccelmatLogPath(slug)}`,
+      });
+      result = await enrichAccelmatResult(result, {
+        slug,
+        sessionId: `accelmat-${slug}`,
+        onLog: feynmanLog,
+      });
+      await writeAccelmatResult(slug, result);
+      feynmanLog({
+        level: 'info',
+        stage: 'feynman_critic',
+        message: `Enrichment saved to output/hypotheses_${slug}.json`,
+        meta: { verdict: result.feynman_enrichment?.verdict },
+      });
+
+      const autoRerun = enrichmentSettings.autoRerunOnReject !== false;
+      if (
+        autoRerun
+        && result.feynman_enrichment?.verdict === 'NO'
+        && !job.payload._isRerun
+      ) {
+        const rerunSlug = `${slug}-r1`;
+        const firstPassEnrichment = result.feynman_enrichment;
+        const feedback = firstPassEnrichment.critic
+          ?.Overall_Feedback_for_improvement_for_future_suggestion_generation ?? '';
+        const augmentedGoal = `${result.goal}\n\nLiterature-backed critic feedback (Feynman+web_search):\n${feedback}`;
+
+        job.stage = 'accelmat_rerun';
+        job.progress = 75;
+        this.appendLog(job, {
+          level: 'info',
+          stage: 'accelmat_rerun',
+          message: `Feynman critic returned NO — re-running ACCELMAT as "${rerunSlug}" with feedback in goal`,
+          meta: { parentSlug: slug, rerunSlug, feedbackPreview: feedback.slice(0, 200) },
+        });
+        await this.persistJob(job);
+
+        await writeAccelmatRequest(rerunSlug, {
+          graphPath,
+          goal: augmentedGoal,
+          constraints,
+          maxRefinementIterations,
+          numHypotheses,
+        });
+        await runAccelmat(rerunSlug, (entry) => this.appendLog(job, entry));
+        result = await readAccelmatResult(rerunSlug);
+        result.feynman_enrichment = firstPassEnrichment;
+        result.metadata = {
+          ...(result.metadata ?? {}),
+          feynman_enriched: true,
+          feynman_rerun_slug: rerunSlug,
+          feynman_parent_slug: slug,
+        };
+        await writeAccelmatResult(rerunSlug, result);
+        job.payload._rerunSlug = rerunSlug;
+        this.appendLog(job, {
+          level: 'info',
+          stage: 'accelmat_rerun',
+          message: `Re-run complete — final result: output/hypotheses_${rerunSlug}.json (Feynman verdict preserved from first pass)`,
+          meta: { feynmanVerdict: firstPassEnrichment.verdict },
+        });
+      }
+    }
+
+    job.progress = 95;
+    if (shouldEnrich && result.feynman_enrichment) {
+      this.appendLog(job, {
+        level: 'info',
+        stage: job.stage ?? 'accelmat',
+        message: `[Summary] Feynman verdict=${result.feynman_enrichment.verdict}, web_searches=${result.feynman_enrichment.tool_calls?.length ?? 0}${job.payload._rerunSlug ? `, rerun=${job.payload._rerunSlug}` : ''}`,
+      });
+    }
+    job.result = result;
     await this.persistJob(job);
   }
 }

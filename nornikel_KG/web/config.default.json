@@ -37,6 +37,12 @@
     "cwd": "..",
     "idleTimeoutMs": 900000
   },
+  "feynmanEnrichment": {
+    "enabledByDefault": false,
+    "timeoutMs": 900000,
+    "maxSearchesPerHypothesis": 2,
+    "autoRerunOnReject": true
+  },
   "security": {
     "apiKey": ""
   },

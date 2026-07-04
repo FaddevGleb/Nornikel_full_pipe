@@ -57,7 +57,7 @@ export interface Job {
   status: string;
   stage: string | null;
   progress: number;
-  logs: { message: string; timestamp: string }[];
+  logs: { message: string; timestamp: string; level?: string; stage?: string; meta?: Record<string, unknown> }[];
   createdAt?: string;
   error?: string;
   diagnosticsReportPath?: string;
@@ -70,6 +70,22 @@ export interface AccelmatHypothesis {
   Reasoning: string;
 }
 
+export interface FeynmanCriticFeedback {
+  Meets_the_goal_statement_and_satisfies_all_constraints_strictly?: string;
+  Reasoning?: string;
+  web_sources?: string[];
+}
+
+export interface FeynmanEnrichment {
+  verdict: 'YES' | 'NO';
+  critic: Record<string, FeynmanCriticFeedback | string | undefined> & {
+    Overall_Feedback_for_improvement_for_future_suggestion_generation?: string;
+  };
+  tool_calls?: { tool: string; query?: string }[];
+  model?: string;
+  completed_at?: string;
+}
+
 export interface AccelmatResult {
   goal: string;
   constraints: string[];
@@ -80,12 +96,16 @@ export interface AccelmatResult {
     summary: string;
     evaluation_model?: string;
   };
+  feynman_enrichment?: FeynmanEnrichment;
   metadata: {
     graph_path: string;
     triplet_count: number;
     refinement_iterations: number;
     critics_approved: boolean;
     kg_context_empty: boolean;
+    feynman_enriched?: boolean;
+    feynman_rerun_slug?: string;
+    feynman_parent_slug?: string;
   };
 }
 
@@ -96,6 +116,7 @@ export interface AccelmatRunRequest {
   maxRefinementIterations?: number;
   numHypotheses?: number;
   slug?: string;
+  feynmanEnrichment?: boolean;
 }
 
 export interface AccelmatResultSummary {
@@ -230,7 +251,7 @@ export const api = {
     return response.blob();
   },
 
-  getAccelmatDefaults: () => request<{ defaults: { maxRefinementIterations: number; numHypotheses: number } }>('/accelmat/defaults'),
+  getAccelmatDefaults: () => request<{ defaults: { maxRefinementIterations: number; numHypotheses: number; feynmanEnrichment?: boolean } }>('/accelmat/defaults'),
   listAccelmatGraphs: () => request<{ graphs: string[] }>('/accelmat/graphs'),
   listAccelmatResults: () => request<{ results: AccelmatResultSummary[] }>('/accelmat/results'),
   getAccelmatResult: (slug: string) => request<{ result: AccelmatResult }>(`/accelmat/results/${encodeURIComponent(slug)}`),
@@ -280,7 +301,7 @@ export function subscribeFeynmanSession(conversationId: string, handlers: {
 
 export function subscribeJob(jobId: string, handlers: {
   onUpdate: (job: Job) => void;
-  onLog: (entry: { message: string }) => void;
+  onLog: (entry: { message: string; level?: string; stage?: string; meta?: Record<string, unknown> }) => void;
 }): () => void {
   const source = new EventSource(`/api/jobs/${jobId}/stream`);
   source.addEventListener('snapshot', (e) => handlers.onUpdate(JSON.parse(e.data)));

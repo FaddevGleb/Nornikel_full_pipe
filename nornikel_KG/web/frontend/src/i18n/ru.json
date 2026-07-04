@@ -1,11 +1,22 @@
 {
+  "brand": {
+    "title": "Норникель — Граф знаний материалов",
+    "footer": "© ПАО «ГМК Норильский Никель»"
+  },
   "nav": {
+    "main": "Основная навигация",
+    "toggle_menu": "Открыть меню",
+    "group_workspace": "Рабочее место",
+    "group_data": "Данные",
+    "group_analytics": "Аналитика",
+    "group_system": "Система",
+    "group_actions": "Действия",
     "dashboard": "Панель управления",
     "pipeline": "Конвейер",
     "graph": "Граф знаний",
     "hypotheses": "Генератор гипотез KPI",
     "accelmat": "Гипотезы ACCELMAT",
-    "feynman": "Feynman",
+    "feynman": "Ассистент Feynman",
     "diagnostics": "Диагностика",
     "settings": "Настройки",
     "audit": "Журнал аудита"
@@ -16,6 +27,7 @@
     "online_short": "Онлайн",
     "offline_short": "Оффлайн",
     "local_model": "Локальная модель",
+    "switch_label": "Режим работы",
     "switch_online": "Переключить в онлайн-режим",
     "switch_offline": "Переключить в оффлайн-режим",
     "regeneration_warning": "Артефакты были созданы в другом режиме. Рекомендуется перестроить граф для согласованности.",
@@ -24,6 +36,7 @@
   "dashboard": {
     "title": "Граф знаний материалов",
     "subtitle": "Синтез · Структура · Свойства",
+    "page_desc": "Загрузка корпуса, сводные показатели и режим интеграции новых документов.",
     "kpi_mode": "Режим работы",
     "kpi_files": "Файлы корпуса",
     "kpi_nodes": "Узлы графа",
@@ -47,7 +60,22 @@
   },
   "pipeline": {
     "title": "Конвейер построения графа",
+    "page_desc": "Пошаговое построение графа знаний из загруженного корпуса.",
     "run_full": "Запустить полный конвейер",
+    "run_stage": "Запустить этап",
+    "confirm_full_title": "Запустить полный конвейер?",
+    "confirm_full_body": "Будут очищены промежуточные каталоги и граф построится заново. Продолжить?",
+    "confirm_stage_title": "Запустить этап «{{stage}}»?",
+    "confirm_stage_body": "Этап конвейера будет выполнен. При полном пересчёте данные могут быть перезаписаны.",
+    "status": {
+      "queued": "В очереди",
+      "running": "Выполняется",
+      "paused": "На паузе",
+      "completed": "Завершено",
+      "failed": "Ошибка",
+      "cancelled": "Отменено",
+      "interrupted": "Прервано"
+    },
     "pause": "Пауза",
     "cancel": "Отмена",
     "resume": "Возобновить",
@@ -71,6 +99,8 @@
     "new_hint": "Перед запуском будут очищены каталоги staging и out — граф построится с нуля"
   },
   "graph": {
+    "title": "Обозреватель графа",
+    "page_desc": "Интерактивная визуализация узлов, связей и метрик графа знаний.",
     "tab_interactive": "Интерактивный обозреватель",
     "tab_detailed": "Табличный просмотр",
     "tab_html": "HTML-визуализация",
@@ -89,7 +119,7 @@
     "empty_graph": "Граф пуст — запустите расчёт метрик",
     "fallback_test": "Используются тестовые данные",
     "fallback_in": "Загружен граф из viz/data/in (метрики не рассчитаны)",
-    "run_metrics": "Запустить graph2metrics",
+    "run_metrics": "Запустить расчёт метрик",
     "no_chunks": "Панель последовательности курса скрыта (нет узлов Chunk)",
     "filters": "Фильтры типов",
     "edge_legend": "Типы связей",
@@ -103,6 +133,7 @@
   },
   "diagnostics": {
     "title": "Диагностика графа",
+    "page_desc": "Проверка файлов, схемы данных и готовности графа к отображению.",
     "description": "Проверяет наличие файлов, схему данных, целостность рёбер и возможность отрисовки графа.",
     "run": "Запустить диагностику",
     "run_failed": "Не удалось выполнить диагностику",
@@ -139,6 +170,7 @@
   },
   "hypotheses": {
     "title": "Генератор гипотез по KPI",
+    "page_desc": "Поиск гипотез по целевым свойствам на основе графа знаний.",
     "generate": "Сгенерировать гипотезы",
     "export_md": "Экспорт Markdown",
     "export_pdf": "Экспорт PDF",
@@ -150,7 +182,7 @@
     "experiments": "Предлагаемый эксперимент",
     "related": "Связанные концепты",
     "empty": "Нет гипотез по заданным параметрам",
-    "export_title": "Отчёт по гипотезам KPI K2-18",
+    "export_title": "Отчёт по гипотезам KPI — Норникель",
     "export_generated": "Создан",
     "export_category": "Категория",
     "export_summary": "Резюме",
@@ -158,7 +190,8 @@
     "export_experiments_label": "Предлагаемые эксперименты"
   },
   "accelmat": {
-    "title": "Гипотезы ACCELMAT (LLM-пайплайн)",
+    "title": "Гипотезы ACCELMAT",
+    "page_desc": "LLM-пайплайн генерации материаловедческих гипотез по цели и ограничениям.",
     "goal": "Цель",
     "constraints": "Ограничения",
     "add_constraint": "Добавить ограничение",
@@ -177,17 +210,26 @@
     "kg_context": "Контекст из графа знаний",
     "expand": "Развернуть",
     "collapse": "Свернуть",
-    "discuss": "Обсудить с Feynman"
+    "discuss": "Обсудить с ассистентом",
+    "feynman_enrichment": "Feynman critic + web search (после ACCELMAT)",
+    "feynman_verdict": "Feynman",
+    "literature_review": "Обзор литературы",
+    "rerun_note": "Перезапущено с feedback Feynman ({{slug}})",
+    "stage_accelmat": "ACCELMAT",
+    "stage_feynman_critic": "Feynman critic + web search",
+    "stage_accelmat_rerun": "Повторный прогон ACCELMAT",
+    "log_file_hint": "Лог Feynman: web/runtime/feynman-accelmat-logs/{{slug}}.log"
   },
   "chat": {
-    "title": "Feynman",
+    "title": "Ассистент Feynman",
+    "page_desc": "Диалог о гипотезах ACCELMAT и структуре графа знаний.",
     "new_chat": "Новый чат",
-    "connecting": "Подключение к Feynman…",
+    "connecting": "Подключение к ассистенту…",
     "status_ready": "Готов",
     "status_thinking": "Печатает…",
     "status_error": "Ошибка соединения",
     "empty": "Задайте вопрос о гипотезах ACCELMAT или о графе знаний",
-    "placeholder": "Спросите Feynman… (Enter — отправить, Shift+Enter — новая строка)",
+    "placeholder": "Спросите ассистента… (Enter — отправить, Shift+Enter — новая строка)",
     "send": "Отправить",
     "latest_run": "Последний запуск ACCELMAT",
     "no_runs": "Гипотезы ещё не сгенерированы",
@@ -196,9 +238,11 @@
   },
   "audit": {
     "title": "Журнал аудита",
+    "page_desc": "История действий пользователей и системных событий.",
     "time": "Время",
     "event": "Событие",
-    "details": "Детали"
+    "details": "Детали",
+    "empty": "Записей аудита пока нет"
   },
   "ontology": {
     "node_types": {
@@ -236,7 +280,7 @@
     }
   },
   "metrics": {
-    "pagerank": "PageRank",
+    "pagerank": "Ранг значимости (PageRank)",
     "betweenness": "Центральность по посредничеству",
     "prerequisite_depth": "Глубина предпосылок",
     "learning_effort": "Учебное усилие",
@@ -255,7 +299,9 @@
     "loading": "Загрузка…",
     "save": "Сохранить",
     "close": "Закрыть",
-    "command_palette": "Командная палитра",
-    "search_commands": "Введите команду или поиск…"
+    "confirm": "Подтвердить",
+    "command_palette": "Командная палитра (Ctrl+K)",
+    "search_commands": "Введите команду или поиск…",
+    "no_commands": "Команды не найдены"
   }
 }
