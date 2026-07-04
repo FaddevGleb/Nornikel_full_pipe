@@ -33,15 +33,15 @@ class GraphCore {
             maxOpacity: 1.0,
             // Animation
             animationDuration: 500,
-            layoutAnimationDuration: 3000,
-            physicsDuration: 3000,
+            layoutAnimationDuration: 0,
+            physicsDuration: 0,
             // Layout
             initialLayout: 'cose-bilkent',
             // Labels
             showLabelsOnHover: true,
             hoverDelay: 500,
             // Animation on load
-            animateOnLoad: true
+            animateOnLoad: false
         };
         return { ...defaults, ...userConfig };
     }
@@ -103,17 +103,22 @@ class GraphCore {
                 nodeAnimDuration: 500,
                 edgeAnimDuration: 500,
                 physicsDuration: this.config.physicsDuration,
-                animateOnLoad: this.config.animateOnLoad
+                animateOnLoad: this.config.animateOnLoad,
             });
             
             // Run animation if enabled
-            if (this.config.animateOnLoad) {
+            if (this.config.animateOnLoad && this.config.physicsDuration > 0) {
                 await this.animationController.animateGraph();
+            } else {
+                this.cy.nodes().style('opacity', 1);
+                this.cy.edges().style('opacity', 0.6);
             }
         } else if (this.config.animateOnLoad) {
             // Fallback to simple animation if controller not available
             await this.animateAppearance();
         }
+
+        this.cy.nodes().lock();
 
         return this.cy;
     }
@@ -340,8 +345,7 @@ class GraphCore {
         if (layoutName === 'cose-bilkent') {
             return {
                 name: 'cose-bilkent',
-                animate: 'end',
-                animationDuration: this.config.layoutAnimationDuration,
+                animate: false,
                 randomize: false,               // Используем наши начальные позиции из широкой полосы
                 nodeRepulsion: 15000,
                 idealEdgeLength: 300,
@@ -361,8 +365,8 @@ class GraphCore {
         // Fallback to grid layout
         return {
             name: 'grid',
-            animate: true,
-            animationDuration: this.config.animationDuration
+            animate: false,
+            animationDuration: 0
         };
     }
 

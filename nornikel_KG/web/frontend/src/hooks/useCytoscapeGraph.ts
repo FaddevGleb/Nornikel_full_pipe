@@ -2,6 +2,7 @@ import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import { useEffect, useRef, useCallback } from 'react';
 import type { GraphBundle, GraphNode } from '../api/client';
+import { edgeTypeLabel } from '../utils/ontologyLabels';
 
 cytoscape.use(coseBilkent);
 
@@ -19,6 +20,11 @@ const DEFAULT_COLORS: Record<string, string> = {
   Concept: '#2ecc71',
   Chunk: '#3498db',
   Assessment: '#f39c12',
+  Equipment: '#7f8c8d',
+  BusinessMetric: '#16a085',
+  Constraint: '#d35400',
+  InternalExperiment: '#9b59b6',
+  HypothesisRecord: '#e84393',
   default: '#7f8c8d',
 };
 
@@ -31,6 +37,12 @@ const EDGE_STYLES: Record<string, { color: string; dashed: boolean }> = {
   APPLIED_IN: { color: '#1abc9c', dashed: true },
   PREREQUISITE: { color: '#3498db', dashed: true },
   RELATED_TO: { color: '#64748b', dashed: true },
+  USES_FEEDSTOCK: { color: '#e67e22', dashed: true },
+  REQUIRES_EQUIPMENT: { color: '#95a5a6', dashed: true },
+  IMPACTS_COST: { color: '#16a085', dashed: false },
+  HAS_REGULATION: { color: '#d35400', dashed: true },
+  SUBSTITUTE_FOR: { color: '#9b59b6', dashed: true },
+  ANALOGOUS_TO: { color: '#8e7cc3', dashed: true },
   default: { color: '#64748b', dashed: false },
 };
 
@@ -138,8 +150,9 @@ function buildElements(bundle: GraphBundle, lodMax: number) {
           id: edge.id ?? `e_${index}`,
           source: edge.source ?? edge.from,
           target: edge.target ?? edge.to,
-          label: edgeType,
+          label: edgeTypeLabel(edgeType),
           edgeType,
+          edgeTypeRaw: edgeType,
           weight: edge.weight ?? edge.attributes?.confidence_score ?? 0.5,
         },
       };
@@ -155,6 +168,8 @@ export function useCytoscapeGraph(
 ) {
   const cyRef = useRef<cytoscape.Core | null>(null);
   const onSelectRef = useRef<(node: GraphNode | null) => void>(() => {});
+  const colorsRef = useRef(colors);
+  colorsRef.current = colors;
 
   const destroy = useCallback(() => {
     if (cyRef.current) {
@@ -174,12 +189,20 @@ export function useCytoscapeGraph(
       cyRef.current = cytoscape({
         container: containerRef.current,
         elements,
-        style: buildStyles(colors),
-        layout: { name: 'cose-bilkent', animate: false, randomize: true, nodeRepulsion: 8000 },
+        style: buildStyles(colorsRef.current),
+        layout: {
+          name: 'cose-bilkent',
+          animate: false,
+          randomize: false,
+          nodeRepulsion: 8000,
+          numIter: 1500,
+        },
         wheelSensitivity: 0.2,
         minZoom: 0.08,
         maxZoom: 4,
       });
+
+      cyRef.current.nodes().lock();
 
       cyRef.current.on('tap', 'node', (evt) => {
         onSelectRef.current(evt.target.data('raw') as GraphNode);
@@ -192,8 +215,13 @@ export function useCytoscapeGraph(
       requestAnimationFrame(() => requestAnimationFrame(fitGraph));
       return true;
     },
-    [colors, containerRef, destroy, lodMax],
+    [containerRef, destroy, lodMax],
   );
+
+  const updateStyles = useCallback(() => {
+    if (!cyRef.current) return;
+    cyRef.current.style(buildStyles(colorsRef.current));
+  }, []);
 
   const resizeAndFit = useCallback(() => {
     if (!cyRef.current) return;
@@ -208,7 +236,6 @@ export function useCytoscapeGraph(
     if (!cy) return;
     cy.elements().removeClass('hidden dimmed highlighted');
     if (mode === 'all') {
-      cy.fit(undefined, 80);
       return;
     }
     const showTypes: Record<string, Set<string>> = {
@@ -226,7 +253,6 @@ export function useCytoscapeGraph(
         edge.addClass('hidden');
       }
     });
-    cy.fit(cy.elements(':visible'), 80);
   }, []);
 
   const applyTypeFilter = useCallback((enabled: Set<string>) => {
@@ -271,7 +297,17 @@ export function useCytoscapeGraph(
     };
   }, []);
 
-  return { initGraph, resizeAndFit, applyViewMode, applyTypeFilter, search, setOnSelect, getStats, destroy };
+  return {
+    initGraph,
+    updateStyles,
+    resizeAndFit,
+    applyViewMode,
+    applyTypeFilter,
+    search,
+    setOnSelect,
+    getStats,
+    destroy,
+  };
 }
 
 export { DEFAULT_COLORS, EDGE_STYLES };
