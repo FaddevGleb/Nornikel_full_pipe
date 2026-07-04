@@ -1,0 +1,864 @@
+{
+  "activeJobId": "012a2e05-3735-482b-9b4a-52a211c28d54",
+  "lastPipelineStage": "metrics",
+  "selectedGraphPath": null,
+  "lastDiagnosticsReportId": "C:\\NORNIKEL3\\k2-18\\viz\\logs\\offline_diagnostics_2026-07-02T15-41-38-015Z.json",
+  "lastAuditReportPath": null,
+  "mode": "online",
+  "provider": "openrouter",
+  "hypothesesCache": [
+    {
+      "id": "hyp_kpi_target_gap_mat_Ti_Ta_Coating",
+      "title": "KPI gap for Ti-Ta Coating",
+      "category": "kpi_target_gap",
+      "confidence": 0.66,
+      "summary": "Ti-Ta Coating has 3 property links but no KPI_Target connections.",
+      "reasoning": [
+        "Structure-property-KPI chains are incomplete for optimization targeting.",
+        "Missing KPI_Target edges limit measurable performance hypotheses."
+      ],
+      "evidence": [
+        {
+          "edgeType": "IMPROVES",
+          "source": "Ti-Ta Coating",
+          "target": "Young's Modulus",
+          "sourceId": "mat_Ti_Ta_Coating",
+          "targetId": "prop_Youngs_Modulus",
+          "quote": "получить модуль упругости, сопоставимый с костной тканью человека",
+          "confidence": 0.91,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "IMPROVES",
+          "source": "Ti-Ta Coating",
+          "target": "Nanohardness",
+          "sourceId": "mat_Ti_Ta_Coating",
+          "targetId": "prop_Nanohardness",
+          "quote": "покрытия системы Ti-Ta, свойства которых ... нанотвердость, модуль упругости",
+          "confidence": 0.84,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "IMPROVES",
+          "source": "Ti-Ta Coating",
+          "target": "Bioinertness",
+          "sourceId": "mat_Ti_Ta_Coating",
+          "targetId": "prop_Bioinertness",
+          "quote": "биоинертные покрытия системы Ti-Ta",
+          "confidence": 0.93,
+          "weight": 0.5
+        }
+      ],
+      "suggestedExperiments": [
+        "Define KPI_Target nodes for key performance metrics of Ti-Ta Coating.",
+        "Link synthesis parameters to KPI outcomes through property intermediates."
+      ],
+      "relatedNodes": [
+        "mat_Ti_Ta_Coating",
+        "prop_Youngs_Modulus",
+        "prop_Nanohardness",
+        "prop_Bioinertness"
+      ],
+      "subgraph": {
+        "nodes": [
+          {
+            "id": "prop_Youngs_Modulus",
+            "type": "Property",
+            "text": "Young's Modulus",
+            "node_offset": 540,
+            "definition": "Механическая характеристика жёсткости материала, определяемая как отношение нормального напряжения к соответствующей деформации в упругой области. Регулирование модуля упругости в ячеистых структурах важно для создания имплантатов с требуемой жёсткостью.",
+            "degree_in": 2,
+            "degree_out": 2,
+            "degree_centrality": 0.012195121951219513,
+            "pagerank": 0.002488212649775599,
+            "betweenness_centrality": 0.00003729395092116059,
+            "ontological_pagerank": 0.002822420702288441,
+            "synthesis_diversity": 0,
+            "property_coverage": 2,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 3,
+            "bridge_score": 0.00002610576564481241,
+            "concepts": [
+              "char_Compression_Testing_ISO13314",
+              "char_FEM",
+              "mat_Ti-6Al-4V",
+              "mat_Ti_Ta_Coating"
+            ]
+          },
+          {
+            "id": "mat_Ti_Ta_Coating",
+            "type": "Material",
+            "text": "Ti-Ta Coating",
+            "node_offset": 1350,
+            "definition": "Биоинертное покрытие на основе β-фазного сплава титана и тантала, наносимое электровзрывным напылением, отличающееся низким модулем упругости и наноструктурированной поверхностью; предназначено для улучшения остеоинтеграции титановых имплантатов.",
+            "degree_in": 0,
+            "degree_out": 6,
+            "degree_centrality": 0.01829268292682927,
+            "pagerank": 0.0018968927880606903,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0021518836984296278,
+            "synthesis_diversity": 0,
+            "property_coverage": 3,
+            "application_breadth": 1,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 3,
+            "bridge_score": 0,
+            "concepts": [
+              "synth_Electroexplosive_Spraying",
+              "prop_Youngs_Modulus",
+              "app_Medical_Implants",
+              "prop_Nanohardness",
+              "prop_Bioinertness",
+              "mat_Beta_Ti_Alloys"
+            ]
+          },
+          {
+            "id": "prop_Nanohardness",
+            "type": "Property",
+            "text": "Nanohardness",
+            "node_offset": 1520,
+            "definition": "Твёрдость материала, измеренная на нанометровом масштабе (часто методом индентирования), отражающая локальные механические свойства поверхностных слоёв, покрытий и наноструктурированных материалов.",
+            "degree_in": 1,
+            "degree_out": 0,
+            "degree_centrality": 0.003048780487804878,
+            "pagerank": 0.002165674543385649,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.002456673245638179,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 3,
+            "bridge_score": 0,
+            "concepts": [
+              "mat_Ti_Ta_Coating"
+            ]
+          },
+          {
+            "id": "prop_Bioinertness",
+            "type": "Property",
+            "text": "Bioinertness",
+            "node_offset": 1470,
+            "definition": "Свойство материала не вызывать отторжения или токсических реакций в биологической среде; биоинертные покрытия (например, Ti-Ta) минимизируют воспалительные процессы и способствуют интеграции имплантата.",
+            "degree_in": 1,
+            "degree_out": 0,
+            "degree_centrality": 0.003048780487804878,
+            "pagerank": 0.002165674543385649,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.002456673245638179,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 3,
+            "bridge_score": 0,
+            "concepts": [
+              "mat_Ti_Ta_Coating"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "mat_Ti_Ta_Coating",
+            "target": "prop_Youngs_Modulus",
+            "type": "IMPROVES",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.91,
+              "evidence_quote": "получить модуль упругости, сопоставимый с костной тканью человека",
+              "source_doi": "new_textets.txt",
+              "co_occurrence_count": 1,
+              "relation_role": "causal",
+              "magnitude": "low",
+              "direction": "positive"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          },
+          {
+            "source": "mat_Ti_Ta_Coating",
+            "target": "prop_Nanohardness",
+            "type": "IMPROVES",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.84,
+              "evidence_quote": "покрытия системы Ti-Ta, свойства которых ... нанотвердость, модуль упругости",
+              "source_doi": "new_textets.txt",
+              "co_occurrence_count": 1,
+              "relation_role": "causal",
+              "direction": "positive"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          },
+          {
+            "source": "mat_Ti_Ta_Coating",
+            "target": "prop_Bioinertness",
+            "type": "IMPROVES",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.93,
+              "evidence_quote": "биоинертные покрытия системы Ti-Ta",
+              "source_doi": "new_textets.txt",
+              "co_occurrence_count": 1,
+              "relation_role": "causal",
+              "direction": "positive"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          }
+        ]
+      },
+      "relatedConcepts": [
+        "Ti-Ta Coating",
+        "Young's Modulus",
+        "Nanohardness",
+        "Bioinertness"
+      ]
+    },
+    {
+      "id": "hyp_ssp_chain_synth_Gas_Atomization_mat_Titanium",
+      "title": "Incomplete synthesis-structure-property chain via Gas Atomization",
+      "category": "ssp_chain_gap",
+      "confidence": 0.57,
+      "summary": "Synthesis method \"Gas Atomization\" produces material \"Titanium\" without linked properties or KPIs.",
+      "reasoning": [
+        "Synthesis-structure-property chain is broken at the property/KPI layer."
+      ],
+      "evidence": [
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Gas Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Gas_Atomization",
+          "quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Gas Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Gas_Atomization",
+          "quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Plasma_Atomization",
+          "quote": "плазменным распылением (Plasma Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        }
+      ],
+      "suggestedExperiments": [
+        "Characterize key properties after this synthesis route and link to KPI targets."
+      ],
+      "relatedNodes": [
+        "synth_Gas_Atomization",
+        "mat_Titanium"
+      ],
+      "subgraph": {
+        "nodes": [
+          {
+            "id": "mat_Titanium",
+            "type": "Material",
+            "text": "Titanium",
+            "node_offset": 2000,
+            "definition": "Химический элемент (Ti) — лёгкий, прочный, коррозионностойкий металл. Порошок титана используется в аддитивных технологиях для производства деталей.",
+            "degree_in": 0,
+            "degree_out": 5,
+            "degree_centrality": 0.01524390243902439,
+            "pagerank": 0.0018968927880606903,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0021518836984296278,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "synth_Plasma_Atomization",
+              "synth_Aluminothermic_Reduction",
+              "synth_Mechanical_Grinding_Ti_Sponge",
+              "synth_Gas_Atomization",
+              "synth_PREP"
+            ]
+          },
+          {
+            "id": "synth_Gas_Atomization",
+            "type": "SynthesisMethod",
+            "text": "Gas Atomization",
+            "node_offset": 2300,
+            "definition": "Метод получения металлического порошка путём распыления струи расплава потоком инертного газа (аргона или гелия), широко применяемый в производстве титановых порошков.",
+            "degree_in": 1,
+            "degree_out": 0,
+            "degree_centrality": 0.003048780487804878,
+            "pagerank": 0.002219430894450641,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0025176311550798892,
+            "synthesis_diversity": 1,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "mat_Titanium"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "mat_Titanium",
+            "target": "synth_Gas_Atomization",
+            "type": "SYNTHESIZED_BY",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.95,
+              "evidence_quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+              "source_doi": "new_textets",
+              "co_occurrence_count": 1,
+              "relation_role": "structural"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          }
+        ]
+      },
+      "relatedConcepts": [
+        "Gas Atomization",
+        "Titanium"
+      ]
+    },
+    {
+      "id": "hyp_ssp_chain_synth_Plasma_Atomization_mat_Titanium",
+      "title": "Incomplete synthesis-structure-property chain via Plasma Atomization",
+      "category": "ssp_chain_gap",
+      "confidence": 0.57,
+      "summary": "Synthesis method \"Plasma Atomization\" produces material \"Titanium\" without linked properties or KPIs.",
+      "reasoning": [
+        "Synthesis-structure-property chain is broken at the property/KPI layer."
+      ],
+      "evidence": [
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Plasma_Atomization",
+          "quote": "плазменным распылением (Plasma Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Gas Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Gas_Atomization",
+          "quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Plasma_Atomization",
+          "quote": "плазменным распылением (Plasma Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        }
+      ],
+      "suggestedExperiments": [
+        "Characterize key properties after this synthesis route and link to KPI targets."
+      ],
+      "relatedNodes": [
+        "synth_Plasma_Atomization",
+        "mat_Titanium"
+      ],
+      "subgraph": {
+        "nodes": [
+          {
+            "id": "mat_Titanium",
+            "type": "Material",
+            "text": "Titanium",
+            "node_offset": 2000,
+            "definition": "Химический элемент (Ti) — лёгкий, прочный, коррозионностойкий металл. Порошок титана используется в аддитивных технологиях для производства деталей.",
+            "degree_in": 0,
+            "degree_out": 5,
+            "degree_centrality": 0.01524390243902439,
+            "pagerank": 0.0018968927880606903,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0021518836984296278,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "synth_Plasma_Atomization",
+              "synth_Aluminothermic_Reduction",
+              "synth_Mechanical_Grinding_Ti_Sponge",
+              "synth_Gas_Atomization",
+              "synth_PREP"
+            ]
+          },
+          {
+            "id": "synth_Plasma_Atomization",
+            "type": "SynthesisMethod",
+            "text": "Plasma Atomization",
+            "node_offset": 2320,
+            "definition": "Метод получения сферических порошков с помощью плазменных горелок, которые расплавляют и диспергируют металл, обеспечивая высокую чистоту и узкое распределение частиц по размерам.",
+            "degree_in": 1,
+            "degree_out": 0,
+            "degree_centrality": 0.003048780487804878,
+            "pagerank": 0.002219430894450641,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0025176311550798892,
+            "synthesis_diversity": 1,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "mat_Titanium"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "mat_Titanium",
+            "target": "synth_Plasma_Atomization",
+            "type": "SYNTHESIZED_BY",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.95,
+              "evidence_quote": "плазменным распылением (Plasma Atomization)",
+              "source_doi": "new_textets",
+              "co_occurrence_count": 1,
+              "relation_role": "structural"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          }
+        ]
+      },
+      "relatedConcepts": [
+        "Plasma Atomization",
+        "Titanium"
+      ]
+    },
+    {
+      "id": "hyp_ssp_chain_synth_PREP_mat_Titanium",
+      "title": "Incomplete synthesis-structure-property chain via Plasma Rotating Electrode Process",
+      "category": "ssp_chain_gap",
+      "confidence": 0.57,
+      "summary": "Synthesis method \"Plasma Rotating Electrode Process\" produces material \"Titanium\" without linked properties or KPIs.",
+      "reasoning": [
+        "Synthesis-structure-property chain is broken at the property/KPI layer."
+      ],
+      "evidence": [
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Rotating Electrode Process",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_PREP",
+          "quote": "плазменным процессом вращающегося электрода (Plasma Rotating Electrode Process)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Gas Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Gas_Atomization",
+          "quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Plasma_Atomization",
+          "quote": "плазменным распылением (Plasma Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        }
+      ],
+      "suggestedExperiments": [
+        "Characterize key properties after this synthesis route and link to KPI targets."
+      ],
+      "relatedNodes": [
+        "synth_PREP",
+        "mat_Titanium"
+      ],
+      "subgraph": {
+        "nodes": [
+          {
+            "id": "mat_Titanium",
+            "type": "Material",
+            "text": "Titanium",
+            "node_offset": 2000,
+            "definition": "Химический элемент (Ti) — лёгкий, прочный, коррозионностойкий металл. Порошок титана используется в аддитивных технологиях для производства деталей.",
+            "degree_in": 0,
+            "degree_out": 5,
+            "degree_centrality": 0.01524390243902439,
+            "pagerank": 0.0018968927880606903,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0021518836984296278,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "synth_Plasma_Atomization",
+              "synth_Aluminothermic_Reduction",
+              "synth_Mechanical_Grinding_Ti_Sponge",
+              "synth_Gas_Atomization",
+              "synth_PREP"
+            ]
+          },
+          {
+            "id": "synth_PREP",
+            "type": "SynthesisMethod",
+            "text": "Plasma Rotating Electrode Process",
+            "node_offset": 2340,
+            "definition": "Метод получения порошков, при котором вращающийся титановый электрод оплавляется плазменной дугой, а капли расплава, срываясь под действием центробежной силы, затвердевают в сферические частицы.",
+            "degree_in": 1,
+            "degree_out": 0,
+            "degree_centrality": 0.003048780487804878,
+            "pagerank": 0.002219430894450641,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0025176311550798892,
+            "synthesis_diversity": 1,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "mat_Titanium"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "mat_Titanium",
+            "target": "synth_PREP",
+            "type": "SYNTHESIZED_BY",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.95,
+              "evidence_quote": "плазменным процессом вращающегося электрода (Plasma Rotating Electrode Process)",
+              "source_doi": "new_textets",
+              "co_occurrence_count": 1,
+              "relation_role": "structural"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          }
+        ]
+      },
+      "relatedConcepts": [
+        "Plasma Rotating Electrode Process",
+        "Titanium"
+      ]
+    },
+    {
+      "id": "hyp_ssp_chain_synth_Mechanical_Grinding_Ti_Sponge_mat_Titanium",
+      "title": "Incomplete synthesis-structure-property chain via Mechanical Grinding of Titanium Sponge",
+      "category": "ssp_chain_gap",
+      "confidence": 0.57,
+      "summary": "Synthesis method \"Mechanical Grinding of Titanium Sponge\" produces material \"Titanium\" without linked properties or KPIs.",
+      "reasoning": [
+        "Synthesis-structure-property chain is broken at the property/KPI layer."
+      ],
+      "evidence": [
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Mechanical Grinding of Titanium Sponge",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Mechanical_Grinding_Ti_Sponge",
+          "quote": "Основным способом получения титановых порошков в России является механическое измельчение титановой губки",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Gas Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Gas_Atomization",
+          "quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Plasma_Atomization",
+          "quote": "плазменным распылением (Plasma Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        }
+      ],
+      "suggestedExperiments": [
+        "Characterize key properties after this synthesis route and link to KPI targets."
+      ],
+      "relatedNodes": [
+        "synth_Mechanical_Grinding_Ti_Sponge",
+        "mat_Titanium"
+      ],
+      "subgraph": {
+        "nodes": [
+          {
+            "id": "mat_Titanium",
+            "type": "Material",
+            "text": "Titanium",
+            "node_offset": 2000,
+            "definition": "Химический элемент (Ti) — лёгкий, прочный, коррозионностойкий металл. Порошок титана используется в аддитивных технологиях для производства деталей.",
+            "degree_in": 0,
+            "degree_out": 5,
+            "degree_centrality": 0.01524390243902439,
+            "pagerank": 0.0018968927880606903,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0021518836984296278,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "synth_Plasma_Atomization",
+              "synth_Aluminothermic_Reduction",
+              "synth_Mechanical_Grinding_Ti_Sponge",
+              "synth_Gas_Atomization",
+              "synth_PREP"
+            ]
+          },
+          {
+            "id": "synth_Mechanical_Grinding_Ti_Sponge",
+            "type": "SynthesisMethod",
+            "text": "Mechanical Grinding of Titanium Sponge",
+            "node_offset": 2360,
+            "definition": "Многостадийный способ производства порошка, при котором титановую губку (получаемую восстановлением TiCl4 магнием) измельчают и рассеивают по фракциям; реализован на «ВСМПО-АВИСМА».",
+            "degree_in": 1,
+            "degree_out": 0,
+            "degree_centrality": 0.003048780487804878,
+            "pagerank": 0.002219430894450641,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0025176311550798892,
+            "synthesis_diversity": 1,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "mat_Titanium"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "mat_Titanium",
+            "target": "synth_Mechanical_Grinding_Ti_Sponge",
+            "type": "SYNTHESIZED_BY",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.95,
+              "evidence_quote": "Основным способом получения титановых порошков в России является механическое измельчение титановой губки",
+              "source_doi": "new_textets",
+              "co_occurrence_count": 1,
+              "relation_role": "structural"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          }
+        ]
+      },
+      "relatedConcepts": [
+        "Mechanical Grinding of Titanium Sponge",
+        "Titanium"
+      ]
+    },
+    {
+      "id": "hyp_ssp_chain_synth_Aluminothermic_Reduction_mat_Titanium",
+      "title": "Incomplete synthesis-structure-property chain via Aluminothermic Reduction",
+      "category": "ssp_chain_gap",
+      "confidence": 0.57,
+      "summary": "Synthesis method \"Aluminothermic Reduction\" produces material \"Titanium\" without linked properties or KPIs.",
+      "reasoning": [
+        "Synthesis-structure-property chain is broken at the property/KPI layer."
+      ],
+      "evidence": [
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Aluminothermic Reduction",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Aluminothermic_Reduction",
+          "quote": "Предложена технология получения титановых порошков алюмотермическим способом из TiO2",
+          "confidence": 0.93,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Gas Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Gas_Atomization",
+          "quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        },
+        {
+          "edgeType": "SYNTHESIZED_BY",
+          "source": "Titanium",
+          "target": "Plasma Atomization",
+          "sourceId": "mat_Titanium",
+          "targetId": "synth_Plasma_Atomization",
+          "quote": "плазменным распылением (Plasma Atomization)",
+          "confidence": 0.95,
+          "weight": 0.5
+        }
+      ],
+      "suggestedExperiments": [
+        "Characterize key properties after this synthesis route and link to KPI targets."
+      ],
+      "relatedNodes": [
+        "synth_Aluminothermic_Reduction",
+        "mat_Titanium"
+      ],
+      "subgraph": {
+        "nodes": [
+          {
+            "id": "mat_Titanium",
+            "type": "Material",
+            "text": "Titanium",
+            "node_offset": 2000,
+            "definition": "Химический элемент (Ti) — лёгкий, прочный, коррозионностойкий металл. Порошок титана используется в аддитивных технологиях для производства деталей.",
+            "degree_in": 0,
+            "degree_out": 5,
+            "degree_centrality": 0.01524390243902439,
+            "pagerank": 0.0018968927880606903,
+            "betweenness_centrality": 0,
+            "ontological_pagerank": 0.0021518836984296278,
+            "synthesis_diversity": 0,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0,
+            "concepts": [
+              "synth_Plasma_Atomization",
+              "synth_Aluminothermic_Reduction",
+              "synth_Mechanical_Grinding_Ti_Sponge",
+              "synth_Gas_Atomization",
+              "synth_PREP"
+            ]
+          },
+          {
+            "id": "synth_Aluminothermic_Reduction",
+            "type": "SynthesisMethod",
+            "text": "Aluminothermic Reduction",
+            "node_offset": 2380,
+            "definition": "Метод получения титанового порошка путём восстановления TiO2 алюминием при 1150 °C в вакууме. В результате образуются гранулы титана и корунд (Al2O3).",
+            "degree_in": 1,
+            "degree_out": 2,
+            "degree_centrality": 0.009146341463414635,
+            "pagerank": 0.002219430894450641,
+            "betweenness_centrality": 0.000018646975460580295,
+            "ontological_pagerank": 0.0025176311550798892,
+            "synthesis_diversity": 1,
+            "property_coverage": 0,
+            "application_breadth": 0,
+            "characterization_richness": 0,
+            "failure_proximity": 0,
+            "cluster_id": 12,
+            "bridge_score": 0.000013052882822406205,
+            "concepts": [
+              "cond_Vacuum",
+              "mat_Titanium",
+              "cond_High_Temperature_1150C"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "source": "mat_Titanium",
+            "target": "synth_Aluminothermic_Reduction",
+            "type": "SYNTHESIZED_BY",
+            "weight": 0.5,
+            "conditions": "",
+            "attributes": {
+              "confidence_score": 0.93,
+              "evidence_quote": "Предложена технология получения титановых порошков алюмотермическим способом из TiO2",
+              "source_doi": "new_textets",
+              "co_occurrence_count": 1,
+              "relation_role": "structural"
+            },
+            "inverse_weight": 2,
+            "is_inter_cluster_edge": false
+          }
+        ]
+      },
+      "relatedConcepts": [
+        "Aluminothermic Reduction",
+        "Titanium"
+      ]
+    }
+  ],
+  "preferences": {
+    "theme": "dark",
+    "locale": "ru"
+  },
+  "artifactsMetadata": {
+    "lastProvider": "openrouter",
+    "lastGeneratedAt": "2026-07-04T09:35:00.667Z"
+  },
+  "integrationMode": "incremental"
+}

@@ -1,0 +1,204 @@
+[graph2metrics]
+use_edge_weights = true
+pagerank_damping = 0.85
+pagerank_max_iter = 100
+betweenness_normalized = true
+closeness_harmonic = true
+min_bridge_score = 0.7
+louvain_resolution = 1.2
+louvain_random_state = 42
+bridge_weight_betweenness = 0.7
+bridge_weight_inter_ratio = 0.3
+bridge_top_gap_min = 0.05
+
+[path_mode]
+alpha_step = 0
+beta_difficulty = 1
+sigma_confidence = 0.5
+default_difficulty = 3
+# ALL edge types are allowed — no ladder filtering
+edge_type_ladder = []
+
+[edge_filter]
+mode = "off"
+
+[prereq_closure]
+enabled = false
+max_depth = 0
+
+[demo_path]
+strategy = 2
+max_nodes = 100
+
+[demo_path.strategy_names]
+1 = "Causal Chain"
+2 = "Material Journey"
+3 = "Failure Analysis"
+4 = "Innovation Path"
+
+[node_shapes]
+Material = "round-rectangle"
+Property = "diamond"
+SynthesisMethod = "hexagon"
+CharacterizationMethod = "pentagon"
+FailureMode = "vee"
+Mechanism = "star"
+Condition = "tag"
+Application = "round-triangle"
+Source = "ellipse"
+Equipment = "barrel"
+BusinessMetric = "rhomboid"
+InternalExperiment = "cut-rectangle"
+Constraint = "concave-hexagon"
+HypothesisRecord = "round-heptagon"
+KPI_Target = "diamond"
+Concept = "star"
+Chunk = "hexagon"
+Assessment = "round-rectangle"
+
+[graph2html]
+output_filename = "materials_knowledge_graph.html"
+minify_json = true
+minify_html = true
+embed_libraries = true
+vendor_js = [
+    "vendor/cytoscape.min.js",
+    "vendor/layout-base.js",
+    "vendor/cose-base.js",
+    "vendor/cytoscape-cose-bilkent.js",
+    "vendor/cytoscape-navigator.js",
+    "vendor/marked.min.js",
+    "vendor/highlight.min.js",
+    "vendor/mathjax-tex-mml-chtml.js"
+]
+vendor_css = [
+    "vendor/cytoscape.js-navigator.css",
+    "vendor/github-dark.min.css"
+]
+default_language = "ru"
+enable_language_switch = true
+
+[visualization]
+initial_layout = "cose-bilkent"
+animation_duration = 500
+tour_speed = 3000
+tour_auto_loop = true
+node_size_min = 20
+node_size_max = 70
+physics_enabled = true
+physics_duration = 3000
+
+[colors]
+theme = "modern"
+cluster_palette = [
+    "#3498db", "#e74c3c", "#2ecc71", "#f39c12",
+    "#9b59b6", "#1abc9c", "#34495e", "#e67e22",
+    "#16a085", "#8e44ad", "#2c3e50", "#27ae60"
+]
+Material = "#3498db"
+Property = "#2ecc71"
+SynthesisMethod = "#9b59b6"
+CharacterizationMethod = "#1abc9c"
+FailureMode = "#e74c3c"
+Mechanism = "#f39c12"
+Condition = "#95a5a6"
+Application = "#16a085"
+Source = "#34495e"
+Equipment = "#2c3e50"
+BusinessMetric = "#f39c12"
+InternalExperiment = "#8e44ad"
+Constraint = "#d35400"
+HypothesisRecord = "#c0392b"
+KPI_Target = "#27ae60"
+Concept = "#2ecc71"
+Chunk = "#3498db"
+Assessment = "#f39c12"
+path_causal = "#e67e22"
+path_innovation = "#27ae60"
+path_failure = "#c0392b"
+path_economic = "#f39c12"
+gradient_high_confidence = "#27ae60"
+gradient_medium_confidence = "#f39c12"
+gradient_low_confidence = "#e74c3c"
+
+[ui]
+sidebar_width = 360
+sidebar_position = "right"
+search_debounce = 300
+max_popup_width = 650
+show_fps_counter = false
+show_legend = true
+show_minimap = true
+show_stats = true
+show_ontology_filter = true
+show_confidence_slider = true
+
+[filters]
+show_all_types = true
+min_confidence_score = 0.0
+min_co_occurrence = 0
+
+[filters.edge_categories]
+show_causal = true
+show_structural = true
+show_economic = true
+show_analogy = true
+show_taxonomic = true
+show_verification = true
+show_provenance = true
+
+[performance]
+viewport_culling = true
+max_nodes_animated = 500
+batch_animations = true
+progressive_loading = false
+
+[text_formatting]
+enable_markdown = true
+enable_code_highlighting = true
+enable_math = true
+math_renderer = "mathjax"
+
+[tooltip]
+max_width = 450
+preview_length = 400
+show_delay = 400
+hide_delay = 200
+show_evidence_quote = true
+show_source_doi = true
+show_confidence_score = true
+show_co_occurrence_count = true
+
+[anomaly_detection]
+pagerank_sum_tolerance = 0.01
+ontological_sum_tolerance = 0.01
+min_modularity = 0.1
+min_bridge_correlation = 0.3
+outlier_method = "iqr"
+outlier_threshold = 1.5
+strict_mode = false
+save_json_report = true
+detect_hallucinated_edges = true
+hallucination_confidence_threshold = 0.4
+hallucination_evidence_required = true
+
+[hypothesis_generation]
+enabled = true
+exploration_path_types = [
+    "Material -> Mechanism -> Property",
+    "FailureMode -> Mechanism -> Mitigation",
+    "SynthesisMethod -> Material -> Application",
+    "Material -> FailureMode -> Substitute"
+]
+weight_novelty = 0.3
+weight_confidence = 0.3
+weight_kpi_impact = 0.25
+weight_feasibility = 0.15
+top_n_hypotheses = 20
+
+[provenance]
+show_citation_links = true
+show_evidence_quotes = true
+max_sources_per_node = 10
+enable_source_filtering = true
+doi_resolver_base_url = "https://doi.org/"

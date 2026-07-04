@@ -1,0 +1,9 @@
+{
+  "graph_path": "Examples_prev_step/LearningChunkGraph_raw.json",
+  "goal": "1",
+  "constraints": [
+    "1"
+  ],
+  "max_refinement_iterations": 1,
+  "num_hypotheses": 5
+}

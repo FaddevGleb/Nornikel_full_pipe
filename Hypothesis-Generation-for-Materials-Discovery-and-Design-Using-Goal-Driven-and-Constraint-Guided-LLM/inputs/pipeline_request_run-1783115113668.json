@@ -1,0 +1,9 @@
+{
+  "graph_path": "Examples_prev_step/LearningChunkGraphNORNIKEL.schema (2).json",
+  "goal": "Генерация гипотезы",
+  "constraints": [
+    "гипотеза должна быть сгенерирована"
+  ],
+  "max_refinement_iterations": 1,
+  "num_hypotheses": 1
+}

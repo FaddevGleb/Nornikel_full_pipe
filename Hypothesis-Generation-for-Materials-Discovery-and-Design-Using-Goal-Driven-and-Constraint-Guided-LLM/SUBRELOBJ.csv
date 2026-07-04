@@ -1,0 +1,51 @@
+Subject,Rel,Object,Count
+PT-7M,CHM-SYN,Expanding,1
+PT-7M,CHM-CMT,Macrostructural Analysis,1
+PT-7M,CHM-CMT,Optical Microscopy,1
+PT-7M,CHM-CMT,X-ray Diffraction,1
+PT-7M,CHM-CMT,Instrumented Indentation Testing,1
+VT-20,CHM-SYN,Multilayer Surfacing,1
+High-alloyed (α+β) Titanium Alloy,CHM-PRO,Impact Toughness,1
+Pseudo-β Titanium Alloy,CHM-PRO,Impact Toughness,1
+High-alloyed (α+β) Titanium Alloy,CHM-PRO,Weldability,1
+Pseudo-β Titanium Alloy,CHM-PRO,Weldability,1
+High-alloyed (α+β) Titanium Alloy,CHM-PRO,Technological Plasticity,1
+Pseudo-β Titanium Alloy,CHM-PRO,Technological Plasticity,1
+ВТ6,CHM-PRO,Impact Toughness,1
+ВТ6,CHM-PRO,Weldability,1
+ВТ6,CHM-PRO,Technological Plasticity,1
+ВТ6,CHM-APL,Armor Element,1
+ВТ16,CHM-PRO,Impact Toughness,1
+ВТ16,CHM-PRO,Weldability,1
+ВТ16,CHM-PRO,Technological Plasticity,1
+ВТ16,CHM-APL,Armor Element,1
+ВТ23,CHM-PRO,Impact Toughness,1
+ВТ23,CHM-PRO,Weldability,1
+ВТ23,CHM-PRO,Technological Plasticity,1
+ВТ23,CHM-APL,Armor Element,1
+ВТ22И,CHM-PRO,Impact Toughness,1
+ВТ22И,CHM-PRO,Weldability,1
+ВТ22И,CHM-PRO,Technological Plasticity,1
+ВТ22И,CHM-APL,Armor Element,1
+ВТ35,CHM-PRO,Impact Toughness,1
+ВТ35,CHM-PRO,Weldability,1
+ВТ35,CHM-PRO,Technological Plasticity,1
+ВТ35,CHM-APL,Armor Element,1
+ВТ1-0,CHM-CMT,Dynamic Mechanical Analysis,1
+Young Modulus,PRO-CMT,Dynamic Mechanical Analysis,1
+ВТ1-0,CHM-CMT,Optical Microscopy,1
+Texture,PRO-CMT,X-ray Diffraction,1
+Ti-10V-2Fe-3Al,CHM-APL,Aircraft Structural Component,1
+Ti-10V-2Fe-3Al,CHM-SYN,Quenching,1
+Ti-10V-2Fe-3Al,CHM-SYN,Aging,1
+Ti-10V-2Fe-3Al,CHM-PRO,Microhardness,1
+Aging,SYN-PRO,Microhardness,1
+Secondary α-phase,CHM-PRO,Microhardness,1
+Secondary α-phase,CHM-CMT,Scanning Electron Microscopy,1
+Secondary α-phase,CHM-CMT,X-ray Diffraction,1
+Coherent Scattering Region Size,PRO-CMT,X-ray Diffraction,1
+Microhardness,PRO-CMT,Instrumented Indentation Testing,1
+Armor Element,APL-PRO,Impact Toughness,5
+Armor Element,APL-PRO,Weldability,5
+Armor Element,APL-PRO,Technological Plasticity,5
+Aircraft Structural Component,APL-PRO,Microhardness,1

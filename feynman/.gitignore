@@ -1,0 +1,16 @@
+node_modules
+.env
+.feynman/npm
+.feynman/git
+.feynman/sessions
+.feynman/schedule-prompts.json
+dist
+*.tgz
+outputs/*
+!outputs/.gitkeep
+papers/*
+!papers/.gitkeep
+notes/*
+!notes/.gitkeep
+experiments/*
+!experiments/.gitkeep

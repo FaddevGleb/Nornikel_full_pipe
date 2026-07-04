@@ -1,0 +1,138 @@
+{
+  "name": "@companion-ai/feynman",
+  "version": "0.3.5",
+  "description": "Research-first CLI agent built on Pi and alphaXiv",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19.0 <26"
+  },
+  "bin": {
+    "feynman": "bin/feynman.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "metadata/",
+    ".feynman/agents/",
+    ".feynman/runtime-workspace.tgz",
+    ".feynman/settings.json",
+    ".feynman/SYSTEM.md",
+    ".feynman/themes/",
+    "extensions/",
+    "prompts/",
+    "logo.mjs",
+    "logo.d.mts",
+    "scripts/build-native-bundle.mjs",
+    "scripts/check-architecture.mjs",
+    "scripts/check-node-version.mjs",
+    "scripts/clean-publish-artifacts.mjs",
+    "scripts/extract-release-notes.mjs",
+    "scripts/install/",
+    "scripts/lib/",
+    "scripts/patch-embedded-pi.mjs",
+    "scripts/prepare-runtime-workspace.mjs",
+    "scripts/prune-runtime-deps.mjs",
+    "scripts/sync-website-installers.mjs",
+    "skills/",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "RELEASES.md",
+    "README.md",
+    ".env.example"
+  ],
+  "scripts": {
+    "preinstall": "node ./scripts/check-node-version.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "build:native-bundle": "node ./scripts/build-native-bundle.mjs",
+    "dev": "tsx src/index.ts",
+    "prepack": "node ./scripts/clean-publish-artifacts.mjs && npm run build && node ./scripts/prepare-runtime-workspace.mjs",
+    "start": "tsx src/index.ts",
+    "start:dist": "node ./bin/feynman.js",
+    "test": "node ./scripts/patch-embedded-pi.mjs && node --import tsx --test --test-concurrency=1 tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "architecture:check": "node ./scripts/check-architecture.mjs"
+  },
+  "keywords": [
+    "pi-package",
+    "research-agent",
+    "literature-review",
+    "experiments"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions"
+    ],
+    "prompts": [
+      "./prompts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.5.1",
+    "@companion-ai/alpha-hub": "^0.1.3",
+    "@earendil-works/pi-agent-core": "0.80.2",
+    "@earendil-works/pi-ai": "0.80.2",
+    "@earendil-works/pi-coding-agent": "0.80.2",
+    "@earendil-works/pi-tui": "0.80.2",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/api-logs": "^0.219.0",
+    "@opentelemetry/exporter-logs-otlp-http": "^0.219.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.219.0",
+    "@opentelemetry/resources": "^2.8.0",
+    "@opentelemetry/sdk-logs": "^0.219.0",
+    "@opentelemetry/sdk-trace-base": "^2.8.0",
+    "@opentelemetry/sdk-trace-node": "^2.8.0",
+    "@opentelemetry/semantic-conventions": "^1.41.1",
+    "@sinclair/typebox": "^0.34.49",
+    "fast-xml-parser": "5.7.3",
+    "posthog-node": "^5.38.2",
+    "undici": "8.5.0"
+  },
+  "overrides": {
+    "basic-ftp": "5.3.1",
+    "hono": "4.12.26",
+    "qs": "6.15.2",
+    "ws": "8.21.0",
+    "@modelcontextprotocol/sdk": {
+      "@hono/node-server": "1.19.14",
+      "hono": "4.12.26"
+    },
+    "express-rate-limit": "8.5.1",
+    "ip-address": "10.2.0",
+    "express": {
+      "router": {
+        "path-to-regexp": "8.4.2"
+      }
+    },
+    "proxy-agent": {
+      "pac-proxy-agent": {
+        "get-uri": {
+          "basic-ftp": "5.3.1"
+        }
+      }
+    },
+    "fast-uri": "3.1.2",
+    "esbuild": "0.28.1",
+    "fast-xml-builder": "1.2.0",
+    "protobufjs": "7.6.4",
+    "minimatch": {
+      "brace-expansion": "5.0.6"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/companion-inc/feynman.git"
+  },
+  "homepage": "https://github.com/companion-inc/feynman#readme",
+  "bugs": {
+    "url": "https://github.com/companion-inc/feynman/issues"
+  }
+}

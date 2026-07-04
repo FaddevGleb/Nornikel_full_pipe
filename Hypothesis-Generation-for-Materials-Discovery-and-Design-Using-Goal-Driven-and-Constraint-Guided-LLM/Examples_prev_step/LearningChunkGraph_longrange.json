@@ -1,0 +1,1100 @@
+{
+  "_meta": {
+    "itext2kg_graph": {
+      "generated_at": "2026-07-02 13:30:26",
+      "config": {
+        "model": "deepseek/deepseek-v4-pro",
+        "temperature": 0.6,
+        "max_output_tokens": 32768,
+        "overlap": 0,
+        "slice_size": 4000,
+        "auto_mentions_weight": 0.35
+      },
+      "source": {
+        "total_slices": 4,
+        "processed_slices": 4,
+        "total_tokens": 12776,
+        "slug": "sample_large",
+        "concepts_used": 48
+      },
+      "api_usage": {
+        "total_requests": 4,
+        "total_input_tokens": 51438,
+        "total_output_tokens": 45299,
+        "total_tokens": 96737
+      },
+      "graph_stats": {
+        "total_nodes": 46,
+        "chunks": 0,
+        "concepts": 46,
+        "assessments": 0,
+        "total_edges": 50,
+        "edge_types": {
+          "SYNTHESIZED_BY": 4,
+          "CHARACTERIZED_BY": 12,
+          "IMPROVES": 20,
+          "DEGRADES": 4,
+          "APPLIED_IN": 6,
+          "CAUSES": 4
+        }
+      },
+      "processing_time": {
+        "start": "2026-07-02 13:21:03",
+        "end": "2026-07-02 13:30:26",
+        "duration_minutes": 9.38
+      }
+    },
+    "deduplication": {
+      "performed_at": "2026-07-02T13:33:08.898431",
+      "config": {
+        "similarity_threshold": 0.85,
+        "length_ratio_threshold": 0.8,
+        "top_k": 5,
+        "min_similarity": 0.85,
+        "model": "C:/NORNIKEL2/k2-18/src/multilingual-e5-large"
+      },
+      "statistics": {
+        "nodes_analyzed": 0,
+        "embeddings_created": 0,
+        "potential_duplicates": 0,
+        "clusters_formed": 0,
+        "nodes_removed": {
+          "duplicates": 0,
+          "empty": 0,
+          "total": 0
+        },
+        "edges_updated": 0,
+        "processing_time_seconds": 0.002517223358154297
+      },
+      "before_after": {
+        "nodes_before": 46,
+        "nodes_after": 46,
+        "edges_before": 50,
+        "edges_after": 50
+      },
+      "quality_issues": {
+        "duplicate_nodes_removed": 0,
+        "empty_nodes_removed": 0,
+        "total_nodes_removed": 0
+      }
+    }
+  },
+  "nodes": [
+    {
+      "id": "mat_PT-7M",
+      "type": "Material",
+      "text": "PT-7M",
+      "node_offset": 58,
+      "definition": "Деформируемый α-титановый сплав состава Ti-2.2Al-2.5Zr (мас. %), используемый для производства труб, эксплуатируемых при комнатной и повышенных (до 400–450 °C) температурах в агрессивных средах.",
+      "name": "PT-7M"
+    },
+    {
+      "id": "synth_expanding",
+      "type": "SynthesisMethod",
+      "text": "Expanding",
+      "node_offset": 69,
+      "definition": "Горячая пластическая деформация, осуществляемая на прошивных прессах, заключающаяся в расширении центрального отверстия предварительно сверленой трубной заготовки с помощью наконечника иглы специальной формы; приводит к измельчению зерна и рекристаллизации.",
+      "name": "Expanding"
+    },
+    {
+      "id": "mech_recrystallization",
+      "type": "Mechanism",
+      "text": "Recrystallization",
+      "node_offset": 230,
+      "definition": "Процесс зарождения и роста новых зерен с низкой плотностью дислокаций в деформированном металле при горячей обработке; приводит к измельчению зеренной структуры и снятию наклепа.",
+      "name": "Recrystallization"
+    },
+    {
+      "id": "prop_microhardness",
+      "type": "Property",
+      "text": "Microhardness",
+      "node_offset": 150,
+      "definition": "Способность материала сопротивляться пластической деформации при вдавливании индентора в микрообъемах, измеряемая методом Виккерса; варьирует в зависимости от направления и структуры.",
+      "name": "Microhardness"
+    },
+    {
+      "id": "prop_contact_elastic_modulus",
+      "type": "Property",
+      "text": "Contact Elastic Modulus",
+      "node_offset": 190,
+      "definition": "Модуль упругости, определяемый при инструментальном индентировании по методике Оливера-Фарра; отражает упругие свойства материала в зоне контакта индентора с поверхностью.",
+      "name": "Contact Elastic Modulus"
+    },
+    {
+      "id": "prop_texture",
+      "type": "Property",
+      "text": "Texture",
+      "node_offset": 500,
+      "definition": "Преимущественная ориентировка кристаллитов в поликристаллическом материале; в α-титановых сплавах часто формируется текстура тангенциальной призмы {0001}TH<10-10> ОН + {0001}TH <11-20> ОН, вызывающая анизотропию механических свойств.",
+      "name": "Texture"
+    },
+    {
+      "id": "prop_anisotropy",
+      "type": "Property",
+      "text": "Anisotropy of Properties",
+      "node_offset": 550,
+      "definition": "Зависимость механических свойств материала от направления приложения нагрузки, наследующаяся от операций горячего прессования и обусловленная кристаллографической текстурой; особенно заметна в α-титановых сплавах.",
+      "name": "Anisotropy of Properties"
+    },
+    {
+      "id": "char_macrostructural_analysis",
+      "type": "CharacterizationMethod",
+      "text": "Macrostructural Analysis",
+      "node_offset": 600,
+      "definition": "Метод оценки структуры металла невооруженным глазом или при небольшом увеличении, с использованием эталонных шкал для определения балла макроструктуры; применяется для контроля однородности и качества заготовок.",
+      "name": "Macrostructural Analysis"
+    },
+    {
+      "id": "char_optical_microscopy",
+      "type": "CharacterizationMethod",
+      "text": "Optical Microscopy",
+      "node_offset": 630,
+      "definition": "Исследование микроструктуры с помощью светового микроскопа; позволяет оценить размер зерна, наличие рекристаллизации и зубчатость границ.",
+      "name": "Optical Microscopy"
+    },
+    {
+      "id": "char_XRD",
+      "type": "CharacterizationMethod",
+      "text": "X-ray Diffraction",
+      "node_offset": 660,
+      "definition": "Метод определения кристаллической структуры, фазового состава и текстуры материалов путем анализа дифракционной картины от рентгеновских лучей; используется для уточнения периодов решетки α-фазы.",
+      "name": "X-ray Diffraction"
+    },
+    {
+      "id": "char_instrumented_indentation",
+      "type": "CharacterizationMethod",
+      "text": "Instrumented Indentation Testing",
+      "node_offset": 690,
+      "definition": "Методика определения микротвердости и модуля упругости путем непрерывной записи усилия и глубины вдавливания индентора; расчет свойств выполняется по алгоритму, предложенному В. С. Оливером и Г. М. Фарром.",
+      "name": "Instrumented Indentation Testing"
+    },
+    {
+      "id": "mat_VT-20",
+      "type": "Material",
+      "text": "VT-20",
+      "node_offset": 2600,
+      "definition": "Титановый сплав, исследованный после многослойной наплавки; в процессе аддитивного производства формирует зоны сплавления, термического влияния и литого состояния с различной микротвердостью и микроструктурой.",
+      "name": "VT-20"
+    },
+    {
+      "id": "synth_multilayer_surfacing",
+      "type": "SynthesisMethod",
+      "text": "Multilayer Surfacing",
+      "node_offset": 2550,
+      "definition": "Процесс послойного нанесения расплавленного металла для создания объемных деталей; приводит к формированию характерных зон (сплавления, термического влияния, литого состояния) и микродефектов.",
+      "name": "Multilayer Surfacing"
+    },
+    {
+      "id": "fail_microdefects",
+      "type": "FailureMode",
+      "text": "Microdefects",
+      "node_offset": 2650,
+      "definition": "Локальные несовершенства структуры (поры, микротрещины), возникающие в процессе многослойной наплавки титанового сплава и влияющие на механические свойства.",
+      "name": "Microdefects"
+    },
+    {
+      "id": "cond_fusion_zone",
+      "type": "Condition",
+      "text": "Fusion Zone",
+      "node_offset": 2650,
+      "definition": "Область сплавления основного и наплавляемого металла при многослойной дуговой наплавке; характеризуется наличием микропор и прорастанием зерен из наплавки в подложку.",
+      "name": "Fusion Zone"
+    },
+    {
+      "id": "cond_heat_affected_zone",
+      "type": "Condition",
+      "text": "Heat-Affected Zone",
+      "node_offset": 2670,
+      "definition": "Область основного металла, примыкающая к зоне сплавления, в которой под воздействием термического цикла наплавки формируется структура бывших зерен β-фазы с α-оторочкой по границам.",
+      "name": "Heat-Affected Zone"
+    },
+    {
+      "id": "cond_cast_state_zone",
+      "type": "Condition",
+      "text": "Cast-State Zone",
+      "node_offset": 2690,
+      "definition": "Наплавленный слой, затвердевший после расплавления; структура характеризуется корзиночным плетением α-фазы, типичным для литого состояния титанового сплава.",
+      "name": "Cast-State Zone"
+    },
+    {
+      "id": "fail_structural_inhomogeneity",
+      "type": "FailureMode",
+      "text": "Structural Inhomogeneity",
+      "node_offset": 0,
+      "definition": "Неравномерность структуры в виде полос, возникающая в титановом сплаве ВТ-20 при многослойной наплавке из-за различий в скоростях кристаллизации; может снижать однородность механических свойств.",
+      "name": "Structural Inhomogeneity"
+    },
+    {
+      "id": "mat_high_alloyed_alpha_beta_Ti",
+      "type": "Material",
+      "text": "High-alloyed (α+β) Titanium Alloy",
+      "node_offset": 0,
+      "definition": "Титановые сплавы, содержащие алюминий и другие элементы, обеспечивающие молибденовый и алюминиевый эквиваленты в диапазоне 8–17; имеют двухфазную (α+β) структуру, обладают высокими прочностными свойствами.",
+      "name": "High-alloyed (α+β) Titanium Alloy"
+    },
+    {
+      "id": "mat_pseudo_beta_Ti",
+      "type": "Material",
+      "text": "Pseudo-β Titanium Alloy",
+      "node_offset": 0,
+      "definition": "Титановые сплавы, преимущественно состоящие из β-фазы при комнатной температуре, с эквивалентами Mo и Al в диапазоне 8–17; характеризуются высокой технологической пластичностью и хорошей свариваемостью.",
+      "name": "Pseudo-β Titanium Alloy"
+    },
+    {
+      "id": "kpi_protection_class",
+      "type": "KPI_Target",
+      "text": "Protection Class",
+      "node_offset": 0,
+      "definition": "Нормативный уровень баллистической защиты по ГОСТ 50963–96, определяемый типом и калибром выдерживаемого боеприпаса; целевой показатель для бронеавтомобилей.",
+      "name": "Protection Class"
+    },
+    {
+      "id": "prop_impact_toughness",
+      "type": "Property",
+      "text": "Impact Toughness",
+      "node_offset": 0,
+      "definition": "Свойство материала поглощать энергию удара без разрушения, измеряемое в Дж/см²; ключевой параметр для оценки бронезащиты.",
+      "name": "Impact Toughness"
+    },
+    {
+      "id": "prop_weldability",
+      "type": "Property",
+      "text": "Weldability",
+      "node_offset": 0,
+      "definition": "Технологическое свойство материала образовывать качественное сварное соединение без дефектов; критично для изготовления крупногабаритных бронеэлементов.",
+      "name": "Weldability"
+    },
+    {
+      "id": "prop_technological_plasticity",
+      "type": "Property",
+      "text": "Technological Plasticity",
+      "node_offset": 0,
+      "definition": "Способность материала к пластической деформации без разрушения в холодном состоянии; необходимое свойство для формообразования броневых листов.",
+      "name": "Technological Plasticity"
+    },
+    {
+      "id": "mat_VT6",
+      "type": "Material",
+      "text": "ВТ6",
+      "node_offset": 800,
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 3.2% и алюминиевым 6.8%, обладающий пределом прочности около 1030 МПа, относительным сужением 25%, ударной вязкостью 0.25 МДж/м²; предназначен для горячей деформации и обладает хорошей свариваемостью.",
+      "name": "ВТ6"
+    },
+    {
+      "id": "mat_VT16",
+      "type": "Material",
+      "text": "ВТ16",
+      "node_offset": 900,
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 8.2% и алюминиевым 4.3%, обладающий пределом прочности 1150 МПа, относительным сужением 50%, ударной вязкостью 0.30 МДж/м²; предназначен для холодной деформации и обладает хорошей свариваемостью.",
+      "name": "ВТ16"
+    },
+    {
+      "id": "mat_VT23",
+      "type": "Material",
+      "text": "ВТ23",
+      "node_offset": 1000,
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 8.1% и алюминиевым 6.5%, обладающий пределом прочности 1100 МПа, относительным сужением 35%, ударной вязкостью 0.40 МДж/м²; предназначен для горячей деформации и обладает хорошей свариваемостью.",
+      "name": "ВТ23"
+    },
+    {
+      "id": "mat_VT22I",
+      "type": "Material",
+      "text": "ВТ22И",
+      "node_offset": 1100,
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 12.3% и алюминиевым 4.1%, обладающий пределом прочности 1300 МПа, относительным сужением 20%, ударной вязкостью 0.30 МДж/м²; предназначен для горячей деформации и имеет удовлетворительную свариваемость.",
+      "name": "ВТ22И"
+    },
+    {
+      "id": "mat_VT35",
+      "type": "Material",
+      "text": "ВТ35",
+      "node_offset": 1200,
+      "definition": "Псевдо-β-титановый сплав с молибденовым эквивалентом 16.7% и алюминиевым 5.2%, обладающий пределом прочности 1220 МПа, низким относительным сужением 6%, ударной вязкостью 0.30 МДж/м²; предназначен для холодной деформации и обладает хорошей свариваемостью.",
+      "name": "ВТ35"
+    },
+    {
+      "id": "app_armor_element",
+      "type": "Application",
+      "text": "Armor Element",
+      "node_offset": 1500,
+      "definition": "Конструктивный элемент броневой защиты транспортного средства, состоящий из титанового металлического слоя и полимерной подложки, предназначенный для деформации и остановки боеприпасов.",
+      "name": "Armor Element"
+    },
+    {
+      "id": "fail_wall_thickness_difference",
+      "type": "FailureMode",
+      "text": "Wall Thickness Difference",
+      "node_offset": 1600,
+      "definition": "Неравномерность толщины стенки трубной заготовки, возникающая при горячем прессовании из-за несоосности инструмента или неоднородности деформации; затрудняет последующую холодную обработку и требует учёта анизотропии свойств.",
+      "name": "Wall Thickness Difference"
+    },
+    {
+      "id": "synth_hot_direct_extrusion",
+      "type": "SynthesisMethod",
+      "text": "Hot Direct Extrusion",
+      "node_offset": 1700,
+      "definition": "Процесс горячей обработки давлением, при котором сплошная заготовка продавливается через матрицу с одновременной прошивкой отверстия иглой; может приводить к поперечной разностенности из-за отсутствия центровки иглы.",
+      "name": "Hot Direct Extrusion"
+    },
+    {
+      "id": "synth_backward_extrusion",
+      "type": "SynthesisMethod",
+      "text": "Backward Extrusion",
+      "node_offset": 1750,
+      "definition": "Способ прессования, при котором металл течёт в направлении, противоположном движению пресс-штемпеля; упоминается как более экономичный по энергозатратам метод по сравнению с прямым прессованием.",
+      "name": "Backward Extrusion"
+    },
+    {
+      "id": "mat_VT1-0",
+      "type": "Material",
+      "text": "ВТ1-0",
+      "node_offset": 1800,
+      "definition": "Технически чистый титановый сплав, широко используемый для получения деформированных полуфабрикатов, в частности холоднокатаных труб; модуль упругости при комнатной температуре составляет около 109 ГПа.",
+      "name": "ВТ1-0"
+    },
+    {
+      "id": "char_DMA",
+      "type": "CharacterizationMethod",
+      "text": "Dynamic Mechanical Analysis",
+      "node_offset": 1900,
+      "definition": "Метод термического анализа, измеряющий изменение механических свойств (модуля упругости) материала при циклическом нагружении в зависимости от температуры; используется для определения температурных интервалов релаксации напряжений и начала рекристаллизации.",
+      "name": "Dynamic Mechanical Analysis"
+    },
+    {
+      "id": "mech_stress_relaxation",
+      "type": "Mechanism",
+      "text": "Stress Relaxation",
+      "node_offset": 1950,
+      "definition": "Процесс постепенного уменьшения внутренних напряжений в материале под воздействием температуры без существенной пластической деформации, наблюдаемый при нагреве холоднодеформированных титановых сплавов в интервале 275–340 °C.",
+      "name": "Stress Relaxation"
+    },
+    {
+      "id": "prop_young_modulus",
+      "type": "Property",
+      "text": "Young Modulus",
+      "node_offset": 2050,
+      "definition": "Физическая константа, характеризующая сопротивление материала упругой деформации при растяжении/сжатии; в титановых сплавах проявляет анизотропию из-за кристаллографической текстуры.",
+      "name": "Young Modulus"
+    },
+    {
+      "id": "mat_Ti-10V-2Fe-3Al",
+      "type": "Material",
+      "text": "Ti-10V-2Fe-3Al",
+      "node_offset": 11250,
+      "definition": "Титановый сплав с высоким содержанием ванадия (10%), железа (2%) и алюминия (3%), применяемый в авиастроении для высокопрочных элементов планера и шасси; упрочняется термической обработкой за счет выделения дисперсной вторичной α-фазы.",
+      "name": "Ti-10V-2Fe-3Al"
+    },
+    {
+      "id": "synth_quenching",
+      "type": "SynthesisMethod",
+      "text": "Quenching",
+      "node_offset": 11600,
+      "definition": "Быстрое охлаждение сплава с высокой температуры (например, из α+β-области) в воду для подавления диффузионных превращений и фиксации пересыщенного твердого раствора.",
+      "name": "Quenching"
+    },
+    {
+      "id": "synth_aging",
+      "type": "SynthesisMethod",
+      "text": "Aging",
+      "node_offset": 11650,
+      "definition": "Этап упрочняющей термической обработки, при котором пересыщенный твердый раствор нагревают до промежуточной температуры для выделения дисперсных частиц вторичных фаз, повышая прочность.",
+      "name": "Aging"
+    },
+    {
+      "id": "mat_secondary_alpha_phase",
+      "type": "Material",
+      "text": "Secondary α-phase",
+      "node_offset": 11400,
+      "definition": "Дисперсные выделения α-Ti, образующиеся в β-матрице титановых сплавов при старении; увеличение дисперсности этой фазы приводит к повышению прочности за счет дисперсионного упрочнения.",
+      "name": "Secondary α-phase"
+    },
+    {
+      "id": "mech_dispersion_strengthening",
+      "type": "Mechanism",
+      "text": "Dispersion Strengthening",
+      "node_offset": 11900,
+      "definition": "Упрочняющий механизм, при котором мелкодисперсные частицы второй фазы блокируют движение дислокаций, повышая прочность и твердость материала.",
+      "name": "Dispersion Strengthening"
+    },
+    {
+      "id": "mech_solid_solution_strengthening",
+      "type": "Mechanism",
+      "text": "Solid Solution Strengthening",
+      "node_offset": 11920,
+      "definition": "Упрочнение сплава за счет искажения кристаллической решетки атомами легирующих элементов, находящихся в твердом растворе, что затрудняет скольжение дислокаций.",
+      "name": "Solid Solution Strengthening"
+    },
+    {
+      "id": "prop_coherent_scattering_region_size",
+      "type": "Property",
+      "text": "Coherent Scattering Region Size",
+      "node_offset": 11800,
+      "definition": "Характеристический размер областей когерентного рассеяния в кристалле, определяемый из уширения дифракционных пиков по формуле Шеррера; используется для оценки дисперсности вторичных фаз.",
+      "name": "Coherent Scattering Region Size"
+    },
+    {
+      "id": "char_SEM",
+      "type": "CharacterizationMethod",
+      "text": "Scanning Electron Microscopy",
+      "node_offset": 11700,
+      "definition": "Метод исследования микроструктуры, основанный на сканировании поверхности образца сфокусированным пучком электронов, позволяющий получать изображения с высоким разрешением и анализировать геометрию фаз.",
+      "name": "Scanning Electron Microscopy"
+    },
+    {
+      "id": "app_aircraft_structural_component",
+      "type": "Application",
+      "text": "Aircraft Structural Component",
+      "node_offset": 11290,
+      "definition": "Детали конструкций летательных аппаратов, такие как элементы планера и стойки шасси, требующие высокой удельной прочности и надежности; изготавливаются из высокопрочных титановых сплавов.",
+      "name": "Aircraft Structural Component"
+    }
+  ],
+  "edges": [
+    {
+      "source": "mat_PT-7M",
+      "target": "synth_expanding",
+      "type": "SYNTHESIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Сплав ПТ-7М (Ti-2.2Al-2.5Zr (мас. %)) относится к деформируемым α-сплавам ... используется преимущественно для изготовления труб ... перед горячим прессованием, применяется операция экспандирования",
+        "source_doi": "unknown",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_PT-7M",
+      "target": "char_macrostructural_analysis",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.98,
+        "evidence_quote": "использовали следующие виды анализа: макроструктурный — визуально с использованием метода шкал",
+        "source_doi": "unknown",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_PT-7M",
+      "target": "char_optical_microscopy",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.98,
+        "evidence_quote": "микроструктурный — c помощью микроскопа OLYMPUS GX51",
+        "source_doi": "unknown",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_PT-7M",
+      "target": "char_XRD",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.98,
+        "evidence_quote": "рентгеноструктурный фазовый (РСФА) — на дифрактометре Bruker D8 Advance в медном Кα-излучении",
+        "source_doi": "unknown",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_PT-7M",
+      "target": "char_instrumented_indentation",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.98,
+        "evidence_quote": "микроиндентирование с определением микротвердости по Виккерсу и контактного модуля упругости с помощью прибора MHTX CSM Instruments по методике В. С. Оливера и Г. М. Фарра",
+        "source_doi": "unknown",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT-20",
+      "target": "synth_multilayer_surfacing",
+      "type": "SYNTHESIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "титанового сплава ВТ-20 после многослойной наплавки",
+        "source_doi": "unknown",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_high_alloyed_alpha_beta_Ti",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "отвечающему всем предъявляемым требованиям: высокой ... ударной вязкости, ... Показано, что наиболее перспективными ... являются высоколегированные сплавы (a + b)-класса и псевдо-b-класса.",
+        "source_doi": "",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_pseudo_beta_Ti",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "отвечающему всем предъявляемым требованиям: высокой ... ударной вязкости, ... Показано, что наиболее перспективными ... являются высоколегированные сплавы (a + b)-класса и псевдо-b-класса.",
+        "source_doi": "",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_high_alloyed_alpha_beta_Ti",
+      "target": "prop_weldability",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "... в сочетании с хорошей свариваемостью. Показано, что наиболее перспективными ... являются высоколегированные сплавы (a + b)-класса и псевдо-b-класса.",
+        "source_doi": "",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_pseudo_beta_Ti",
+      "target": "prop_weldability",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "... в сочетании с хорошей свариваемостью. Показано, что наиболее перспективными ... являются высоколегированные сплавы (a + b)-класса и псевдо-b-класса.",
+        "source_doi": "",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_high_alloyed_alpha_beta_Ti",
+      "target": "prop_technological_plasticity",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "требованиям: высокой технологической пластичности в холодном состоянии ... Показано, что наиболее перспективными ... являются высоколегированные сплавы (a + b)-класса и псевдо-b-класса.",
+        "source_doi": "",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_pseudo_beta_Ti",
+      "target": "prop_technological_plasticity",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "требованиям: высокой технологической пластичности в холодном состоянии ... Показано, что наиболее перспективными ... являются высоколегированные сплавы (a + b)-класса и псевдо-b-класса.",
+        "source_doi": "",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT6",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "KCU 0,25 МДж/см2",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "0.25",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT6",
+      "target": "prop_weldability",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Сварка Хорошая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "good",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT6",
+      "target": "prop_technological_plasticity",
+      "type": "DEGRADES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "ПД Горячая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "hot deformation",
+        "direction": "negative"
+      }
+    },
+    {
+      "source": "mat_VT6",
+      "target": "app_armor_element",
+      "type": "APPLIED_IN",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Титановые сплавы, перспективные для создания защитных элементов с повышенной динамической стойкостью",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT16",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "KCU 0,30 МДж/см2",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "0.30",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT16",
+      "target": "prop_weldability",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Сварка Хорошая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "good",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT16",
+      "target": "prop_technological_plasticity",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "ПД Холодная",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "cold deformation",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT16",
+      "target": "app_armor_element",
+      "type": "APPLIED_IN",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Титановые сплавы, перспективные для создания защитных элементов с повышенной динамической стойкостью",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT23",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "KCU 0,40 МДж/см2",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "0.40",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT23",
+      "target": "prop_weldability",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Сварка Хорошая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "good",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT23",
+      "target": "prop_technological_plasticity",
+      "type": "DEGRADES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "ПД Горячая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "hot deformation",
+        "direction": "negative"
+      }
+    },
+    {
+      "source": "mat_VT23",
+      "target": "app_armor_element",
+      "type": "APPLIED_IN",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Титановые сплавы, перспективные для создания защитных элементов с повышенной динамической стойкостью",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT22I",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "KCU 0,30 МДж/см2",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "0.30",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT22I",
+      "target": "prop_weldability",
+      "type": "DEGRADES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Сварка Удовл.",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "satisfactory",
+        "direction": "negative"
+      }
+    },
+    {
+      "source": "mat_VT22I",
+      "target": "prop_technological_plasticity",
+      "type": "DEGRADES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "ПД Горячая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "hot deformation",
+        "direction": "negative"
+      }
+    },
+    {
+      "source": "mat_VT22I",
+      "target": "app_armor_element",
+      "type": "APPLIED_IN",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Титановые сплавы, перспективные для создания защитных элементов с повышенной динамической стойкостью",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT35",
+      "target": "prop_impact_toughness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "KCU 0,30 МДж/см2",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "0.30",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT35",
+      "target": "prop_weldability",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Сварка Хорошая",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "good",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT35",
+      "target": "prop_technological_plasticity",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "ПД Холодная",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "cold deformation",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_VT35",
+      "target": "app_armor_element",
+      "type": "APPLIED_IN",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Титановые сплавы, перспективные для создания защитных элементов с повышенной динамической стойкостью",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT1-0",
+      "target": "char_DMA",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "изменения модуля упругости от температуры нагрева холоднокатаного сплава ВТ1-0, полученная на приборе DMA 242 C",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "prop_young_modulus",
+      "target": "char_DMA",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "анализ кривой нагрева... сплав ВТ1-0 имеет величину модуля упругости около 109 ГПа",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_VT1-0",
+      "target": "char_optical_microscopy",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "микроструктурных исследований отожженных образцов (рис. 2)",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mech_recrystallization",
+      "target": "prop_texture",
+      "type": "CAUSES",
+      "attributes": {
+        "confidence_score": 0.8,
+        "evidence_quote": "эффект изменения текстуры при рекристаллизации характерен и для титановых сплавов",
+        "source_doi": "10.0000/mat_sci_slice_003",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "neutral"
+      }
+    },
+    {
+      "source": "mech_recrystallization",
+      "target": "prop_young_modulus",
+      "type": "CAUSES",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "формированием характерного «перелома» на кривой изменения модуля упругости",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "neutral"
+      }
+    },
+    {
+      "source": "prop_texture",
+      "target": "char_XRD",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "согласуется с данными рентгеноструктурного анализа отожженных образцов ... увеличение интенсивности линии 110a, что характерно для изменения текстурного состояния",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti-10V-2Fe-3Al",
+      "target": "app_aircraft_structural_component",
+      "type": "APPLIED_IN",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "нашел широкое применение в авиастроении для изготовления высокопрочных конструкционных элементов планера и узлов группы шасси",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti-10V-2Fe-3Al",
+      "target": "synth_quenching",
+      "type": "SYNTHESIZED_BY",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "включающей: закалку с температуры (α + β)-области с охлаждением в воде",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti-10V-2Fe-3Al",
+      "target": "synth_aging",
+      "type": "SYNTHESIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "после упрочняющей термической обработки, включающей... старение при температуре 500 °С",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti-10V-2Fe-3Al",
+      "target": "prop_microhardness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Твердость образцов сплава, содержащего 0.063 вес. %, в исследованном диапазоне времени старения в среднем больше на 8 %, чем у образцов сплава, содержащего 0.008 вес. %",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "+8%",
+        "direction": "positive",
+        "condition_context": "carbon content 0.063 wt.%"
+      }
+    },
+    {
+      "source": "synth_aging",
+      "target": "prop_microhardness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "В результате старения наблюдается прирост твердости за счет дисперсионного упрочнения",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive",
+        "condition_context": "при 500 °С"
+      }
+    },
+    {
+      "source": "mech_dispersion_strengthening",
+      "target": "prop_microhardness",
+      "type": "CAUSES",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "прирост твердости за счет дисперсионного упрочнения",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mech_solid_solution_strengthening",
+      "target": "prop_microhardness",
+      "type": "CAUSES",
+      "attributes": {
+        "confidence_score": 0.85,
+        "evidence_quote": "связано с большим вкладом от твердорастворного и дисперсионного упрочнения при более высоком содержании углерода",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_secondary_alpha_phase",
+      "target": "prop_microhardness",
+      "type": "IMPROVES",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "наблюдаемое отличие твердости сплавов после старения связано с отличием дисперсности, образующейся при старении вторичной α-фазы",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_secondary_alpha_phase",
+      "target": "char_SEM",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Исследование микроструктуры образцов проводили на растровом электронном микроскопе (РЭМ) Quanta 3D FEG",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_secondary_alpha_phase",
+      "target": "char_XRD",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Полученные методом РСФА результаты подтверждают выводы ... дисперсности вторичной α-фазы",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "prop_coherent_scattering_region_size",
+      "target": "char_XRD",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "размеров ОКР вторичной α-фазы определяли ... с использованием дифрактометра Bruker D8 Advance",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "prop_microhardness",
+      "target": "char_instrumented_indentation",
+      "type": "CHARACTERIZED_BY",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Твердость по Виккерсу определяли на твердомере DuraScan50",
+        "source_doi": "10.0000/sample_large",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    }
+  ]
+}

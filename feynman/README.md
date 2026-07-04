@@ -1,0 +1,225 @@
+<p align="center">
+  <a href="https://feynman.is">
+    <img src="assets/hero.png" alt="Feynman CLI" width="800" />
+  </a>
+</p>
+<p align="center">The open source AI research agent.</p>
+<p align="center">
+  <a href="https://feynman.is/docs"><img alt="Docs" src="https://img.shields.io/badge/docs-feynman.is-0d9668?style=flat-square" /></a>
+  <a href="https://github.com/companion-inc/feynman/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/companion-inc/feynman?style=flat-square" /></a>
+</p>
+
+---
+
+### Installation
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://feynman.is/install | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://feynman.is/install.ps1 | iex
+```
+
+The one-line installer fetches the latest tagged release. To pin a version, pass it explicitly, for example `curl -fsSL https://feynman.is/install | bash -s -- 0.2.35`.
+
+The installer downloads a standalone native bundle with its own Node.js runtime.
+
+To upgrade the standalone app later, rerun the installer. `feynman update` only refreshes installed Pi packages inside Feynman's environment; it does not replace the standalone runtime bundle itself.
+
+To uninstall the standalone app, remove the launcher and runtime bundle, then optionally remove `~/.feynman` if you also want to delete settings, sessions, and installed package state. If you also want to delete alphaXiv login state, remove `~/.ahub`. See the installation guide for platform-specific paths.
+
+Local models are supported through the setup flow. For LM Studio, run `feynman setup`, choose `LM Studio`, and keep the default `http://localhost:1234/v1` unless you changed the server port. For LiteLLM, choose `LiteLLM Proxy` and keep the default `http://localhost:4000/v1`. For Ollama or vLLM, choose `Custom provider (baseUrl + API key)`, use `openai-completions`, and point it at the local `/v1` endpoint.
+
+[Yandex AI Studio](https://aistudio.yandex.ru/) is supported out of the box and is the default option in `feynman setup`. Grab an API key and your Yandex Cloud folder ID from AI Studio, then run `feynman setup` (or `feynman model login yandex-ai-studio`) and choose `Yandex AI Studio`; Feynman builds the required `gpt://<folder-id>/<model>/<version>` model URI and `x-folder-id` header for you.
+
+### Skills Only
+
+If you want just the research skills without the full terminal app:
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://feynman.is/install-skills.ps1 | iex
+```
+
+That installs the skill library into `~/.codex/skills/feynman` for Codex. You can also name the Codex target explicitly:
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash -s -- --codex
+```
+
+**Windows (PowerShell):**
+
+```powershell
+& ([scriptblock]::Create((irm https://feynman.is/install-skills.ps1))) -Scope Codex
+```
+
+For a repo-local Claude/agent install instead:
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash -s -- --repo
+```
+
+**Windows (PowerShell):**
+
+```powershell
+& ([scriptblock]::Create((irm https://feynman.is/install-skills.ps1))) -Scope Repo
+```
+
+That installs into `.agents/skills/feynman` under the current repository.
+
+For an OpenCode project-local install instead:
+
+**macOS / Linux:**
+
+```bash
+curl -fsSL https://feynman.is/install-skills | bash -s -- --opencode
+```
+
+**Windows (PowerShell):**
+
+```powershell
+& ([scriptblock]::Create((irm https://feynman.is/install-skills.ps1))) -Scope OpenCode
+```
+
+That installs into `.opencode/skills/feynman` under the current repository.
+
+These installers download the bundled `skills/` and `prompts/` trees plus the repo guidance files referenced by those skills. They do not install the Feynman terminal, bundled Node runtime, auth storage, or Pi packages.
+
+---
+
+### What you type → what happens
+
+```
+$ feynman "what do we know about scaling laws"
+→ Searches papers and web, produces a cited research brief
+
+$ feynman deepresearch "mechanistic interpretability"
+→ Multi-agent investigation with parallel researchers, synthesis, verification
+
+$ feynman lit "RLHF alternatives"
+→ Literature review with consensus, disagreements, open questions, and lab/PI corpus mode when the input names a research group
+
+$ feynman rank "mechanistic interpretability sparse autoencoders"
+→ Decides what to read first with citation, method, reproducibility, and provenance evidence
+
+$ feynman rank "mechanistic interpretability sparse autoencoders" --expand-citations 2
+→ Adds cited and citing papers to the local citation graph before scoring graph prestige
+
+$ feynman rank "mechanistic interpretability sparse autoencoders" --full-text-top 3
+→ Adds section-aware full-text evidence and checklist rubric answers before rescoring
+
+$ feynman rank "mechanistic interpretability sparse autoencoders" --critique-top 5
+→ Adds research-critique strengths, concerns, and follow-up questions grounded in score evidence
+
+$ feynman rank "mechanistic interpretability sparse autoencoders" --synthesize
+→ Writes an auditable model synthesis and names the selected model plus whether it was recommended or explicitly requested
+
+$ feynman paper 10.7717/peerj.4375 --fetch-full-text
+→ Resolves legal full-text access candidates for one paper and fetches source-specific text when available
+
+$ feynman audit 2401.12345
+→ Compares paper claims against the public codebase
+
+$ feynman replicate "chain-of-thought improves math"
+→ Plans replication checks and runs them only after an explicit environment choice
+
+$ feynman recipe "fine-tune a small model for math reasoning"
+→ Finds ranked, implementable ML training recipes from papers, datasets, docs, and code
+```
+
+---
+
+### Workflows
+
+Ask naturally or use slash commands as shortcuts.
+
+| Command | What it does |
+| --- | --- |
+| `feynman rank <topic>` | PaperRank scoring for deciding what to read first, with transparent evidence for citations, methods, reproducibility, and provenance |
+| `feynman paper <id-or-title>` | Paper access resolver for one DOI, arXiv ID, OpenAlex ID, PMID, PMCID, or title, with OpenAlex, arXiv/alphaXiv, DOI, and Europe PMC candidates plus optional source-specific text fetching |
+| `/deepresearch <topic>` | Source-heavy multi-agent investigation |
+| `/lit <topic-or-lab>` | Literature review from paper search and primary sources; lab/PI inputs map publication trajectories and originality-ranked papers |
+| `/review <artifact>` | Research review with severity and revision plan |
+| `/audit <item>` | Paper vs. codebase mismatch audit |
+| `/replicate <paper>` | Plan replication checks; execute only after choosing an environment |
+| `/recipe <task-or-paper>` | Ranked ML training recipes with dataset, method, code, and verification status |
+| `/compare <topic>` | Source comparison matrix |
+| `/draft <topic>` | Paper-style draft from research findings |
+| `/autoresearch <idea>` | Bounded experiment loop with benchmark evidence |
+| `/watch <topic>` | Research watch baseline with optional scheduled follow-up |
+| `/outputs` | Browse all research artifacts |
+
+---
+
+### Agents
+
+Four bundled research agents, invoked by workflow prompts when decomposition helps.
+
+- **Researcher** — gather evidence across papers, web, repos, docs
+- **Reviewer** — internal research critique with severity-graded feedback
+- **Writer** — structured drafts from research notes
+- **Verifier** — inline citations, source URL verification, dead link cleanup
+
+---
+
+### Skills & Tools
+
+- **[AlphaXiv](https://www.alphaxiv.org/)** — paper search, Q&A, code reading, annotations (via Feynman's `alpha` tools and `feynman alpha` command)
+- **[Hugging Face Hub](https://huggingface.co/docs/hub/api)** — dataset metadata, split/schema inspection, and small file reads from model, dataset, and Space repos
+- **Web search** — Exa, Perplexity, or Gemini API; no Chromium cookie access by default
+- **Session search** — indexed recall across prior research sessions
+- **Preview dependencies** — optional browser/PDF rendering support for generated artifacts when preview commands or shell renderers are available
+- **Observability** — PostHog analytics, logs, distributed traces, and Pi AI runtime traces through OpenTelemetry metadata
+- **Research execution options** — Docker, Modal, and RunPod instructions for explicitly chosen replication, benchmark, or dataset-heavy experiment runs; not service deployment or generic cloud administration
+
+---
+
+### How it works
+
+Built on [Pi](https://github.com/badlogic/pi-mono) for the agent runtime, [alphaXiv](https://www.alphaxiv.org/) for paper search and analysis, and CLI tools for compute and execution. Runtime resources follow Pi's documented package model for [packages](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/packages.md), [extensions](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/extensions.md), and [skills](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/skills.md). Hugging Face inspection uses the public [Hub API endpoints](https://huggingface.co/docs/hub/api) and `HF_TOKEN` / `HUGGINGFACE_HUB_TOKEN` environment variables documented by [`huggingface_hub`](https://huggingface.co/docs/huggingface_hub/main/en/package_reference/environment_variables). The ML recipe workflow was informed by the open-source [Hugging Face `ml-intern`](https://github.com/huggingface/ml-intern) research-agent repo, but is implemented as native Feynman prompts, skills, and read-only tools. Research outputs are source-grounded — research claims link to papers, docs, or repos with direct URLs.
+
+---
+
+### Star History
+
+<a href="https://www.star-history.com/?repos=companion-inc%2Ffeynman&type=date&legend=top-left">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=companion-inc/feynman&type=date&theme=dark&legend=top-left" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=companion-inc/feynman&type=date&legend=top-left" />
+    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=companion-inc/feynman&type=date&legend=top-left" />
+  </picture>
+</a>
+
+---
+
+### Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor guide.
+
+```bash
+git clone https://github.com/companion-inc/feynman.git
+cd feynman
+nvm use || nvm install
+npm install
+npm test
+npm run typecheck
+npm run build
+```
+
+[Docs](https://feynman.is/docs) · [Release Notes](RELEASES.md) · [MIT License](LICENSE)

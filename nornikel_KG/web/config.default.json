@@ -1,0 +1,32 @@
+{
+  "port": 3847,
+  "mode": "online",
+  "providers": {
+    "online": "yandex",
+    "offline": "local_transformers"
+  },
+  "paths": {
+    "pythonVenv": "../.venv",
+    "projectRoot": ".."
+  },
+  "pipeline": {
+    "stages": [
+      "slicer",
+      "concepts",
+      "graph",
+      "refiner",
+      "metrics"
+    ],
+    "autoRunMetrics": true,
+    "autoConvertIncoming": true
+  },
+  "hypothesis": {
+    "minConfidence": 0.4,
+    "maxResults": 20,
+    "focusAreas": ["Material", "Property", "SynthesisMethod"]
+  },
+  "ui": {
+    "defaultTheme": "light",
+    "graphMaxNodesLOD": 2000
+  }
+}

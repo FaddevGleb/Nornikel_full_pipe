@@ -1,0 +1,25 @@
+/* Proxima Nova: load from /brand/fonts/ when corporate files are available.
+   Tahoma is the approved fallback per brand guidelines. */
+@font-face {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Proxima Nova"), local("ProximaNova-Regular");
+}
+
+@font-face {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local("Proxima Nova Semibold"), local("ProximaNova-Semibold");
+}
+
+@font-face {
+  font-family: "Proxima Nova";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local("Proxima Nova Bold"), local("ProximaNova-Bold");
+}

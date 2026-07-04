@@ -1,0 +1,35 @@
+{
+  "port": 3847,
+  "mode": "online",
+  "providers": {
+    "online": "openrouter",
+    "offline": "local_transformers"
+  },
+  "paths": {
+    "pythonVenv": "../.venv",
+    "projectRoot": ".."
+  },
+  "pipeline": {
+    "stages": [
+      "slicer",
+      "concepts",
+      "graph",
+      "refiner",
+      "metrics"
+    ],
+    "autoRunMetrics": true
+  },
+  "hypothesis": {
+    "minConfidence": 0.4,
+    "maxResults": 20,
+    "focusAreas": [
+      "Material",
+      "Property",
+      "SynthesisMethod"
+    ]
+  },
+  "ui": {
+    "defaultTheme": "dark",
+    "graphMaxNodesLOD": 2000
+  }
+}
