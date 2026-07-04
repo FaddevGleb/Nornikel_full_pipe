@@ -1,0 +1,707 @@
+{
+  "_meta": {
+    "itext2kg_graph": {
+      "generated_at": "2026-07-02 23:47:50",
+      "mode": "incremental",
+      "config": {
+        "model": "openai/gpt-4.1-mini",
+        "temperature": 0.6,
+        "max_output_tokens": 32768,
+        "overlap": 0,
+        "slice_size": 4000,
+        "auto_mentions_weight": 0.35
+      },
+      "source": {
+        "total_slices": 3,
+        "processed_slices": 3,
+        "skipped_slices": 2,
+        "total_tokens": 11146,
+        "slug": "tehnologiya_izvlecheniya_zolota_i_serebra_iz_upornogo_zolotosoderzhaschego",
+        "concepts_used": 27
+      },
+      "api_usage": {
+        "total_requests": 1,
+        "total_input_tokens": 8908,
+        "total_output_tokens": 4939,
+        "total_tokens": 13847
+      },
+      "graph_stats": {
+        "total_nodes": 33,
+        "chunks": 0,
+        "concepts": 33,
+        "assessments": 0,
+        "total_edges": 28,
+        "edge_types": {
+          "DEGRADES": 1,
+          "SYNTHESIZED_BY": 8,
+          "CHARACTERIZED_BY": 3,
+          "APPLIED_IN": 2,
+          "REQUIRES_CONDITION": 2,
+          "IMPROVES": 5,
+          "SUBCLASS_OF": 2,
+          "USES_FEEDSTOCK": 1,
+          "SUPPORTED_BY": 4
+        }
+      },
+      "processing_time": {
+        "start": "2026-07-02 23:46:28",
+        "end": "2026-07-02 23:47:50",
+        "duration_minutes": 1.37
+      },
+      "processed_slice_ids": [
+        "slice_001",
+        "slice_002",
+        "slice_003"
+      ],
+      "processed_source_files": [
+        "new_textets.txt",
+        "tehnologiya_izvlecheniya_zolota_i_serebra_iz_upornogo_zolotosoderzhaschego.txt"
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "id": "mat_Ti-6Al-4V",
+      "type": "Material",
+      "text": "Ti-6Al-4V",
+      "node_offset": 520,
+      "definition": "Двухфазный (α+β) титановый сплав с 6% алюминия и 4% ванадия, сочетающий высокую прочность, коррозионную стойкость и биосовместимость, широко применяемый в авиации и медицинских имплантатах."
+    },
+    {
+      "id": "prop_Youngs_Modulus",
+      "type": "Property",
+      "text": "Young's Modulus",
+      "node_offset": 540,
+      "definition": "Механическая характеристика жёсткости материала, определяемая как отношение нормального напряжения к соответствующей деформации в упругой области. Регулирование модуля упругости в ячеистых структурах важно для создания имплантатов с требуемой жёсткостью."
+    },
+    {
+      "id": "prop_Porosity",
+      "type": "Property",
+      "text": "Porosity",
+      "node_offset": 570,
+      "definition": "Доля объёма пустот в материале, выраженная в процентах. Пористость существенно влияет на модуль упругости и механические свойства ячеистых титановых конструкций."
+    },
+    {
+      "id": "prop_Anisotropy",
+      "type": "Property",
+      "text": "Anisotropy",
+      "node_offset": 590,
+      "definition": "Свойство материала проявлять различное поведение в зависимости от направления приложения нагрузки. Ячеистые структуры с контролируемой анизотропией позволяют адаптировать имплантат под направленные нагрузки."
+    },
+    {
+      "id": "char_FEM",
+      "type": "CharacterizationMethod",
+      "text": "Finite Element Method",
+      "node_offset": 610,
+      "definition": "Численный метод решения инженерных задач, заключающийся в дискретизации расчётной области на элементы и аппроксимации искомых полей; в работе применён для моделирования напряжённо-деформированного состояния ячеистых структур."
+    },
+    {
+      "id": "char_Compression_Testing_ISO13314",
+      "type": "CharacterizationMethod",
+      "text": "Compression Testing (ISO 13314:2011)",
+      "node_offset": 640,
+      "definition": "Стандартизированный метод определения механических характеристик ячеистых материалов путём одноосного сжатия согласно ISO 13314:2011."
+    },
+    {
+      "id": "synth_Additive_Manufacturing",
+      "type": "SynthesisMethod",
+      "text": "Additive Manufacturing",
+      "node_offset": 220,
+      "definition": "Группа технологий послойного построения трёхмерного объекта по цифровой модели, включающая селективное лазерное плавление (SLM), электронно-лучевое плавление (EBM) и прямое энергетическое осаждение (DED)."
+    },
+    {
+      "id": "app_Medical_Implants",
+      "type": "Application",
+      "text": "Medical Implants",
+      "node_offset": 600,
+      "definition": "Хирургические устройства, вживляемые в организм, где титановые сплавы с контролируемой пористой архитектурой и анизотропией модуля упругости обеспечивают остеоинтеграцию и биосовместимость."
+    },
+    {
+      "id": "mat_Titanium",
+      "type": "Material",
+      "text": "Titanium",
+      "node_offset": 2000,
+      "definition": "Химический элемент (Ti) — лёгкий, прочный, коррозионностойкий металл. Порошок титана используется в аддитивных технологиях для производства деталей."
+    },
+    {
+      "id": "mat_TiO2",
+      "type": "Material",
+      "text": "TiO2",
+      "node_offset": 2100,
+      "definition": "Диоксид титана — твёрдый белый порошок, используемый в качестве прекурсора для алюмотермического восстановления с получением металлического титана."
+    },
+    {
+      "id": "synth_Gas_Atomization",
+      "type": "SynthesisMethod",
+      "text": "Gas Atomization",
+      "node_offset": 2300,
+      "definition": "Метод получения металлического порошка путём распыления струи расплава потоком инертного газа (аргона или гелия), широко применяемый в производстве титановых порошков."
+    },
+    {
+      "id": "synth_Plasma_Atomization",
+      "type": "SynthesisMethod",
+      "text": "Plasma Atomization",
+      "node_offset": 2320,
+      "definition": "Метод получения сферических порошков с помощью плазменных горелок, которые расплавляют и диспергируют металл, обеспечивая высокую чистоту и узкое распределение частиц по размерам."
+    },
+    {
+      "id": "synth_PREP",
+      "type": "SynthesisMethod",
+      "text": "Plasma Rotating Electrode Process",
+      "node_offset": 2340,
+      "definition": "Метод получения порошков, при котором вращающийся титановый электрод оплавляется плазменной дугой, а капли расплава, срываясь под действием центробежной силы, затвердевают в сферические частицы."
+    },
+    {
+      "id": "synth_Mechanical_Grinding_Ti_Sponge",
+      "type": "SynthesisMethod",
+      "text": "Mechanical Grinding of Titanium Sponge",
+      "node_offset": 2360,
+      "definition": "Многостадийный способ производства порошка, при котором титановую губку (получаемую восстановлением TiCl4 магнием) измельчают и рассеивают по фракциям; реализован на «ВСМПО-АВИСМА»."
+    },
+    {
+      "id": "synth_Aluminothermic_Reduction",
+      "type": "SynthesisMethod",
+      "text": "Aluminothermic Reduction",
+      "node_offset": 2380,
+      "definition": "Метод получения титанового порошка путём восстановления TiO2 алюминием при 1150 °C в вакууме. В результате образуются гранулы титана и корунд (Al2O3)."
+    },
+    {
+      "id": "synth_Ultrasonic_Cleaning",
+      "type": "SynthesisMethod",
+      "text": "Ultrasonic Cleaning",
+      "node_offset": 2400,
+      "definition": "Метод очистки поверхностей, основанный на эффекте кавитации: в жидкости под действием ультразвука возникают пузырьки, схлопывание которых создаёт ударные волны, отделяющие загрязнения (например, корунд от титановых гранул)."
+    },
+    {
+      "id": "prop_Particle_Size_Distribution",
+      "type": "Property",
+      "text": "Particle Size Distribution",
+      "node_offset": 2420,
+      "definition": "Характеристика порошка, отражающая долю частиц различных размеров во фракции. Правильное соотношение фракций обеспечивает высокую плотность упаковки и улучшает технологические свойства при аддитивном производстве."
+    },
+    {
+      "id": "prop_Flowability",
+      "type": "Property",
+      "text": "Flowability",
+      "node_offset": 2440,
+      "definition": "Способность порошка равномерно и стабильно растекаться, критически важная для процессов аддитивного производства, где равномерное нанесение слоя влияет на качество детали."
+    },
+    {
+      "id": "prop_Oxygen_Content",
+      "type": "Property",
+      "text": "Oxygen Content",
+      "node_offset": 2460,
+      "definition": "Массовая доля кислорода в титановом порошке; повышенное содержание кислорода охрупчивает титан и ухудшает механические свойства конечных изделий."
+    },
+    {
+      "id": "mech_Cavitation",
+      "type": "Mechanism",
+      "text": "Cavitation",
+      "node_offset": 2480,
+      "definition": "Явление образования и последующего схлопывания парогазовых пузырьков в жидкости под действием ультразвука, сопровождающееся высвобождением энергии и ударными волнами. Используется для ультразвуковой очистки поверхности."
+    },
+    {
+      "id": "cond_Vacuum",
+      "type": "Condition",
+      "text": "Vacuum",
+      "node_offset": 2500,
+      "definition": "Среда с пониженным давлением, используемая при алюмотермическом восстановлении TiO2 для предотвращения окисления титана при высокой температуре."
+    },
+    {
+      "id": "cond_High_Temperature_1150C",
+      "type": "Condition",
+      "text": "High Temperature (1150 °C)",
+      "node_offset": 2520,
+      "definition": "Температура, при которой проводят алюмотермическое восстановление TiO2 алюминием в вакууме для получения титановых гранул."
+    },
+    {
+      "id": "synth_SLM",
+      "type": "SynthesisMethod",
+      "text": "Selective Laser Melting",
+      "node_offset": 2540,
+      "definition": "Аддитивная технология, в которой лазерный луч избирательно расплавляет порошковый материал слой за слоем для создания плотных металлических деталей."
+    },
+    {
+      "id": "synth_EBM",
+      "type": "SynthesisMethod",
+      "text": "Electron Beam Melting",
+      "node_offset": 2560,
+      "definition": "Аддитивная технология, использующая мощный электронный луч для послойного плавления металлического порошка в вакууме, применяемая для титановых сплавов."
+    },
+    {
+      "id": "synth_DED",
+      "type": "SynthesisMethod",
+      "text": "Direct Energy Deposition",
+      "node_offset": 2580,
+      "definition": "Аддитивный процесс, в котором сфокусированная тепловая энергия (лазер, плазма или дуга) расплавляет материал непосредственно в зоне построения, обеспечивая высокую производительность."
+    },
+    {
+      "id": "synth_Cold_Gas_Dynamic_Spraying",
+      "type": "SynthesisMethod",
+      "text": "Cold Gas-Dynamic Spraying",
+      "node_offset": 200,
+      "definition": "Аддитивная технология, при которой порошковые частицы (0.01–50 мкм) ускоряются в сверхзвуковом холодном или подогретом газовом потоке (0.4–0.7 Тпл) и осаждаются на подложку без плавления, обеспечивая покрытия с высокой адгезией (до 120 МПа) и низкой пористостью."
+    },
+    {
+      "id": "prop_Adhesion",
+      "type": "Property",
+      "text": "Adhesion",
+      "node_offset": 780,
+      "definition": "Способность покрытия сохранять механическую связь с подложкой, количественно характеризуемая напряжением, необходимым для отделения покрытия; ключевой параметр надёжности напылённых слоёв."
+    },
+    {
+      "id": "char_SEM",
+      "type": "CharacterizationMethod",
+      "text": "Scanning Electron Microscopy",
+      "node_offset": 1050,
+      "definition": "Метод получения изображений с высоким разрешением путём сканирования поверхности сфокусированным пучком электронов и регистрации вторичных или отражённых электронов, широко используемый для анализа микроструктуры и морфологии материалов."
+    },
+    {
+      "id": "mat_Ti_Ta_Coating",
+      "type": "Material",
+      "text": "Ti-Ta Coating",
+      "node_offset": 1350,
+      "definition": "Биоинертное покрытие на основе β-фазного сплава титана и тантала, наносимое электровзрывным напылением, отличающееся низким модулем упругости и наноструктурированной поверхностью; предназначено для улучшения остеоинтеграции титановых имплантатов."
+    },
+    {
+      "id": "synth_Electroexplosive_Spraying",
+      "type": "SynthesisMethod",
+      "text": "Electroexplosive Spraying",
+      "node_offset": 1400,
+      "definition": "Импульсный плазменный метод нанесения покрытий, при котором поверхность частично переплавляется и затвердевает с высокой скоростью охлаждения, что позволяет формировать наноструктурированные биоинертные покрытия с низким модулем упругости (например, системы Ti-Ta) на медицинских имплантатах."
+    },
+    {
+      "id": "mat_Beta_Ti_Alloys",
+      "type": "Material",
+      "text": "β-Phase Ti-Based Alloys",
+      "node_offset": 1320,
+      "definition": "Титановые сплавы с преобладающей β-фазой при комнатной температуре, обычно содержащие нетоксичные β-стабилизирующие элементы (Ta, Nb, Zr), обладающие низким модулем упругости и высокой биосовместимостью, перспективные для медицинских имплантатов."
+    },
+    {
+      "id": "prop_Nanohardness",
+      "type": "Property",
+      "text": "Nanohardness",
+      "node_offset": 1520,
+      "definition": "Твёрдость материала, измеренная на нанометровом масштабе (часто методом индентирования), отражающая локальные механические свойства поверхностных слоёв, покрытий и наноструктурированных материалов."
+    },
+    {
+      "id": "prop_Bioinertness",
+      "type": "Property",
+      "text": "Bioinertness",
+      "node_offset": 1470,
+      "definition": "Свойство материала не вызывать отторжения или токсических реакций в биологической среде; биоинертные покрытия (например, Ti-Ta) минимизируют воспалительные процессы и способствуют интеграции имплантата."
+    }
+  ],
+  "edges": [
+    {
+      "source": "mat_Ti-6Al-4V",
+      "target": "prop_Youngs_Modulus",
+      "type": "DEGRADES",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "модуль упругости материала зависит от пористости материала... прямо пропорциональная зависимость модуля упругости материала от пористости материала",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 2,
+        "relation_role": "causal",
+        "magnitude": "linear decrease with porosity increase",
+        "direction": "negative",
+        "condition_context": "with increasing porosity"
+      }
+    },
+    {
+      "source": "mat_Ti-6Al-4V",
+      "target": "synth_Additive_Manufacturing",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.92,
+        "evidence_quote": "Применение аддитивных технологий предоставляет возможность создавать ячеистые изделия ... из титановых сплавов",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "prop_Youngs_Modulus",
+      "target": "char_FEM",
+      "type": "CHARACTERIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.93,
+        "evidence_quote": "Для симуляции этого вида испытаний методом конечных элементов применили программный комплекс ABAQUS",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "prop_Youngs_Modulus",
+      "target": "char_Compression_Testing_ISO13314",
+      "type": "CHARACTERIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.91,
+        "evidence_quote": "Испытание ячеистых структур на сжатие производится согласно стандарту ISO 13314:2011",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti-6Al-4V",
+      "target": "app_Medical_Implants",
+      "type": "APPLIED_IN",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.9,
+        "evidence_quote": "Материалы такого типа, изготовленные из титановых сплавов, востребованы в области производства имплантантов",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Titanium",
+      "target": "synth_Gas_Atomization",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Титановые порошки получают следующими способами: газовым распылением (Gas Atomization)",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Titanium",
+      "target": "synth_Plasma_Atomization",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "плазменным распылением (Plasma Atomization)",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Titanium",
+      "target": "synth_PREP",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "плазменным процессом вращающегося электрода (Plasma Rotating Electrode Process)",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Titanium",
+      "target": "synth_Mechanical_Grinding_Ti_Sponge",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "Основным способом получения титановых порошков в России является механическое измельчение титановой губки",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Titanium",
+      "target": "synth_Aluminothermic_Reduction",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.93,
+        "evidence_quote": "Предложена технология получения титановых порошков алюмотермическим способом из TiO2",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "synth_Aluminothermic_Reduction",
+      "target": "cond_High_Temperature_1150C",
+      "type": "REQUIRES_CONDITION",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.94,
+        "evidence_quote": "процесс восстановления происходит при 1150 °C",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "neutral"
+      }
+    },
+    {
+      "source": "synth_Aluminothermic_Reduction",
+      "target": "cond_Vacuum",
+      "type": "REQUIRES_CONDITION",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.94,
+        "evidence_quote": "процесс восстановления происходит при 1150 °C в вакууме",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "neutral"
+      }
+    },
+    {
+      "source": "synth_Ultrasonic_Cleaning",
+      "target": "prop_Oxygen_Content",
+      "type": "IMPROVES",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.88,
+        "evidence_quote": "Ультразвуковая технология очистки ... отделить корунд от поверхности гранул титанового порошка",
+        "source_doi": "new_textets",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "negative",
+        "condition_context": "reduces oxide contamination, improving oxygen content"
+      }
+    },
+    {
+      "source": "synth_Cold_Gas_Dynamic_Spraying",
+      "target": "synth_Additive_Manufacturing",
+      "type": "SUBCLASS_OF",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "аддитивные технологии, Cold Spray технология",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti-6Al-4V",
+      "target": "synth_Cold_Gas_Dynamic_Spraying",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.92,
+        "evidence_quote": "титанового сплава ВТ-6, полученного методом холодного газодинамического напыления",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "synth_Cold_Gas_Dynamic_Spraying",
+      "target": "prop_Adhesion",
+      "type": "IMPROVES",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.93,
+        "evidence_quote": "высокая адгезия покрытий (до 120 МПа)",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "up to 120 MPa",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_Ti-6Al-4V",
+      "target": "char_SEM",
+      "type": "CHARACTERIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.96,
+        "evidence_quote": "Микроструктура сплава ВТ-6, полученного методом ХГН, СЭМ",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti_Ta_Coating",
+      "target": "synth_Electroexplosive_Spraying",
+      "type": "SYNTHESIZED_BY",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.94,
+        "evidence_quote": "электровзрывные покрытия системы Ti-Ta ... реализовано при помощи перспективной методики электровзрывного напыления",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "mat_Ti_Ta_Coating",
+      "target": "mat_Beta_Ti_Alloys",
+      "type": "SUBCLASS_OF",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.92,
+        "evidence_quote": "β-фазные сплавы на основе титана, электровзрывное напыление... системы Ti-Ta",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "taxonomic"
+      }
+    },
+    {
+      "source": "mat_Ti_Ta_Coating",
+      "target": "prop_Youngs_Modulus",
+      "type": "IMPROVES",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.91,
+        "evidence_quote": "получить модуль упругости, сопоставимый с костной тканью человека",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "magnitude": "low",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_Ti_Ta_Coating",
+      "target": "prop_Nanohardness",
+      "type": "IMPROVES",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.84,
+        "evidence_quote": "покрытия системы Ti-Ta, свойства которых ... нанотвердость, модуль упругости",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_Ti_Ta_Coating",
+      "target": "prop_Bioinertness",
+      "type": "IMPROVES",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.93,
+        "evidence_quote": "биоинертные покрытия системы Ti-Ta",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "causal",
+        "direction": "positive"
+      }
+    },
+    {
+      "source": "mat_Ti_Ta_Coating",
+      "target": "app_Medical_Implants",
+      "type": "APPLIED_IN",
+      "weight": 0.5,
+      "conditions": "",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "на поверхности экономичных медицинских имплантатов",
+        "source_doi": "new_textets.txt",
+        "co_occurrence_count": 1,
+        "relation_role": "structural"
+      }
+    },
+    {
+      "source": "proc_ArsenatizingRoasting",
+      "target": "mat_RefractoryGoldArsenicFlotationConcentrate",
+      "type": "USES_FEEDSTOCK",
+      "attributes": {
+        "confidence_score": 0.91,
+        "evidence_quote": "Для подготовки упорного мышьяковистого флотоконцентрата к цианированию испытано применение арсенатизирующего обжига",
+        "source_doi": "10.21285/1814-3520-2019-1-179-186",
+        "co_occurrence_count": 1,
+        "relation_role": "operational",
+        "magnitude": "none",
+        "direction": "neutral",
+        "condition_context": "as pretreatment before cyanidation"
+      }
+    },
+    {
+      "source": "proc_AutoclaveOxidation",
+      "target": "source_DOI_10_21285_1814_3520_2019_1_179_186",
+      "type": "SUPPORTED_BY",
+      "attributes": {
+        "confidence_score": 0.95,
+        "evidence_quote": "В дальнейшем авторами планируется проведение исследования по технологии автоклавного окисления флотоконцентрата с последующим извлечением драгоценных металлов из отмытых твердых остатков автоклавного окисления цианированием",
+        "source_doi": "10.21285/1814-3520-2019-1-179-186",
+        "co_occurrence_count": 1,
+        "relation_role": "structural",
+        "magnitude": "none",
+        "direction": "neutral",
+        "condition_context": "future research direction"
+      }
+    },
+    {
+      "source": "proc_ArsenatizingRoasting",
+      "target": "source_DOI_10_21285_1814_3520_2019_1_179_186",
+      "type": "SUPPORTED_BY",
+      "attributes": {
+        "confidence_score": 1.0,
+        "evidence_quote": "Для подготовки упорного мышьяковистого флотоконцентрата к цианированию испытано применение арсенатизирующего обжига",
+        "source_doi": "10.21285/1814-3520-2019-1-179-186",
+        "co_occurrence_count": 1,
+        "relation_role": "structural",
+        "magnitude": "none",
+        "direction": "neutral",
+        "condition_context": "article evidence"
+      }
+    },
+    {
+      "source": "mat_RefractoryGoldArsenicFlotationConcentrate",
+      "target": "source_DOI_10_21285_1814_3520_2019_1_179_186",
+      "type": "SUPPORTED_BY",
+      "attributes": {
+        "confidence_score": 1.0,
+        "evidence_quote": "исследуемый флотоконцентрат является упорным к цианированию",
+        "source_doi": "10.21285/1814-3520-2019-1-179-186",
+        "co_occurrence_count": 1,
+        "relation_role": "structural",
+        "magnitude": "none",
+        "direction": "neutral",
+        "condition_context": "article evidence"
+      }
+    },
+    {
+      "source": "proc_Cyanidation",
+      "target": "source_DOI_10_21285_1814_3520_2019_1_179_186",
+      "type": "SUPPORTED_BY",
+      "attributes": {
+        "confidence_score": 0.93,
+        "evidence_quote": "к цианированию",
+        "source_doi": "10.21285/1814-3520-2019-1-179-186",
+        "co_occurrence_count": 1,
+        "relation_role": "structural",
+        "magnitude": "none",
+        "direction": "neutral",
+        "condition_context": "processing route mentioned in article"
+      }
+    }
+  ]
+}
