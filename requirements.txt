@@ -1,6 +1,7 @@
 openai>=1.0.0
 python-dotenv>=1.0.0
 pandas
+openpyxl>=3.1.0
 requests
 tqdm
 matplotlib

@@ -4,15 +4,36 @@ from pathlib import Path
 from typing import Any
 
 import requests
-from dotenv import load_dotenv
 from openai import OpenAI, PermissionDeniedError
 
 from logging_utils import get_logger
 
 logger = get_logger("llm_client")
 
-# Ensure local .env is loaded even when this module is imported outside run_pipeline.py
-load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
+
+def _bootstrap_workspace() -> None:
+    import sys
+
+    candidate = Path(__file__).resolve().parent.parent
+    if (candidate / "project.toml").exists():
+        root = candidate
+    else:
+        root = None
+        for parent in Path(__file__).resolve().parents:
+            if (parent / "project.toml").exists():
+                root = parent
+                break
+    if root is None:
+        raise FileNotFoundError("project.toml not found for llm_client bootstrap")
+    root_str = str(root)
+    if root_str not in sys.path:
+        sys.path.insert(0, root_str)
+    from config.loader import apply_env_from_config
+
+    apply_env_from_config()
+
+
+_bootstrap_workspace()
 
 SUPPORTED_PROVIDERS = frozenset({"routerai", "yandex"})
 
@@ -24,6 +45,7 @@ ROUTERAI_MODEL_DEFAULTS = {
     "CRITIC": "qwen/qwen3.6-flash",
     "CRITIC_2": "qwen/qwen3.6-flash",
     "CRITIC_3": "qwen/qwen3.6-flash",
+    "CRITIC_4": "qwen/qwen3.6-flash",
     "SUMMARIZER": "qwen/qwen3.6-flash",
     "EVALUATION": "qwen/qwen3.6-flash",
     "KG": "qwen/qwen3.6-flash",
@@ -34,6 +56,7 @@ YANDEX_MODEL_DEFAULTS = {
     "CRITIC": "qwen3.6-flash/latest",
     "CRITIC_2": "qwen3.6-flash/latest",
     "CRITIC_3": "qwen3.6-flash/latest",
+    "CRITIC_4": "qwen3.6-flash/latest",
     "SUMMARIZER": "qwen3.6-flash/latest",
     "EVALUATION": "qwen3.6-flash/latest",
     "KG": "qwen3.6-flash/latest",
@@ -67,6 +90,7 @@ MODEL_HGA = _resolve_model_env("HGA")
 MODEL_CRITIC = _resolve_model_env("CRITIC")
 MODEL_CRITIC_2 = _resolve_model_env("CRITIC_2")
 MODEL_CRITIC_3 = _resolve_model_env("CRITIC_3")
+MODEL_CRITIC_4 = _resolve_model_env("CRITIC_4")
 MODEL_SUMMARIZER = _resolve_model_env("SUMMARIZER")
 MODEL_EVALUATION = _resolve_model_env("EVALUATION")
 MODEL_KG = _resolve_model_env("KG")
