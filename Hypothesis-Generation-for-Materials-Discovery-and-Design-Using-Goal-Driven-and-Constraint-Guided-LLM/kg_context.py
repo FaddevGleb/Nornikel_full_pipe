@@ -13,8 +13,14 @@ import pandas as pd
 from graph_to_subrelobj import learning_chunk_graph_to_subrelobj
 from llm_client import MODEL_KG, llm_completion
 from logging_utils import get_logger, log_block
+from supplementary_context import append_supplementary_to_prompt
 
 logger = get_logger("kg_context")
+
+RUSSIAN_OUTPUT_RULE = (
+    "Все пояснения и текстовые значения в ответе пиши на русском языке. "
+    "Ключи JSON оставляй на английском, как указано в схеме."
+)
 
 APL_REL_TYPES = frozenset({"APL-CHM", "CHM-APL", "APL-PRO", "PRO-APL"})
 
@@ -50,6 +56,7 @@ def _match_known_in_goal(goal: str, known: list[str]) -> list[str]:
 def extract_applications_from_goal(
     goal: str,
     known_applications: list[str] | None = None,
+    supplementary_context: str | None = None,
 ) -> list[str]:
     if known_applications:
         heuristic = _match_known_in_goal(goal, known_applications)
@@ -60,16 +67,17 @@ def extract_applications_from_goal(
     known_hint = ""
     if known_applications:
         known_hint = (
-            "\nKnown applications in the knowledge graph (prefer exact names from this list):\n"
+            "\nИзвестные приложения в графе знаний (предпочитай точные названия из этого списка):\n"
             + ", ".join(known_applications)
         )
 
-    prompt = f"""You are an expert Material Scientist. Your task is to extract the 'applications' embedded in the goal statement provided to you. Extract the applications and print them separated by commas. The initial letter of every word in the applications list should be a capital letter.
-The extracted applications should be within two or three words.
+    prompt = f"""Ты — эксперт в горном деле и обогащении полезных ископаемых. Твоя задача — извлечь из формулировки цели технологические цели или приложения месторождения. Выведи их через запятую. Каждое слово с заглавной буквы.
+Каждый пункт — не более двух–трёх слов (например, «Флотация никеля», «Кучное выщелачивание», «Сульфидный концентрат»).
 {known_hint}
-Provided Goal Statement:
+Формулировка цели:
 {goal}
 """
+    prompt = append_supplementary_to_prompt(prompt, supplementary_context)
     logger.info("[KG] Extracting applications from goal via %s (%d known applications)", MODEL_KG, len(known_applications or []))
     try:
         extracted = llm_completion(prompt, model=MODEL_KG)
@@ -150,43 +158,50 @@ def _format_query_results(query_results: dict[str, dict[str, list[str]]]) -> str
     parts: list[str] = []
     for apl, data in query_results.items():
         parts.append(
-            f"\nTo satisfy the application of {apl}, the potential materials which can be explored are: {data['materials']} "
-            f"\nTo satisfy the application of {apl}, The properties which can be explored are: {data['properties']} "
+            f"\nДля достижения технологической цели «{apl}» потенциальные руды/минералы для рассмотрения: {data['materials']} "
+            f"\nДля достижения технологической цели «{apl}» показатели процесса для рассмотрения: {data['properties']} "
         )
     return "".join(parts)
 
 
-def summarize_kg_context(goal: str, query_results: dict[str, dict[str, list[str]]]) -> dict[str, Any]:
+def summarize_kg_context(
+    goal: str,
+    query_results: dict[str, dict[str, list[str]]],
+    supplementary_context: str | None = None,
+) -> dict[str, Any]:
     extracted_list = _format_query_results(query_results)
     if not extracted_list.strip():
         logger.info("[KG] No application-based query results to summarize")
         return {}
 
-    prompt = f"""You are an expert Material Scientist.
-Your task is to go through a list of materials and properties extracted based on a particular application from a Knowledge Graph and then add explanations of reasoning behind these extracted materials and properties.
-You have been provided with a goal statement from which appropriate target applications, which are to be explored, have been already extracted.
+    prompt = f"""Ты — эксперт в извлечении и обогащении полезных ископаемых.
+Твоя задача — пройти по списку руд/минералов и показателей процесса, извлечённых для конкретной технологической цели из графа знаний, и добавить пояснения к выбору этих сущностей.
+Тебе дана формулировка цели, из которой уже извлечены целевые задачи.
 
-You must follow the instructions below:
-### Instructions:
-1. Extract only the top twenty materials and properties if there are more than twenty of them.
-2. If there is no data extracted from the Knowledge Graph for an extracted application, then return an empty json dictionary. DO NOT ADD any materials or properties from your parametric knowledge.
-3. DO NOT create any 'application' terms from your own parametric knowledge.
+Следуй инструкциям ниже:
+### Инструкции:
+1. Если сущностей больше двадцати, оставь только двадцать наиболее релевантных руд/минералов и показателей процесса.
+2. Если для извлечённой цели нет данных из графа знаний, верни пустой JSON-словарь {{}}. НЕ добавляй руды, минералы или свойства из своих знаний.
+3. НЕ создавай названия целей из своих знаний.
 
-### Provided Goal Statement:
+### Формулировка цели:
 {goal}
 
-### Extracted Applications from Knowledge Graph corresponding materials and properties:
+### Извлечённые цели из графа знаний с соответствующими рудами/минералами и показателями процесса:
 {extracted_list}
 
-Provide your response in a strict json format with the following format:
+{RUSSIAN_OUTPUT_RULE}
+
+Ответ — строго в формате JSON:
 {{
-"<Name of the extracted application>":
+"<Название извлечённой цели>":
     {{
-        "KG Suggested Materials": {{"material_name": "reasoning"}},
-        "KG Suggested Properties": {{"property_name": "reasoning"}}
+        "KG Suggested Materials": {{"ore_or_mineral_name": "обоснование на русском"}},
+        "KG Suggested Properties": {{"process_indicator_name": "обоснование на русском"}}
     }}
 }}
 """
+    prompt = append_supplementary_to_prompt(prompt, supplementary_context)
     logger.info("[KG] Summarizing application-based KG context via %s", MODEL_KG)
     raw = llm_completion(prompt, model=MODEL_KG, json_format=True)
     log_block(logger, "[KG] Summarize context raw response", raw)
@@ -209,19 +224,21 @@ def get_known_materials(graph: dict[str, Any]) -> list[str]:
 def extract_materials_from_goal(
     goal: str,
     known_materials: list[str] | None = None,
+    supplementary_context: str | None = None,
 ) -> list[str]:
     known_hint = ""
     if known_materials:
         known_hint = (
-            "\nKnown materials in the knowledge graph (prefer exact names from this list):\n"
+            "\nИзвестные материалы в графе знаний (предпочитай точные названия из этого списка):\n"
             + ", ".join(known_materials)
         )
 
-    prompt = f"""You are an expert Material Scientist. Your task is to extract the 'materials' (chemical compounds, alloys, etc.) referenced or implied in the goal statement provided to you. Extract the materials and print them separated by commas.
+    prompt = f"""Ты — эксперт в горном деле и обогащении полезных ископаемых. Твоя задача — извлечь из формулировки цели полезные минералы, типы руд или металлические продукты, явно указанные или подразумеваемые. Выведи их через запятую.
 {known_hint}
-Provided Goal Statement:
+Формулировка цели:
 {goal}
 """
+    prompt = append_supplementary_to_prompt(prompt, supplementary_context)
     logger.info("[KG] Extracting materials from goal via %s (%d known materials)", MODEL_KG, len(known_materials or []))
     extracted = llm_completion(prompt, model=MODEL_KG)
     material_list = [item.strip() for item in extracted.split(",") if item.strip()]
@@ -299,44 +316,47 @@ def query_material_relations(
 def summarize_material_context(
     goal: str,
     material_relations: dict[str, dict[str, list[dict[str, Any]]]],
+    supplementary_context: str | None = None,
 ) -> dict[str, Any]:
     if not material_relations:
         logger.info("[KG] No material-based relations to summarize")
         return {}
 
-    prompt = f"""You are an expert Material Scientist working with an industrial knowledge graph
-that captures not only material properties but also process, equipment, cost, and regulatory
-relations extracted from internal reports and literature.
+    prompt = f"""Ты — эксперт в извлечении и обогащении полезных ископаемых, работающий с промышленным графом знаний,
+который описывает не только свойства руд/минералов, но и связи процесса, оборудования, затрат и нормативных ограничений,
+извлечённые из внутренних отчётов и литературы.
 
-You have been provided with a goal statement and, for each material relevant to it, the raw
-relations extracted from the knowledge graph.
+Тебе дана формулировка цели и для каждой релевантной руды/минерала — сырые связи из графа знаний.
 
-You must follow the instructions below:
-### Instructions:
-1. Group the relations into: properties/effects (IMPROVES, DEGRADES, CAUSES, MITIGATES),
-   process considerations (SYNTHESIZED_BY, CHARACTERIZED_BY, REQUIRES_EQUIPMENT, REQUIRES_CONDITION,
-   USES_FEEDSTOCK), and economic/regulatory constraints (IMPACTS_COST, HAS_REGULATION, HAS_FAILURE_MODE).
-2. For each item, add a short reasoning based ONLY on the provided evidence/magnitude/direction. DO NOT
-   invent facts that are not present in the provided relations.
-3. If a material has no relations in a category, omit that category.
-4. DO NOT create any material names from your own parametric knowledge; only use the materials provided.
+Следуй инструкциям ниже:
+### Инструкции:
+1. Сгруппируй связи на: свойства и эффекты руды/процесса (IMPROVES, DEGRADES, CAUSES, MITIGATES),
+   технологические аспекты (SYNTHESIZED_BY, CHARACTERIZED_BY, REQUIRES_EQUIPMENT, REQUIRES_CONDITION,
+   USES_FEEDSTOCK) и экономические/нормативные ограничения (IMPACTS_COST, HAS_REGULATION, HAS_FAILURE_MODE).
+2. Для каждого пункта добавь краткое обоснование ТОЛЬКО на основе предоставленных evidence/magnitude/direction. НЕ
+   выдумывай факты, которых нет в переданных связях.
+3. Если у руды/минерала нет связей в категории, пропусти эту категорию.
+4. НЕ создавай названия руд или минералов из своих знаний; используй только переданные сущности.
 
-### Provided Goal Statement:
+### Формулировка цели:
 {goal}
 
-### Extracted relations per material from the Knowledge Graph:
+### Извлечённые связи по рудам/минералам из графа знаний:
 {json.dumps(material_relations, ensure_ascii=False, indent=2)}
 
-Provide your response in a strict json format with the following format:
+{RUSSIAN_OUTPUT_RULE}
+
+Ответ — строго в формате JSON:
 {{
-"<Name of the material>":
+"<Название руды или минерала>":
     {{
-        "KG Suggested Properties": {{"property_or_effect_name": "reasoning"}},
-        "KG Process Considerations": {{"consideration_name": "reasoning"}},
-        "KG Economic and Regulatory Constraints": {{"constraint_name": "reasoning"}}
+        "KG Suggested Properties": {{"property_or_effect_name": "обоснование на русском"}},
+        "KG Process Considerations": {{"consideration_name": "обоснование на русском"}},
+        "KG Economic and Regulatory Constraints": {{"constraint_name": "обоснование на русском"}}
     }}
 }}
 """
+    prompt = append_supplementary_to_prompt(prompt, supplementary_context)
     logger.info("[KG] Summarizing material-based KG context via %s", MODEL_KG)
     raw = llm_completion(prompt, model=MODEL_KG, json_format=True)
     log_block(logger, "[KG] Summarize material context raw response", raw)
@@ -348,14 +368,23 @@ def build_kg_context(
     goal: str,
     subrelobj: pd.DataFrame,
     graph: dict[str, Any],
+    supplementary_context: str | None = None,
 ) -> dict[str, Any]:
     known_applications = get_known_applications(graph)
     logger.info("[KG] Graph has %d known Application nodes", len(known_applications))
     if known_applications:
-        apl_list = extract_applications_from_goal(goal, known_applications)
+        apl_list = extract_applications_from_goal(
+            goal,
+            known_applications,
+            supplementary_context=supplementary_context,
+        )
         query_results = query_materials_properties(subrelobj, apl_list)
         if query_results:
-            return summarize_kg_context(goal, query_results)
+            return summarize_kg_context(
+                goal,
+                query_results,
+                supplementary_context=supplementary_context,
+            )
         logger.info("[KG] No application-based matches found; falling back to material-centric context")
 
     # Fallback for graphs without Application nodes (e.g. the extended Nornikel ontology,
@@ -365,9 +394,17 @@ def build_kg_context(
     if not known_materials:
         logger.info("[KG] No Application or Material nodes found; returning empty KG context")
         return {}
-    material_list = extract_materials_from_goal(goal, known_materials)
+    material_list = extract_materials_from_goal(
+        goal,
+        known_materials,
+        supplementary_context=supplementary_context,
+    )
     material_relations = query_material_relations(graph, material_list)
-    return summarize_material_context(goal, material_relations)
+    return summarize_material_context(
+        goal,
+        material_relations,
+        supplementary_context=supplementary_context,
+    )
 
 
 def build_kg_context_from_graph_path(goal: str, graph_path: str | Path) -> tuple[dict[str, Any], pd.DataFrame]:

@@ -10,6 +10,7 @@ from typing import Any
 from agent_framework_materials_discovery import format_constraints, run_accelmat_loop
 from kg_context import build_kg_context, build_subrelobj_from_graph
 from logging_utils import get_logger, log_step
+from supplementary_context import build_supplementary_context
 
 logger = get_logger("pipeline")
 
@@ -21,6 +22,7 @@ class PipelineRequest:
     constraints: list[str]
     max_refinement_iterations: int = 5
     num_hypotheses: int = 20
+    supplementary_document_paths: list[Path] = field(default_factory=list)
 
 
 @dataclass
@@ -31,6 +33,7 @@ class PipelineResult:
     hypotheses: dict[str, Any]
     evaluation: dict[str, Any]
     metadata: dict[str, Any] = field(default_factory=dict)
+    supplementary_context: dict[str, Any] = field(default_factory=dict)
 
 
 def load_pipeline_request(path: str | Path) -> PipelineRequest:
@@ -43,6 +46,9 @@ def load_pipeline_request(path: str | Path) -> PipelineRequest:
         constraints=list(data["constraints"]),
         max_refinement_iterations=int(data.get("max_refinement_iterations", 5)),
         num_hypotheses=int(data.get("num_hypotheses", 20)),
+        supplementary_document_paths=[
+            Path(p) for p in data.get("supplementary_document_paths", [])
+        ],
     )
 
 
@@ -52,7 +58,15 @@ def run_pipeline(
     save_subrelobj_path: Path | None = None,
 ) -> PipelineResult:
     logger.info("[Pipeline] Loading graph from %s", request.graph_path)
-    graph_path = request.graph_path
+    graph_path = request.graph_path.resolve()
+    project_root = Path.cwd()
+
+    supplementary = build_supplementary_context(
+        request.supplementary_document_paths,
+        base_dir=project_root,
+    )
+    supplementary_text = supplementary.formatted_text
+
     with graph_path.open(encoding="utf-8") as f:
         graph = json.load(f)
 
@@ -64,7 +78,12 @@ def run_pipeline(
             logger.info("[Pipeline] Saved SUBRELOBJ to %s", save_subrelobj_path)
 
     with log_step(logger, "Stage 2/3: Build KG context"):
-        kg_context = build_kg_context(request.goal, subrelobj, graph)
+        kg_context = build_kg_context(
+            request.goal,
+            subrelobj,
+            graph,
+            supplementary_context=supplementary_text,
+        )
         logger.info("[Pipeline] KG context entries: %d", len(kg_context))
 
     constraint_text = format_constraints(request.constraints)
@@ -74,6 +93,7 @@ def run_pipeline(
             request.goal,
             constraint_text,
             kg_context,
+            supplementary_context=supplementary_text,
             max_iterations=request.max_refinement_iterations,
             num_hypotheses=request.num_hypotheses,
         )
@@ -84,6 +104,7 @@ def run_pipeline(
         "refinement_iterations": accelmat.refinement_iterations,
         "critics_approved": accelmat.critics_approved,
         "kg_context_empty": not bool(kg_context),
+        "supplementary_document_count": len(supplementary.documents),
     }
     logger.info("[Pipeline] Finished: %s", metadata)
 
@@ -94,11 +115,12 @@ def run_pipeline(
         hypotheses=accelmat.hypotheses,
         evaluation=accelmat.evaluation,
         metadata=metadata,
+        supplementary_context=supplementary.to_dict(),
     )
 
 
 def pipeline_result_to_dict(result: PipelineResult) -> dict[str, Any]:
-    return {
+    payload = {
         "goal": result.goal,
         "constraints": result.constraints,
         "kg_context": result.kg_context,
@@ -106,6 +128,9 @@ def pipeline_result_to_dict(result: PipelineResult) -> dict[str, Any]:
         "evaluation": result.evaluation,
         "metadata": result.metadata,
     }
+    if result.supplementary_context:
+        payload["supplementary_context"] = result.supplementary_context
+    return payload
 
 
 def save_pipeline_result(result: PipelineResult, output_path: str | Path) -> None:

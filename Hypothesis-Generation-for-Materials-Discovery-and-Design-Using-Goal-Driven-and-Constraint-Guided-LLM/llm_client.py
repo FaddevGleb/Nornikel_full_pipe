@@ -4,33 +4,115 @@ from pathlib import Path
 from typing import Any
 
 import requests
-from dotenv import load_dotenv
 from openai import OpenAI, PermissionDeniedError
 
 from logging_utils import get_logger
 
 logger = get_logger("llm_client")
 
-# Ensure local .env is loaded even when this module is imported outside run_pipeline.py
-load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
 
-YANDEX_BASE_URL = os.getenv("YANDEX_BASE_URL", "https://llm.api.cloud.yandex.net/v1")
-YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
-YANDEX_FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
+def _bootstrap_workspace() -> None:
+    import sys
 
-MODEL_HGA = os.getenv("YANDEX_MODEL_HGA", "yandexgpt/rc")
-MODEL_CRITIC = os.getenv("YANDEX_MODEL_CRITIC", "qwen3-235b-a22b-fp8/latest")
-MODEL_CRITIC_2 = os.getenv("YANDEX_MODEL_CRITIC_2", "gpt-oss-120b/latest")
-MODEL_CRITIC_3 = os.getenv("YANDEX_MODEL_CRITIC_3", "qwen3-235b-a22b-fp8/latest")
-MODEL_SUMMARIZER = os.getenv("YANDEX_MODEL_SUMMARIZER", "yandexgpt/rc")
-MODEL_EVALUATION = os.getenv("YANDEX_MODEL_EVALUATION", "yandexgpt/latest")
-MODEL_KG = os.getenv("YANDEX_MODEL_KG", "qwen3-235b-a22b-fp8/latest")
+    candidate = Path(__file__).resolve().parent.parent
+    if (candidate / "project.toml").exists():
+        root = candidate
+    else:
+        root = None
+        for parent in Path(__file__).resolve().parents:
+            if (parent / "project.toml").exists():
+                root = parent
+                break
+    if root is None:
+        raise FileNotFoundError("project.toml not found for llm_client bootstrap")
+    root_str = str(root)
+    if root_str not in sys.path:
+        sys.path.insert(0, root_str)
+    from config.loader import apply_env_from_config
+
+    apply_env_from_config()
+
+
+_bootstrap_workspace()
+
+SUPPORTED_PROVIDERS = frozenset({"routerai", "yandex"})
+
+ROUTERAI_BASE_URL = "https://routerai.ru/api/v1"
+YANDEX_BASE_URL = "https://llm.api.cloud.yandex.net/v1"
+
+ROUTERAI_MODEL_DEFAULTS = {
+    "HGA": "qwen/qwen3.6-flash",
+    "CRITIC": "qwen/qwen3.6-flash",
+    "CRITIC_2": "qwen/qwen3.6-flash",
+    "CRITIC_3": "qwen/qwen3.6-flash",
+    "CRITIC_4": "qwen/qwen3.6-flash",
+    "SUMMARIZER": "qwen/qwen3.6-flash",
+    "EVALUATION": "qwen/qwen3.6-flash",
+    "KG": "qwen/qwen3.6-flash",
+}
+
+YANDEX_MODEL_DEFAULTS = {
+    "HGA": "qwen3.6-flash/latest",
+    "CRITIC": "qwen3.6-flash/latest",
+    "CRITIC_2": "qwen3.6-flash/latest",
+    "CRITIC_3": "qwen3.6-flash/latest",
+    "CRITIC_4": "qwen3.6-flash/latest",
+    "SUMMARIZER": "qwen3.6-flash/latest",
+    "EVALUATION": "qwen3.6-flash/latest",
+    "KG": "qwen3.6-flash/latest",
+}
 
 _client: OpenAI | None = None
+_client_provider: str | None = None
+
+
+def get_provider() -> str:
+    provider = os.getenv("LLM_PROVIDER", "routerai").strip().lower()
+    if provider not in SUPPORTED_PROVIDERS:
+        supported = ", ".join(sorted(SUPPORTED_PROVIDERS))
+        raise ValueError(f"LLM_PROVIDER must be one of: {supported} (got {provider!r})")
+    return provider
+
+
+def _resolve_model_env(role: str) -> str:
+    """Read MODEL_<ROLE>, then provider-specific override, then provider default."""
+    direct = os.getenv(f"MODEL_{role}")
+    if direct:
+        return direct
+
+    provider = get_provider()
+    if provider == "yandex":
+        return os.getenv(f"YANDEX_MODEL_{role}", YANDEX_MODEL_DEFAULTS[role])
+    return os.getenv(f"ROUTERAI_MODEL_{role}", ROUTERAI_MODEL_DEFAULTS[role])
+
+
+MODEL_HGA = _resolve_model_env("HGA")
+MODEL_CRITIC = _resolve_model_env("CRITIC")
+MODEL_CRITIC_2 = _resolve_model_env("CRITIC_2")
+MODEL_CRITIC_3 = _resolve_model_env("CRITIC_3")
+MODEL_CRITIC_4 = _resolve_model_env("CRITIC_4")
+MODEL_SUMMARIZER = _resolve_model_env("SUMMARIZER")
+MODEL_EVALUATION = _resolve_model_env("EVALUATION")
+MODEL_KG = _resolve_model_env("KG")
+
+
+def validate_credentials() -> None:
+    provider = get_provider()
+    if provider == "yandex":
+        if not os.getenv("YANDEX_API_KEY"):
+            raise ValueError("YANDEX_API_KEY is not set (required when LLM_PROVIDER=yandex)")
+        if not os.getenv("YANDEX_FOLDER_ID"):
+            raise ValueError("YANDEX_FOLDER_ID is not set (required when LLM_PROVIDER=yandex)")
+        return
+    if not os.getenv("ROUTERAI_API_KEY"):
+        raise ValueError("ROUTERAI_API_KEY is not set (required when LLM_PROVIDER=routerai)")
 
 
 def resolve_model(model: str) -> str:
-    """Convert a short model name to Yandex gpt:// URI."""
+    """Normalize model id for the active provider."""
+    if get_provider() == "routerai":
+        return model
+
     if model.startswith("gpt://"):
         return model
     folder_id = os.getenv("YANDEX_FOLDER_ID")
@@ -40,17 +122,24 @@ def resolve_model(model: str) -> str:
     return f"gpt://{folder_id}/{model_name}"
 
 
-def get_client() -> OpenAI:
-    global _client
-    if _client is not None:
-        return _client
+def _build_routerai_client() -> OpenAI:
+    api_key = os.getenv("ROUTERAI_API_KEY")
+    if not api_key:
+        raise ValueError("ROUTERAI_API_KEY is not set")
+    return OpenAI(
+        api_key=api_key,
+        base_url=os.getenv("ROUTERAI_BASE_URL", ROUTERAI_BASE_URL),
+    )
+
+
+def _build_yandex_client() -> OpenAI:
     api_key = os.getenv("YANDEX_API_KEY")
     folder_id = os.getenv("YANDEX_FOLDER_ID")
     if not api_key:
         raise ValueError("YANDEX_API_KEY is not set")
     if not folder_id:
         raise ValueError("YANDEX_FOLDER_ID is not set")
-    _client = OpenAI(
+    return OpenAI(
         api_key=api_key,
         base_url=os.getenv("YANDEX_BASE_URL", YANDEX_BASE_URL),
         default_headers={
@@ -58,6 +147,20 @@ def get_client() -> OpenAI:
             "x-data-logging-enabled": "false",
         },
     )
+
+
+def get_client() -> OpenAI:
+    global _client, _client_provider
+    provider = get_provider()
+    if _client is not None and _client_provider == provider:
+        return _client
+
+    if provider == "yandex":
+        _client = _build_yandex_client()
+    else:
+        _client = _build_routerai_client()
+    _client_provider = provider
+    logger.info("[llm_client] Using provider=%s", provider)
     return _client
 
 
@@ -73,7 +176,7 @@ client = _ClientProxy()
 
 
 def chat_completion(**kwargs: Any):
-    """Create a chat completion with Yandex model URI resolution."""
+    """Create a chat completion with provider-specific model resolution."""
     kwargs = dict(kwargs)
     if "model" in kwargs:
         kwargs["model"] = resolve_model(kwargs["model"])
@@ -88,7 +191,7 @@ def llm_completion(
     max_retries: int = 3,
     retry_delay: float = 2.0,
 ) -> str:
-    """Call Yandex AI Studio chat completions with optional JSON mode and retries."""
+    """Call the configured LLM provider with optional JSON mode and retries."""
     model = model or MODEL_KG
     last_error: Exception | None = None
 
@@ -108,16 +211,22 @@ def llm_completion(
             return content
         except (requests.exceptions.Timeout, requests.exceptions.RequestException, Exception) as exc:
             last_error = exc
-            logger.warning("[llm_completion:%s] Attempt %d/%d failed: %s", model, attempt, max_retries, exc)
+            logger.warning(
+                "[llm_completion:%s:%s] Attempt %d/%d failed: %s",
+                get_provider(),
+                model,
+                attempt,
+                max_retries,
+                exc,
+            )
             time.sleep(retry_delay)
 
     if last_error is not None:
-        if isinstance(last_error, PermissionDeniedError):
+        if isinstance(last_error, PermissionDeniedError) and get_provider() == "yandex":
             raise PermissionDeniedError(
                 "Yandex AI Studio returned 403 Permission denied. "
                 "Regenerate the API key in https://aistudio.yandex.ru/ and verify YANDEX_FOLDER_ID "
-                f"({os.getenv('YANDEX_FOLDER_ID', 'unset')}) matches the folder where the key was issued. "
-                "The service account/user needs the ai.languageModels.user role on that folder.",
+                f"({os.getenv('YANDEX_FOLDER_ID', 'unset')}) matches the folder where the key was issued.",
                 response=getattr(last_error, "response", None),
                 body=getattr(last_error, "body", None),
             ) from last_error

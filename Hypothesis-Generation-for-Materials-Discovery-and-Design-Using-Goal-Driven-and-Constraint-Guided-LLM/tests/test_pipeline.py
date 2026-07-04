@@ -67,9 +67,32 @@ def test_save_pipeline_result(tmp_path: Path, pipeline_request) -> None:
         hypotheses=MOCK_HYPOTHESES,
         evaluation=MOCK_EVALUATION,
         metadata={"triplet_count": 50},
+        supplementary_context={
+            "documents": [{"filename": "ore.xlsx", "sheets": ["Grades"], "char_count": 120}],
+            "formatted_text": "### Supplementary Excel Documents\nGold 4.2 g/t",
+        },
     )
     output = tmp_path / "out.json"
     save_pipeline_result(result, output)
     loaded = json.loads(output.read_text(encoding="utf-8"))
     assert loaded["goal"] == pipeline_request.goal
     assert len(loaded["hypotheses"]) == 20
+    assert loaded["supplementary_context"]["documents"][0]["filename"] == "ore.xlsx"
+
+
+def test_load_pipeline_request_with_supplementary_paths(tmp_path: Path) -> None:
+    request_path = tmp_path / "request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "graph_path": "Examples_prev_step/LearningChunkGraph_dedup.json",
+                "goal": "Test goal",
+                "constraints": ["C1"],
+                "supplementary_document_paths": ["inputs/accelmat_docs/run-1/data.xlsx"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    loaded = load_pipeline_request(request_path)
+    assert len(loaded.supplementary_document_paths) == 1
+    assert loaded.supplementary_document_paths[0].as_posix().endswith("data.xlsx")
