@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { configManager } from './configManager.js';
-import { getPythonExecutable, loadProjectConfig } from '../../../../../config/loader.mjs';
+import { getPythonExecutable, loadProjectConfig } from '../../../../config/loader.mjs';
 
 const REQUEST_PREFIX = 'pipeline_request_';
 const RESULT_PREFIX = 'hypotheses_';

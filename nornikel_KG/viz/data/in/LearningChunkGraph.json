@@ -369,10 +369,20 @@
         "edges_updated": 1721,
         "total_nodes": 730,
         "total_edges": 1721
+      },
+      {
+        "timestamp": "2026-07-04T23:11:13.324Z",
+        "source": "LearningChunkGraph_longrange.json",
+        "nodes_added": 0,
+        "nodes_updated": 730,
+        "edges_added": 0,
+        "edges_updated": 1721,
+        "total_nodes": 730,
+        "total_edges": 1721
       }
     ],
-    "_merged_at": "2026-07-04T21:29:48.406Z",
-    "_total_sources": 12
+    "_merged_at": "2026-07-04T23:11:13.324Z",
+    "_total_sources": 13
   },
   "nodes": [
     {

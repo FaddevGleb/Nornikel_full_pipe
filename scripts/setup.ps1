@@ -75,8 +75,14 @@ if (Test-Path $paths.PythonExe) {
 }
 if (-not (Test-Path $paths.PythonExe)) {
     & $pythonLauncher.Exe -m venv $paths.PythonVenv
+    
+    # После создания venv путь к интерпретатору меняется.
+    # Обновляем его явно, чтобы последующие вызовы pip работали корректно.
+    $paths.PythonExe = Join-Path $paths.PythonVenv 'Scripts\python.exe'
+    if (-not (Test-Path $paths.PythonExe)) {
+        $paths.PythonExe = Join-Path $paths.PythonVenv 'bin\python'
+    }
 }
-
 & $paths.PythonExe -m pip install --upgrade pip wheel
 
 if ($Profile -eq 'full') {
@@ -97,11 +103,6 @@ if ($Profile -eq 'full') {
 Write-Step 'pip: tomli / tomli-w (consolidate_config)'
 & $paths.PythonExe -m pip install tomli tomli-w
 
-Write-Step 'Patch project.toml [web.accelmat].pythonExecutable'
-$patchScript = Join-Path $ScriptDir 'lib/patch-accelmat-python.mjs'
-& node $patchScript $paths.PythonExe
-$paths = Resolve-ProjectPaths
-
 if (-not $SkipNpm) {
     Write-Step "Feynman npm ci + build: $($paths.FeynmanRoot)"
     Push-Location $paths.FeynmanRoot
@@ -121,6 +122,11 @@ if (-not $SkipNpm) {
         Pop-Location
     }
 }
+
+Write-Step 'Patch project.toml [web.accelmat].pythonExecutable'
+$patchScript = Join-Path $ScriptDir 'lib/patch-accelmat-python.mjs'
+& node $patchScript $paths.PythonExe
+$paths = Resolve-ProjectPaths
 
 if (-not $SkipSmoke) {
     Write-Step 'Smoke tests'

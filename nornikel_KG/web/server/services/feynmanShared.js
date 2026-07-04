@@ -1,4 +1,4 @@
-import { getFeynmanConfig, getWebConfig, getNornikelKgRoot, getWorkspaceRoot } from '../../../../../config/loader.mjs';
+import { getFeynmanConfig, getWebConfig, getNornikelKgRoot, getWorkspaceRoot } from '../../../../config/loader.mjs';
 import path from 'node:path';
 import os from 'node:os';
 import { accessSync } from 'node:fs';

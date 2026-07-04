@@ -267,7 +267,7 @@ mode = "online"
 
   [web.accelmat]
   projectDir = "../Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM"
-  pythonExecutable = ""
+  pythonExecutable = "C:/NN/Nornikel_full_pipe/nornikel_KG/.venv/Scripts/python.exe"
 
     [web.accelmat.defaults]
     maxRefinementIterations = 1

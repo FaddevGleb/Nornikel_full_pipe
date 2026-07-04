@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { loadProjectConfig } from '../../../../../config/loader.mjs';
+import { loadProjectConfig } from '../../../../config/loader.mjs';
 import { configManager } from './configManager.js';
 import { fileExists } from './graphLoader.js';
 

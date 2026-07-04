@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api, type GraphBundle, type GraphNode } from '../api/client';
+import { api, type GraphBundle } from '../api/client';
 import { useGraphRefresh } from '../context/GraphRefreshContext';
 import { mergeNodeColors, resolveEdgeStyle, resolveNodeColor } from '../config/ontologyTheme';
-import { useCytoscapeGraph } from '../hooks/useCytoscapeGraph';
-import { formatNumber } from '../utils/format';
+import { useCytoscapeGraph, type GraphSelection } from '../hooks/useCytoscapeGraph';
+import { sanitizeGraphBundle } from '../utils/fixDisplayText';
 import { edgeTypeLabel, nodeTypeLabel } from '../utils/ontologyLabels';
+import { GraphInspector } from './GraphInspector';
 import { PageHeader } from './PageHeader';
 import { Button, Spinner } from './ui';
 
@@ -18,7 +19,7 @@ export function GraphView({ active }: Props) {
   const { revision, refreshGraph } = useGraphRefresh();
   const containerRef = useRef<HTMLDivElement>(null);
   const [bundle, setBundle] = useState<GraphBundle | null>(null);
-  const [selected, setSelected] = useState<GraphNode | null>(null);
+  const [selection, setSelection] = useState<GraphSelection>(null);
   const [viewMode, setViewMode] = useState('all');
   const [search, setSearch] = useState('');
   const [vizConfig, setVizConfig] = useState<{ nodeColors: Record<string, string> } | null>(null);
@@ -31,11 +32,21 @@ export function GraphView({ active }: Props) {
 
   const colors = mergeNodeColors(vizConfig?.nodeColors);
 
-  const { initGraph, updateStyles, resizeAndFit, applyViewMode, applyTypeFilter, search: doSearch, setOnSelect, getStats, destroy } =
-    useCytoscapeGraph(containerRef, colors);
+  const {
+    initGraph,
+    updateStyles,
+    resizeAndFit,
+    applyViewMode,
+    applyTypeFilter,
+    search: doSearch,
+    setOnSelect,
+    getStats,
+    clearSelection,
+    destroy,
+  } = useCytoscapeGraph(containerRef, colors);
 
   useEffect(() => {
-    setOnSelect(setSelected);
+    setOnSelect(setSelection);
   }, [setOnSelect]);
 
   useEffect(() => {
@@ -44,7 +55,7 @@ export function GraphView({ active }: Props) {
     setLoading(true);
     Promise.all([api.getGraph(), api.getVizConfig()])
       .then(([graphBundle, viz]) => {
-        setBundle(graphBundle);
+        setBundle(sanitizeGraphBundle(graphBundle));
         setVizConfig(viz);
         setEnabledTypes(new Set(Object.keys(graphBundle.loadStatus.nodeTypes)));
       })
@@ -91,7 +102,10 @@ export function GraphView({ active }: Props) {
   }, [active, graphReady, resizeAndFit]);
 
   useEffect(() => {
-    if (!active) destroy();
+    if (!active) {
+      destroy();
+      setSelection(null);
+    }
   }, [active, destroy]);
 
   useEffect(() => {
@@ -124,6 +138,11 @@ export function GraphView({ active }: Props) {
   const edgeTypesSorted = Object.keys(edgeTypeCounts).sort((a, b) =>
     edgeTypeLabel(a).localeCompare(edgeTypeLabel(b), 'ru'),
   );
+
+  function handleCloseInspector() {
+    setSelection(null);
+    clearSelection();
+  }
 
   return (
     <div className="graph-view">
@@ -186,18 +205,7 @@ export function GraphView({ active }: Props) {
             </>
           )}
 
-          <h3>{t('graph.node_details')}</h3>
-          {selected ? (
-            <div className="node-details">
-              <strong>{selected.name ?? selected.text ?? selected.id}</strong>
-              <div className="node-type">{t('graph.node_type')}: {nodeTypeLabel(selected.type)}</div>
-              <p>{selected.definition ?? '—'}</p>
-              <div>{t('metrics.pagerank')}: {formatNumber(selected.pagerank ?? 0)}</div>
-              <div>{t('metrics.betweenness')}: {formatNumber(selected.betweenness_centrality ?? 0)}</div>
-            </div>
-          ) : (
-            <p className="hint">{t('graph.select_node_hint')}</p>
-          )}
+          <p className="hint graph-sidebar-hint">{t('graph.select_element_hint')}</p>
         </aside>
 
         <div className="graph-main">
@@ -235,7 +243,10 @@ export function GraphView({ active }: Props) {
               {t('graph.stats', { visible: stats.visible, total: stats.total, edges: stats.edges })}
             </span>
           </div>
-          <div ref={containerRef} className="cy-container" />
+          <div className="graph-canvas-wrap">
+            <div ref={containerRef} className="cy-container" />
+            <GraphInspector selection={selection} onClose={handleCloseInspector} />
+          </div>
         </div>
       </div>
     </div>

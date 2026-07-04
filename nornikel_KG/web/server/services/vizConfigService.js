@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getNornikelKgRoot, getVizConfig } from '../../../../../config/loader.mjs';
+import { getNornikelKgRoot, getVizConfig } from '../../../../config/loader.mjs';
 
 const DEFAULT_NODE_SHAPES = {
   Material: 'round-rectangle',

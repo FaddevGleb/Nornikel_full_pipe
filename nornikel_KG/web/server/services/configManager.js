@@ -9,7 +9,7 @@ import {
   getWebConfig,
   getWorkspaceRoot,
   loadProjectConfig,
-} from '../../../../../config/loader.mjs';
+} from '../../../../config/loader.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const WEB_ROOT = path.resolve(__dirname, '../..');
@@ -60,7 +60,7 @@ export class ConfigManager {
 
   async saveSettings(nextSettings) {
     this.settings = nextSettings;
-    const { saveProjectWebConfig } = await import('../../../../../config/loader.mjs');
+    const { saveProjectWebConfig } = await import('../../../../config/loader.mjs');
     await saveProjectWebConfig(nextSettings);
     loadProjectConfig(true);
     return this.settings;

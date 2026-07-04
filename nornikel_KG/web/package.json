@@ -17,6 +17,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@iarna/toml": "^2.2.5",
     "ajv": "^8.17.1",
     "cytoscape": "^3.34.0",
     "cytoscape-cose-bilkent": "^4.1.0",
@@ -29,8 +30,7 @@
     "react-i18next": "^15.4.1",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "uuid": "^11.1.0",
-    "@iarna/toml": "^2.2.5"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",

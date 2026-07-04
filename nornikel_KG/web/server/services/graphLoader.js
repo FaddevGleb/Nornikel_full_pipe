@@ -1,5 +1,6 @@
 import { configManager } from './configManager.js';
 import { readJsonFile } from '../utils/readJson.js';
+import { sanitizeGraphBundle } from '../../shared/fixDisplayText.js';
 import {
   findBestGraphArtifact,
   getArtifactTimestamps,
@@ -90,7 +91,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
     if (missingMetrics) {
       warnings.push('missing_metrics');
     }
-    return {
+    return sanitizeGraphBundle({
       graph,
       concepts,
       loadStatus: buildLoadStatus({
@@ -104,7 +105,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
         graphModifiedAt,
         isStale: false,
       }),
-    };
+    });
   }
 
   if (wowStale) {
@@ -128,7 +129,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
       readJsonFile(fallbackGraph),
       readJsonFile(fallbackConcepts),
     ]);
-    return {
+    return sanitizeGraphBundle({
       graph,
       concepts,
       loadStatus: buildLoadStatus({
@@ -142,7 +143,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
         graphModifiedAt,
         isStale: wowStale,
       }),
-    };
+    });
   }
 
   const outDir = configManager.resolveProjectPath('data/out');
@@ -154,7 +155,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
       readJsonFile(best.path),
       readJsonFile(outConcepts),
     ]);
-    return {
+    return sanitizeGraphBundle({
       graph,
       concepts,
       loadStatus: buildLoadStatus({
@@ -168,7 +169,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
         graphModifiedAt,
         isStale: true,
       }),
-    };
+    });
   }
 
   warnings.push('fallback_to_test_data');
@@ -176,7 +177,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
     readJsonFile(testGraph),
     readJsonFile(testConcepts),
   ]);
-  return {
+  return sanitizeGraphBundle({
     graph,
     concepts,
     loadStatus: buildLoadStatus({
@@ -190,7 +191,7 @@ export async function loadGraphBundle({ autoSync = true } = {}) {
       graphModifiedAt,
       isStale: true,
     }),
-  };
+  });
 }
 
 export { countNodeTypes, fileExists };
