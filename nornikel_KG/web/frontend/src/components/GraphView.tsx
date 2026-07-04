@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { api, type GraphBundle, type GraphNode } from '../api/client';
 import { useCytoscapeGraph, EDGE_STYLES } from '../hooks/useCytoscapeGraph';
 import { formatNumber } from '../utils/format';
+import { edgeTypeLabel, nodeTypeLabel } from '../utils/ontologyLabels';
 import { PageHeader } from './PageHeader';
 import { Button, Spinner } from './ui';
 
@@ -26,7 +27,7 @@ export function GraphView({ active }: Props) {
 
   const colors = vizConfig?.nodeColors;
 
-  const { initGraph, resizeAndFit, applyViewMode, applyTypeFilter, search: doSearch, setOnSelect, getStats, destroy } =
+  const { initGraph, updateStyles, resizeAndFit, applyViewMode, applyTypeFilter, search: doSearch, setOnSelect, getStats, destroy } =
     useCytoscapeGraph(containerRef, colors);
 
   const edgeTypes = bundle
@@ -67,9 +68,14 @@ export function GraphView({ active }: Props) {
   }, [active, bundle, initGraph, getStats]);
 
   useEffect(() => {
-    if (active && graphReady) {
-      resizeAndFit();
-    }
+    if (graphReady) updateStyles();
+  }, [graphReady, colors, updateStyles]);
+
+  useEffect(() => {
+    if (!active || !graphReady) return;
+    const onResize = () => resizeAndFit();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, [active, graphReady, resizeAndFit]);
 
   useEffect(() => {
@@ -127,7 +133,7 @@ export function GraphView({ active }: Props) {
                   }}
                 />
                 <span className="type-swatch" style={{ background: colors?.[type] ?? '#7f8c8d' }} />
-                {t(`ontology.node_types.${type}`, { defaultValue: type })}
+                {nodeTypeLabel(type)}
               </label>
             ))}
           </div>
@@ -141,7 +147,7 @@ export function GraphView({ active }: Props) {
                   return (
                     <li key={type}>
                       <span className={`edge-sample${style.dashed ? ' dashed' : ''}`} style={{ borderColor: style.color }} />
-                      {t(`ontology.edge_types.${type}`, { defaultValue: type })}
+                      {edgeTypeLabel(type)}
                     </li>
                   );
                 })}
@@ -153,6 +159,7 @@ export function GraphView({ active }: Props) {
           {selected ? (
             <div className="node-details">
               <strong>{selected.name ?? selected.text ?? selected.id}</strong>
+              <div className="node-type">{t('graph.node_type')}: {nodeTypeLabel(selected.type)}</div>
               <p>{selected.definition ?? '—'}</p>
               <div>{t('metrics.pagerank')}: {formatNumber(selected.pagerank ?? 0)}</div>
               <div>{t('metrics.betweenness')}: {formatNumber(selected.betweenness_centrality ?? 0)}</div>

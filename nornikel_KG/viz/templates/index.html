@@ -183,15 +183,15 @@
                 maxNodeSize: window.vizConfig?.node_size_max || 60,
                 // Animation settings
                 animationDuration: window.vizConfig?.animation_duration || 500,
-                layoutAnimationDuration: window.vizConfig?.physics_duration || 3000,
-                physicsDuration: window.vizConfig?.physics_duration || 3000,
+                layoutAnimationDuration: window.vizConfig?.physics_enabled ? (window.vizConfig?.physics_duration || 3000) : 0,
+                physicsDuration: window.vizConfig?.physics_enabled ? (window.vizConfig?.physics_duration || 3000) : 0,
                 // Layout
                 initialLayout: window.vizConfig?.initial_layout || 'cose-bilkent',
                 // Labels
                 showLabelsOnHover: true,
                 hoverDelay: 500,
                 // Animation on load
-                animateOnLoad: true
+                animateOnLoad: Boolean(window.vizConfig?.physics_enabled)
             };
             
             // Initialize GraphCore
