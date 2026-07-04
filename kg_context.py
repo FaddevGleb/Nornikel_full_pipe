@@ -64,8 +64,8 @@ def extract_applications_from_goal(
             + ", ".join(known_applications)
         )
 
-    prompt = f"""You are an expert Material Scientist. Your task is to extract the 'applications' embedded in the goal statement provided to you. Extract the applications and print them separated by commas. The initial letter of every word in the applications list should be a capital letter.
-The extracted applications should be within two or three words.
+    prompt = f"""You are an expert in mining and mineral processing. Your task is to extract the processing objectives or deposit applications embedded in the goal statement. Extract them and print them separated by commas. The initial letter of every word should be a capital letter.
+Each item should be within two or three words (e.g. "Nickel Flotation", "Heap Leaching", "Sulfide Concentrate").
 {known_hint}
 Provided Goal Statement:
 {goal}
@@ -150,8 +150,8 @@ def _format_query_results(query_results: dict[str, dict[str, list[str]]]) -> str
     parts: list[str] = []
     for apl, data in query_results.items():
         parts.append(
-            f"\nTo satisfy the application of {apl}, the potential materials which can be explored are: {data['materials']} "
-            f"\nTo satisfy the application of {apl}, The properties which can be explored are: {data['properties']} "
+            f"\nTo satisfy the processing objective of {apl}, the potential ores/minerals which can be explored are: {data['materials']} "
+            f"\nTo satisfy the processing objective of {apl}, the process properties/indicators which can be explored are: {data['properties']} "
         )
     return "".join(parts)
 
@@ -162,28 +162,28 @@ def summarize_kg_context(goal: str, query_results: dict[str, dict[str, list[str]
         logger.info("[KG] No application-based query results to summarize")
         return {}
 
-    prompt = f"""You are an expert Material Scientist.
-Your task is to go through a list of materials and properties extracted based on a particular application from a Knowledge Graph and then add explanations of reasoning behind these extracted materials and properties.
-You have been provided with a goal statement from which appropriate target applications, which are to be explored, have been already extracted.
+    prompt = f"""You are an expert in extraction and beneficiation of useful minerals.
+Your task is to go through a list of ores/minerals and process indicators extracted for a particular processing objective from a Knowledge Graph and add explanations of reasoning behind these extracted entities.
+You have been provided with a goal statement from which appropriate target objectives have already been extracted.
 
 You must follow the instructions below:
 ### Instructions:
-1. Extract only the top twenty materials and properties if there are more than twenty of them.
-2. If there is no data extracted from the Knowledge Graph for an extracted application, then return an empty json dictionary. DO NOT ADD any materials or properties from your parametric knowledge.
-3. DO NOT create any 'application' terms from your own parametric knowledge.
+1. Extract only the top twenty ores/minerals and process indicators if there are more than twenty of them.
+2. If there is no data extracted from the Knowledge Graph for an extracted objective, then return an empty json dictionary. DO NOT ADD any ores, minerals, or properties from your parametric knowledge.
+3. DO NOT create any objective terms from your own parametric knowledge.
 
 ### Provided Goal Statement:
 {goal}
 
-### Extracted Applications from Knowledge Graph corresponding materials and properties:
+### Extracted objectives from Knowledge Graph with corresponding ores/minerals and process indicators:
 {extracted_list}
 
 Provide your response in a strict json format with the following format:
 {{
-"<Name of the extracted application>":
+"<Name of the extracted objective>":
     {{
-        "KG Suggested Materials": {{"material_name": "reasoning"}},
-        "KG Suggested Properties": {{"property_name": "reasoning"}}
+        "KG Suggested Materials": {{"ore_or_mineral_name": "reasoning"}},
+        "KG Suggested Properties": {{"process_indicator_name": "reasoning"}}
     }}
 }}
 """
@@ -217,7 +217,7 @@ def extract_materials_from_goal(
             + ", ".join(known_materials)
         )
 
-    prompt = f"""You are an expert Material Scientist. Your task is to extract the 'materials' (chemical compounds, alloys, etc.) referenced or implied in the goal statement provided to you. Extract the materials and print them separated by commas.
+    prompt = f"""You are an expert in mining and mineral processing. Your task is to extract the useful minerals, ore types, or metal products referenced or implied in the goal statement. Extract them and print them separated by commas.
 {known_hint}
 Provided Goal Statement:
 {goal}
@@ -304,32 +304,32 @@ def summarize_material_context(
         logger.info("[KG] No material-based relations to summarize")
         return {}
 
-    prompt = f"""You are an expert Material Scientist working with an industrial knowledge graph
-that captures not only material properties but also process, equipment, cost, and regulatory
+    prompt = f"""You are an expert in extraction and beneficiation of useful minerals, working with an industrial knowledge graph
+that captures not only ore/mineral properties but also process, equipment, cost, and regulatory
 relations extracted from internal reports and literature.
 
-You have been provided with a goal statement and, for each material relevant to it, the raw
+You have been provided with a goal statement and, for each ore/mineral relevant to it, the raw
 relations extracted from the knowledge graph.
 
 You must follow the instructions below:
 ### Instructions:
-1. Group the relations into: properties/effects (IMPROVES, DEGRADES, CAUSES, MITIGATES),
+1. Group the relations into: ore/process properties and effects (IMPROVES, DEGRADES, CAUSES, MITIGATES),
    process considerations (SYNTHESIZED_BY, CHARACTERIZED_BY, REQUIRES_EQUIPMENT, REQUIRES_CONDITION,
    USES_FEEDSTOCK), and economic/regulatory constraints (IMPACTS_COST, HAS_REGULATION, HAS_FAILURE_MODE).
 2. For each item, add a short reasoning based ONLY on the provided evidence/magnitude/direction. DO NOT
    invent facts that are not present in the provided relations.
-3. If a material has no relations in a category, omit that category.
-4. DO NOT create any material names from your own parametric knowledge; only use the materials provided.
+3. If an ore/mineral has no relations in a category, omit that category.
+4. DO NOT create any ore or mineral names from your own parametric knowledge; only use the entities provided.
 
 ### Provided Goal Statement:
 {goal}
 
-### Extracted relations per material from the Knowledge Graph:
+### Extracted relations per ore/mineral from the Knowledge Graph:
 {json.dumps(material_relations, ensure_ascii=False, indent=2)}
 
 Provide your response in a strict json format with the following format:
 {{
-"<Name of the material>":
+"<Name of the ore or mineral>":
     {{
         "KG Suggested Properties": {{"property_or_effect_name": "reasoning"}},
         "KG Process Considerations": {{"consideration_name": "reasoning"}},

@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
 
 from logging_utils import setup_logging
+from llm_client import validate_credentials
 from pipeline import load_pipeline_request, run_pipeline, save_pipeline_result
 
 
@@ -66,11 +67,10 @@ def main() -> int:
         log_level = "INFO"
     setup_logging(log_level)
 
-    if not os.getenv("YANDEX_API_KEY") or not os.getenv("YANDEX_FOLDER_ID"):
-        print(
-            "Error: YANDEX_API_KEY and YANDEX_FOLDER_ID must be set. Copy .env.example to .env.",
-            file=sys.stderr,
-        )
+    try:
+        validate_credentials()
+    except ValueError as exc:
+        print(f"Error: {exc} Copy .env.example to .env and set LLM_PROVIDER plus API keys.", file=sys.stderr)
         return 1
 
     request = load_pipeline_request(args.request)

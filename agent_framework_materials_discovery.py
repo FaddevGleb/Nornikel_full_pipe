@@ -1,4 +1,4 @@
-"""ACCELMAT agent framework for materials discovery hypothesis generation."""
+"""ACCELMAT agent framework for mineral extraction and beneficiation hypothesis generation."""
 
 from __future__ import annotations
 
@@ -30,6 +30,14 @@ def format_constraints(constraints: list[str]) -> str:
     return "\n".join(f" {index}) {constraint}" for index, constraint in enumerate(constraints, start=1))
 
 
+SUGGESTION_JSON_SCHEMA = """
+Each suggestion must use these JSON keys exactly as written:
+- Materials: target useful mineral(s), ore body, or mineral assemblage to extract (what is recovered)
+- Methods_to_develop_the_materials_suggested: extraction and beneficiation flowsheet (mining, comminution, flotation, gravity separation, heap/tank leaching, hydrometallurgy, pyrometallurgy, dewatering, tailings/waste management)
+- Reasoning: technical and economic justification (head grade, recovery, reagent/water use, CAPEX/OPEX, equipment compatibility, environmental and regulatory compliance)
+"""
+
+
 def construct_prompt_for_hypotheses_generator(
     goal_statement: str,
     constraint_list: str,
@@ -39,14 +47,18 @@ def construct_prompt_for_hypotheses_generator(
     kg_section = ""
     if kg_context:
         kg_section = (
-            "\n\n### Knowledge Graph Context (materials/properties from literature graph):\n"
+            "\n\n### Knowledge Graph Context (ores, minerals, process constraints from literature graph):\n"
             f"{json.dumps(kg_context, ensure_ascii=False, indent=2)}\n"
             "Use ONLY these KG-suggested entities where applicable; do not ignore constraints.\n"
         )
 
-    return f"""{goal_statement}{kg_section} \n\n Constraints:- \n{constraint_list}.\n
-Provide me {num_hypotheses} innovative suggestions that will help achieve the above goal while satisfying all of the above mentioned constraints strictly.
+    return f"""You are generating hypotheses for the extraction and beneficiation of useful minerals (полезные ископаемые).
+
+{goal_statement}{kg_section} \n\n Constraints:- \n{constraint_list}.\n
+Provide me {num_hypotheses} innovative technological suggestions that will help achieve the above goal while satisfying all of the above mentioned constraints strictly.
+Focus on mining, ore preparation, concentration, hydrometallurgical/pyrometallurgical extraction, and tailings management — not on designing new alloys or structural materials.
 Provide reason for each suggestion. The suggestions must be in the below mentioned format in a JSON object. For example:\n
+{SUGGESTION_JSON_SCHEMA}
 {{Suggestion_1:
     Materials:
     Methods_to_develop_the_materials_suggested:
@@ -59,7 +71,7 @@ Suggestion_{num_hypotheses}:
 
 
 def construct_critic_prompt(goal_statement: str, constraint_list: str, chat_history: str) -> str:
-    return f"""{goal_statement}\n\nConstraints:-\n{constraint_list}\n\nSuggestions:\n{chat_history}Given the above goal statement, constraints and suggestions about materials design and discovery, evaluate each suggestion and generate detailed feedback which will help the suggestion generation process to generate suggestions such that they help achieve goal statement and satisfy all the constraints strictly. The detailed feedback should be in the below JSON format strictly:
+    return f"""{goal_statement}\n\nConstraints:-\n{constraint_list}\n\nSuggestions:\n{chat_history}Given the above goal statement, constraints and suggestions about extraction and beneficiation of useful minerals, evaluate each suggestion and generate detailed feedback which will help the suggestion generation process to generate suggestions such that they help achieve goal statement and satisfy all the constraints strictly. Check recovery, head grade assumptions, reagent/water balance, equipment compatibility, cost limits, tailings/environmental compliance, and regulatory claims. The detailed feedback should be in the below JSON format strictly:
     {{"Feedback_for_suggestion_1":
     Meets_the_goal_statement_and_satisfies_all_constraints_strictly: "YES/NO"
     Reasoning:" ",
@@ -72,7 +84,7 @@ def construct_critic_prompt(goal_statement: str, constraint_list: str, chat_hist
 
 
 def construct_feedback_prompt(feedback: str) -> str:
-    return f"""Below provided is the feedback you gave for each of the initial suggestions generated and an overall feedback for the improvement of future suggestion generations\n{feedback}.Refine your suggestions based on the feedback accordingly to meet the goal statement and satisfy all the constraints strictly. The suggestions must be in the below mentioned format in a JSON object. For example:\n
+    return f"""Below provided is the feedback you gave for each of the initial suggestions generated and an overall feedback for the improvement of future suggestion generations\n{feedback}.Refine your suggestions based on the feedback accordingly to meet the goal statement and satisfy all the constraints strictly. Keep focus on useful-mineral extraction and beneficiation (not alloy design). {SUGGESTION_JSON_SCHEMA} The suggestions must be in the below mentioned format in a JSON object. For example:\n
 {{Suggestion_1:
     Materials:
     Methods_to_develop_the_materials_suggested:
@@ -85,7 +97,7 @@ Suggestion_20:
 
 
 def construct_feedback_prompt_for_refined_hypotheses(feedback_history: str, chat_history: str) -> str:
-    return f"""Below provided is the feedback you gave for the initial suggestions\n{feedback_history}. Below are the refined suggestions based on the feedback\n{chat_history}. Now evaluate each refined suggestion and provide detailed feedback which will help the suggestion generation process to generate suggestions such that they help achieve goal statement and satisfy all the constraints strictly. The detailed feedback should be in the below JSON format strictly:
+    return f"""Below provided is the feedback you gave for the initial suggestions\n{feedback_history}. Below are the refined suggestions based on the feedback\n{chat_history}. Now evaluate each refined suggestion for mineral extraction and beneficiation feasibility and provide detailed feedback which will help the suggestion generation process to generate suggestions such that they help achieve goal statement and satisfy all the constraints strictly. The detailed feedback should be in the below JSON format strictly:
     {{"Feedback_for_suggestion_1":
     Meets_the_goal_statement_and_satisfies_all_constraints_strictly: "YES/NO"
     Reasoning:" ",
@@ -183,9 +195,12 @@ def expert_list_generator(goal_statement: str) -> str:
             {
                 "role": "user",
                 "content": (
-                    "Generate a list of experts required to achieve the below mentioned goal:\n"
+                    "Generate a list of experts required to achieve the below mentioned goal in mining "
+                    "and mineral processing (extraction of useful minerals):\n"
                     f"{goal_statement}. Just list the top 5 experts in the format "
-                    '"Expert_1, Expert_2, Expert_3, Expert_4, Expert_5"'
+                    '"Expert_1, Expert_2, Expert_3, Expert_4, Expert_5" '
+                    "(e.g. mining engineer, mineral processing technologist, hydrometallurgist, "
+                    "flotation specialist, environmental/regulatory specialist)."
                 ),
             },
         ],
@@ -205,8 +220,9 @@ def hypothesis_generator(
         {
             "role": "system",
             "content": (
-                f"You are an innovative {expert_list} capable of doing impactful "
-                "materials discovery and design"
+                f"You are an innovative {expert_list} capable of proposing impactful schemes for "
+                "extracting and beneficiating useful minerals (полезные ископаемые): ore preparation, "
+                "concentration, leaching, smelting, and tailings management."
             ),
         },
         {"role": "user", "content": prompt},
@@ -273,10 +289,10 @@ def run_critic(
     refined_feedback_prompt: str | None = None,
 ) -> str:
     system_content = (
-        f"You are an expert {expert_list} capable of doing impactful materials discovery and design. "
-        "Given a goal statement, additional constraints, and a list of suggestions about materials "
-        "design and discovery, your task is to evaluate each suggestion such that it meets the goal "
-        "statement and satisfies all the constraints strictly."
+        f"You are an expert {expert_list} in mining and mineral processing. "
+        "Given a goal statement, additional constraints, and a list of suggestions about extraction "
+        "and beneficiation of useful minerals, your task is to evaluate each suggestion such that it "
+        "meets the goal statement and satisfies all the constraints strictly."
     )
     messages: list[dict[str, str]] = [
         {"role": "system", "content": system_content},
@@ -347,7 +363,7 @@ def summarize_critic_feedback(
     goal_statement: str,
     constraint_list: str,
 ) -> dict[str, Any]:
-    prompt = f"""You are the Summarizer Agent in the ACCELMAT framework.
+    prompt = f"""You are the Summarizer Agent in the ACCELMAT framework for mineral extraction hypotheses.
 Consolidate the feedback from three critic agents into one structured JSON object that can guide hypothesis refinement.
 
 Goal statement:
@@ -381,8 +397,9 @@ def evaluate_hypotheses(
     constraint_list: str,
     hypotheses: dict[str, Any],
 ) -> dict[str, Any]:
-    prompt = f"""You are the Evaluation Agent in the ACCELMAT framework.
+    prompt = f"""You are the Evaluation Agent in the ACCELMAT framework for mineral extraction and beneficiation.
 Evaluate the closeness and quality of the generated hypotheses relative to the goal and constraints.
+Score recovery potential, technical feasibility, cost/environmental compliance, and alignment with stated ore/mineral targets.
 
 Goal statement:
 {goal_statement}

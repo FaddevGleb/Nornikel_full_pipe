@@ -22,27 +22,40 @@ back to the HGA to guide the refinement process. We use GPT-4o as the SA.
 
 4). Evaluation Agent (EA): The Evaluation Agent is used to evaluate the closeness and quality of the generated hypotheses. We use OpenAI-o1-preview as our evaluation agent.
 
-## Setup (Yandex AI Studio)
+## Setup (LLM provider)
 
-LLM calls use [Yandex AI Studio](https://yandex.cloud/en/docs/ai-studio/) via an OpenAI-compatible API.
+LLM calls use an OpenAI-compatible API. Default provider is [RouterAI](https://routerai.ru/) (pay in RUB, no VPN). Yandex AI Studio remains available via `.env`.
 
-1. Create a Yandex Cloud folder and enable AI Studio.
-2. Create an API key in the [Yandex Cloud console](https://console.yandex.cloud/).
-3. Copy `.env.example` to `.env` and set `YANDEX_API_KEY` and `YANDEX_FOLDER_ID`.
+1. Copy `.env.example` to `.env`.
+2. **RouterAI (default):** set `LLM_PROVIDER=routerai` and `ROUTERAI_API_KEY` from [routerai.ru](https://routerai.ru/docs/guides/overview/authentication).
+3. **Yandex:** set `LLM_PROVIDER=yandex`, `YANDEX_API_KEY`, and `YANDEX_FOLDER_ID` from [AI Studio](https://aistudio.yandex.ru/).
 4. Install dependencies: `pip install -r requirements.txt`
-5. Optionally change model names in `.env` (see [model catalog](https://yandex.cloud/en/docs/ai-studio/concepts/generation/models)).
+5. Verify: `python scripts/verify_llm.py`
+6. Optionally override stage models via `MODEL_*`, `ROUTERAI_MODEL_*`, or `YANDEX_MODEL_*` in `.env`.
 
-Default models (tuned for ACCELMAT roles):
+Default models when `LLM_PROVIDER=routerai`:
 
-| Role | Env var | Model | Why |
-|------|---------|-------|-----|
-| Hypotheses Generator | `YANDEX_MODEL_HGA` | `yandexgpt/rc` (5.1 Pro) | Best generation quality for complex scientific tasks |
-| Critic 1 | `YANDEX_MODEL_CRITIC` | `qwen3-235b-a22b-fp8/latest` | Strong instruction following, large context for 20 hypotheses |
-| Critic 2 | `YANDEX_MODEL_CRITIC_2` | `gpt-oss-120b/latest` | Heavy reasoning, different model family |
-| Critic 3 | `YANDEX_MODEL_CRITIC_3` | `aliceai-llm/latest` | Third independent perspective |
-| Summarizer | `YANDEX_MODEL_SUMMARIZER` | `yandexgpt/rc` (5.1 Pro) | Synthesizes critic feedback into structured output |
-| Evaluation Agent | `YANDEX_MODEL_EVALUATION` | `yandexgpt/latest` (5 Pro) | Reliable scoring of final hypotheses |
-| Knowledge Graph | `YANDEX_MODEL_KG` | `aliceai-llm-flash/latest` | Fast agent workflow for many extraction calls |
+| Role | Env override | Default model |
+|------|--------------|---------------|
+| Hypotheses Generator | `ROUTERAI_MODEL_HGA` | `openai/gpt-4o` |
+| Critic 1 | `ROUTERAI_MODEL_CRITIC` | `deepseek/deepseek-chat` |
+| Critic 2 | `ROUTERAI_MODEL_CRITIC_2` | `anthropic/claude-3.5-sonnet` |
+| Critic 3 | `ROUTERAI_MODEL_CRITIC_3` | `google/gemini-2.0-flash-001` |
+| Summarizer | `ROUTERAI_MODEL_SUMMARIZER` | `openai/gpt-4o` |
+| Evaluation Agent | `ROUTERAI_MODEL_EVALUATION` | `openai/gpt-4o-mini` |
+| Knowledge Graph | `ROUTERAI_MODEL_KG` | `deepseek/deepseek-chat` |
+
+Default models when `LLM_PROVIDER=yandex`:
+
+| Role | Env var | Model |
+|------|---------|-------|
+| Hypotheses Generator | `YANDEX_MODEL_HGA` | `yandexgpt/rc` |
+| Critic 1 | `YANDEX_MODEL_CRITIC` | `qwen3-235b-a22b-fp8/latest` |
+| Critic 2 | `YANDEX_MODEL_CRITIC_2` | `gpt-oss-120b/latest` |
+| Critic 3 | `YANDEX_MODEL_CRITIC_3` | `qwen3-235b-a22b-fp8/latest` |
+| Summarizer | `YANDEX_MODEL_SUMMARIZER` | `yandexgpt/rc` |
+| Evaluation Agent | `YANDEX_MODEL_EVALUATION` | `yandexgpt/latest` |
+| Knowledge Graph | `YANDEX_MODEL_KG` | `qwen3-235b-a22b-fp8/latest` |
 
 ## Knowledge Graph conversion
 
