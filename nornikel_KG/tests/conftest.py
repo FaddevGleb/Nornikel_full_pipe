@@ -1,13 +1,18 @@
 """
 Глобальная конфигурация для pytest.
-Автоматически загружает переменные окружения из .env файла.
+Загружает workspace project.toml через NORNIKEL_PROJECT_ROOT.
 """
 
+import os
 from pathlib import Path
+
 import pytest
 from dotenv import load_dotenv
 
-# Загружаем переменные окружения из .env файла при запуске тестов
+WORKSPACE_ROOT = Path(__file__).resolve().parents[3]
+os.environ.setdefault("NORNIKEL_PROJECT_ROOT", str(WORKSPACE_ROOT))
+
+# Legacy .env fallback for integration tests that still read env vars directly
 load_dotenv()
 
 

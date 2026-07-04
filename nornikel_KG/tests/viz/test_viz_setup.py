@@ -2,9 +2,14 @@
 Tests for visualization infrastructure setup.
 """
 
+import os
 from pathlib import Path
 
 import pytest
+
+
+def _workspace_root() -> Path:
+    return Path(os.environ.get("NORNIKEL_PROJECT_ROOT", Path(__file__).resolve().parents[4]))
 
 
 @pytest.mark.viz
@@ -14,10 +19,11 @@ def test_viz_infrastructure():
     assert viz_root.exists(), "viz directory does not exist"
     assert viz_root.is_dir(), "viz is not a directory"
 
-    # Check config file
-    config_file = viz_root / "config.toml"
-    assert config_file.exists(), "viz/config.toml does not exist"
-    assert config_file.is_file(), "viz/config.toml is not a file"
+    # Workspace config (project.toml at repo root)
+    workspace_root = _workspace_root()
+    project_toml = workspace_root / "project.toml"
+    example_toml = workspace_root / "project.example.toml"
+    assert project_toml.exists() or example_toml.exists(), "project.toml or project.example.toml missing at workspace root"
 
     # Check directory structure
     assert (viz_root / "data").exists(), "viz/data directory does not exist"
@@ -44,11 +50,10 @@ def test_viz_infrastructure():
 
 @pytest.mark.viz
 def test_config_loading_with_path():
-    """Test that config.py can load viz config."""
-    from src.utils.config import load_config
+    """Test that load_viz_config reads [viz] from workspace project.toml."""
+    from src.utils.config import load_viz_config
 
-    # Load viz config with explicit path
-    config = load_config("viz/config.toml")
+    config = load_viz_config()
     assert config is not None, "Failed to load viz config"
 
     # Check that viz-specific sections are present

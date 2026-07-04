@@ -444,7 +444,7 @@ const NodeExplorer = {
         // Type badge
         const typeBadge = document.createElement('span');
         typeBadge.className = `node-type-badge badge-${(node.type || 'unknown').toLowerCase()}`;
-        typeBadge.textContent = node.type || 'Unknown';
+        typeBadge.textContent = window.OntologyLabels?.nodeTypeLabel(node.type) ?? node.type ?? 'Unknown';
         nodeHeader.appendChild(typeBadge);
 
         // ID
@@ -669,7 +669,7 @@ const NodeExplorer = {
         // Edge type on first line
         const edgeTypeDiv = document.createElement('div');
         edgeTypeDiv.className = 'edge-type-name';
-        edgeTypeDiv.textContent = edge.type || 'UNKNOWN';
+        edgeTypeDiv.textContent = window.OntologyLabels?.edgeTypeLabel(edge.type) ?? edge.type ?? 'UNKNOWN';
         mergedCell.appendChild(edgeTypeDiv);
 
         // Node type badge on second line
@@ -677,12 +677,7 @@ const NodeExplorer = {
             const badge = document.createElement('span');
             badge.className = `node-type-badge badge-${(otherNode.type || 'unknown').toLowerCase()}`;
             const nodeType = otherNode.type || 'Unknown';
-            // Uniform uppercase abbreviations
-            const displayType = nodeType === 'Assessment' ? 'ASMNT' :
-                               nodeType === 'Chunk' ? 'CHUNK' :
-                               nodeType === 'Concept' ? 'CONCEPT' :
-                               nodeType.toUpperCase();
-            badge.textContent = displayType;
+            badge.textContent = window.OntologyLabels?.nodeTypeLabel(nodeType) ?? nodeType;
             mergedCell.appendChild(badge);
         } else {
             const unknownDiv = document.createElement('div');

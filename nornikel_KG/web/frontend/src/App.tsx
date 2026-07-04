@@ -11,6 +11,7 @@ import { HypothesesView } from './components/HypothesesView';
 import { AccelmatView } from './components/AccelmatView';
 import { FeynmanChat } from './components/FeynmanChat';
 import { Toast } from './components/ui';
+import { GraphRefreshProvider } from './context/GraphRefreshContext';
 import type { ConfigStatus } from './utils/modeLabel';
 
 export default function App() {
@@ -87,6 +88,7 @@ export default function App() {
   }
 
   return (
+    <GraphRefreshProvider>
     <div className="app-shell">
       <SidebarNav view={view} onNavigate={navigate} open={navOpen} onClose={() => setNavOpen(false)} />
 
@@ -133,5 +135,6 @@ export default function App() {
         onSetMode={(mode) => switchMode(mode)}
       />
     </div>
+    </GraphRefreshProvider>
   );
 }

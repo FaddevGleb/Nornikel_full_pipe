@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
+import fs from 'node:fs';
 import path from 'node:path';
-import { configManager } from './configManager.js';
+import { getNornikelKgRoot, getVizConfig } from '../../../../../config/loader.mjs';
 
 const DEFAULT_NODE_SHAPES = {
   Material: 'round-rectangle',
@@ -16,71 +16,56 @@ const DEFAULT_NODE_SHAPES = {
   Concept: 'ellipse',
   Chunk: 'rectangle',
   Assessment: 'round-rectangle',
+  Equipment: 'barrel',
+  BusinessMetric: 'rhomboid',
+  Constraint: 'concave-hexagon',
+  InternalExperiment: 'cut-rectangle',
+  HypothesisRecord: 'round-heptagon',
 };
 
-const DEFAULT_NODE_COLORS = {
-  Material: '#c87941',
-  Property: '#3d9970',
-  SynthesisMethod: '#e67e22',
-  CharacterizationMethod: '#4a90d9',
-  Mechanism: '#8e7cc3',
-  FailureMode: '#e74c3c',
-  Condition: '#95a5a6',
-  Application: '#1abc9c',
-  KPI_Target: '#f1c40f',
-  Source: '#bdc3c7',
-  Concept: '#2ecc71',
-  Chunk: '#3498db',
-  Assessment: '#f39c12',
-};
+let cachedTheme = null;
 
-function parseSimpleTomlSection(content, sectionName) {
-  const regex = new RegExp(`\\[${sectionName}\\]([\\s\\S]*?)(?=\\n\\[|$)`);
-  const match = content.match(regex);
-  if (!match) return {};
-  const result = {};
-  for (const line of match[1].split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const kv = trimmed.match(/^(\w+)\s*=\s*"([^"]*)"/);
-    if (kv) {
-      result[kv[1]] = kv[2];
-    }
-  }
-  return result;
+function loadOntologyTheme() {
+  if (cachedTheme) return cachedTheme;
+  const themePath = path.join(getNornikelKgRoot(), 'viz', 'shared', 'ontology_theme.json');
+  cachedTheme = JSON.parse(fs.readFileSync(themePath, 'utf8'));
+  return cachedTheme;
 }
 
-function parseNodeShapes(content) {
-  const regex = /\[node_shapes\]([\s\S]*?)(?=\n\[|$)/;
-  const match = content.match(regex);
-  if (!match) return { ...DEFAULT_NODE_SHAPES };
-  const shapes = { ...DEFAULT_NODE_SHAPES };
-  for (const line of match[1].split('\n')) {
-    const kv = line.trim().match(/^(\w+)\s*=\s*"([^"]*)"/);
-    if (kv) shapes[kv[1]] = kv[2];
+function mapNodeShapes(viz) {
+  const shapes = viz.node_shapes ?? {};
+  return { ...DEFAULT_NODE_SHAPES, ...shapes };
+}
+
+function mapNodeColors(viz) {
+  const theme = loadOntologyTheme();
+  const colors = viz.colors ?? {};
+  const merged = { ...theme.nodeColors };
+  for (const [key, value] of Object.entries(colors)) {
+    if (typeof value === 'string' && key in merged) {
+      merged[key] = value;
+    }
   }
-  return shapes;
+  return merged;
 }
 
 export async function loadVizConfig() {
-  const vizConfigPath = configManager.resolveProjectPath('viz/config.toml');
-  let content = '';
   try {
-    content = await fs.readFile(vizConfigPath, 'utf8');
+    const viz = getVizConfig();
+    return {
+      nodeShapes: mapNodeShapes(viz),
+      nodeColors: mapNodeColors(viz),
+      visualization: viz.visualization ?? {},
+      graph2html: viz.graph2html ?? {},
+    };
   } catch {
+    const theme = loadOntologyTheme();
     return {
       nodeShapes: DEFAULT_NODE_SHAPES,
-      nodeColors: DEFAULT_NODE_COLORS,
+      nodeColors: theme.nodeColors,
       visualization: {},
     };
   }
-
-  return {
-    nodeShapes: parseNodeShapes(content),
-    nodeColors: DEFAULT_NODE_COLORS,
-    visualization: parseSimpleTomlSection(content, 'visualization'),
-    graph2html: parseSimpleTomlSection(content, 'graph2html'),
-  };
 }
 
-export { DEFAULT_NODE_SHAPES, DEFAULT_NODE_COLORS };
+export { DEFAULT_NODE_SHAPES };

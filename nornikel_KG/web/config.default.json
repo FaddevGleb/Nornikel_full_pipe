@@ -1,4 +1,5 @@
 {
+  "_deprecated": "Migrated to workspace root project.toml [web]. Copy project.example.toml to project.toml.",
   "port": 3847,
   "mode": "online",
   "providers": {
@@ -14,10 +15,14 @@
       "slicer",
       "concepts",
       "graph",
+      "dedup",
       "refiner",
       "metrics"
     ],
-    "autoRunMetrics": true
+    "autoRunMetrics": true,
+    "syncOnGraphStages": ["graph", "dedup", "refiner"],
+    "autoMetricsOnExternalChange": true,
+    "watchDataOut": true
   },
   "hypothesis": {
     "minConfidence": 0.4,

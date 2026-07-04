@@ -1,14 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" role="img" aria-label=">@=8:5;L">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" role="img" aria-label="Норникель">
   <defs>
-    <linearGradient id="nn-ribbon" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="nn-ribbon-a" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0077C8"/>
+      <stop offset="100%" stop-color="#004C97"/>
+    </linearGradient>
+    <linearGradient id="nn-ribbon-b" x1="100%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#0077C8"/>
       <stop offset="100%" stop-color="#004C97"/>
     </linearGradient>
   </defs>
-  <!-- Stylized N ribbon mark (brand colors only) -->
-  <path fill="url(#nn-ribbon)" d="M4 4h14c6 0 10 4 10 10v30H18V18c0-2-1-3-3-3H4V4zm2 14h6c4 0 6 2 6 6v14h-6V24c0-2-1-3-3-3H6V18z"/>
-  <path fill="#004C97" d="M8 8h8v4H8zm0 28h8v4H8z" opacity="0"/>
-  <ellipse cx="16" cy="24" rx="12" ry="20" fill="none"/>
-  <path fill="url(#nn-ribbon)" d="M6 6c8-2 14 2 16 10 2 8-2 16-10 18-4 1-8 0-10-4 10-2 14-10 12-18C12 8 8 6 6 6zm4 32c6-1 10-6 10-12s-4-11-10-12c-2 8 0 16 0 24z"/>
-  <text x="44" y="32" font-family="Tahoma, Arial, sans-serif" font-size="22" font-weight="700" fill="#626262">>@=8:5;L</text>
+  <path fill="url(#nn-ribbon-a)" d="M6 6c6-3 12 1 14 8 1 4 0 8-3 11-5 5-13 5-18 0C-1 19-1 11 6 6zm4 30c5-1 9-5 9-10 0-3-1-6-4-8-1 6 0 12 0 18h-5z"/>
+  <path fill="url(#nn-ribbon-b)" d="M22 6c-4 8 0 16 6 22 3 3 7 4 11 3-6-4-9-11-7-18 2-5 7-9 13-10-8 1-15 7-17 15-2-4-2-8 0-12 4-6 10-9 17-9-9 2-16 8-19 17-1 3-1 7 0 10 2 7 7 13 14 16-5 1-10 0-14-3-8-5-12-14-10-23 2-8 8-15 16-18z" opacity="0.95"/>
+  <text x="44" y="32" font-family="Tahoma, Arial, sans-serif" font-size="22" font-weight="700" fill="#626262">Норникель</text>
 </svg>

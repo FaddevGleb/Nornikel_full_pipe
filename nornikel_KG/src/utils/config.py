@@ -70,63 +70,87 @@ def _find_config_path(config_path):
     return root_path
 
 
-def load_config(config_path=None):
+def _ensure_workspace_importable() -> Path:
+    """Add workspace root (project.toml directory) to sys.path."""
+    env_root = os.environ.get("NORNIKEL_PROJECT_ROOT")
+    if env_root:
+        root = Path(env_root).expanduser().resolve()
+        if (root / "project.toml").exists():
+            root_str = str(root)
+            if root_str not in sys.path:
+                sys.path.insert(0, root_str)
+            return root
+
+    for candidate in [Path.cwd(), *Path.cwd().parents, *Path(__file__).resolve().parents]:
+        if (candidate / "project.toml").exists():
+            root_str = str(candidate.resolve())
+            if root_str not in sys.path:
+                sys.path.insert(0, root_str)
+            return candidate.resolve()
+
+    raise FileNotFoundError(
+        "project.toml not found. Copy project.example.toml to project.toml in workspace root."
+    )
+
+
+def load_viz_config():
+    """Load [viz] section from workspace project.toml."""
+    _ensure_workspace_importable()
+    from config.loader import get_viz_config
+
+    return get_viz_config()
+
+
+def load_config(config_path=None, provider_override=None):
     """
-    Loads and validates configuration from TOML file.
+    Loads and validates configuration.
 
-    Args:
-        config_path: Path to configuration file.
-                    If None, searches in project root and src/.
-
-    Returns:
-        Dictionary with validated configuration
-
-    Raises:
-        ConfigValidationError: On validation errors
-        FileNotFoundError: If configuration file not found
+    Default: workspace project.toml [kg] section.
+    Explicit config_path: legacy file load (tests / viz file paths).
     """
-    config_path = _find_config_path(config_path)
-
-    if not config_path.exists():
-        raise FileNotFoundError(f"Configuration file not found: {config_path}")
-
-    # Load TOML file
-    try:
-        with open(config_path, "rb") as f:
-            config = tomllib.load(f)
-    except Exception as e:
-        raise ConfigValidationError(f"Failed to parse TOML file: {e}")
-
-    # Check if this is a viz config (has viz-specific sections)
-    is_viz_config = "graph2metrics" in config or "visualization" in config
-
-    # Only inject API keys and validate main sections for non-viz configs
-    if not is_viz_config:
-        _inject_env_api_keys(config)
-
+    if config_path is not None:
+        path = Path(config_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Configuration file not found: {path}")
         try:
-            _validate_config(config)
+            with open(path, "rb") as f:
+                config = tomllib.load(f)
         except Exception as e:
-            raise ConfigValidationError(f"Configuration validation failed: {e}")
+            raise ConfigValidationError(f"Failed to parse TOML file: {e}")
 
-    # Optional consistency check (warning, not error)
+        is_viz_config = "graph2metrics" in config or "visualization" in config
+        if not is_viz_config:
+            _inject_env_api_keys(config)
+            try:
+                _validate_config(config)
+            except Exception as e:
+                raise ConfigValidationError(f"Configuration validation failed: {e}")
+        return config
+
+    _ensure_workspace_importable()
+    from config.loader import apply_env_from_config, get_kg_config, patch_kg_provider
+
+    apply_env_from_config()
+    config = patch_kg_provider(provider_override) if provider_override else get_kg_config()
+
+    try:
+        _validate_config(config)
+    except Exception as e:
+        raise ConfigValidationError(f"Configuration validation failed: {e}")
+
     for section in ["itext2kg_concepts", "itext2kg_graph", "refiner"]:
         if section not in config:
             continue
-
         is_reasoning = config[section].get("is_reasoning", False)
         has_temperature = config[section].get("temperature") is not None
         has_reasoning_effort = config[section].get("reasoning_effort") is not None
-
         if is_reasoning and has_temperature:
             logger.warning(
-                f"[{section}] Reasoning model with temperature parameter - "
-                f"might be ignored by API"
+                f"[{section}] Reasoning model with temperature parameter - might be ignored by API"
             )
         if not is_reasoning and has_reasoning_effort:
             logger.warning(
-                f"[{section}] Non-reasoning model with reasoning_effort - "
-                f"will be ignored by API"
+                f"[{section}] Non-reasoning model with reasoning_effort - will be ignored by API"
             )
 
     return config

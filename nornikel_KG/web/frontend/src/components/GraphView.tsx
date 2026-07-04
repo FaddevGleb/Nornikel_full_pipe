@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, type GraphBundle, type GraphNode } from '../api/client';
-import { useCytoscapeGraph, EDGE_STYLES } from '../hooks/useCytoscapeGraph';
+import { useGraphRefresh } from '../context/GraphRefreshContext';
+import { mergeNodeColors, resolveEdgeStyle, resolveNodeColor } from '../config/ontologyTheme';
+import { useCytoscapeGraph } from '../hooks/useCytoscapeGraph';
 import { formatNumber } from '../utils/format';
 import { edgeTypeLabel, nodeTypeLabel } from '../utils/ontologyLabels';
 import { PageHeader } from './PageHeader';
@@ -13,6 +15,7 @@ interface Props {
 
 export function GraphView({ active }: Props) {
   const { t } = useTranslation();
+  const { revision, refreshGraph } = useGraphRefresh();
   const containerRef = useRef<HTMLDivElement>(null);
   const [bundle, setBundle] = useState<GraphBundle | null>(null);
   const [selected, setSelected] = useState<GraphNode | null>(null);
@@ -23,16 +26,13 @@ export function GraphView({ active }: Props) {
   const [stats, setStats] = useState({ total: 0, visible: 0, edges: 0 });
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [graphReady, setGraphReady] = useState(false);
 
-  const colors = vizConfig?.nodeColors;
+  const colors = mergeNodeColors(vizConfig?.nodeColors);
 
   const { initGraph, updateStyles, resizeAndFit, applyViewMode, applyTypeFilter, search: doSearch, setOnSelect, getStats, destroy } =
     useCytoscapeGraph(containerRef, colors);
-
-  const edgeTypes = bundle
-    ? [...new Set((bundle.graph.edges ?? []).map((e) => e.type ?? e.relationship ?? 'default'))].sort()
-    : [];
 
   useEffect(() => {
     setOnSelect(setSelected);
@@ -50,7 +50,19 @@ export function GraphView({ active }: Props) {
       })
       .catch((err) => setLoadError(err instanceof Error ? err.message : 'load_failed'))
       .finally(() => setLoading(false));
-  }, [active]);
+  }, [active, revision]);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setLoadError(null);
+    try {
+      await refreshGraph(false);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'load_failed');
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   useEffect(() => {
     if (!active || !bundle) return;
@@ -99,6 +111,20 @@ export function GraphView({ active }: Props) {
   const loadStatus = bundle?.loadStatus;
   const shortPath = loadStatus?.graphPath?.split(/[/\\]/).slice(-3).join('/') ?? '';
 
+  const nodeTypesSorted = Object.keys(loadStatus?.nodeTypes ?? {}).sort((a, b) =>
+    nodeTypeLabel(a).localeCompare(nodeTypeLabel(b), 'ru'),
+  );
+
+  const edgeTypeCounts = (bundle?.graph.edges ?? []).reduce<Record<string, number>>((acc, edge) => {
+    const type = edge.type ?? edge.relationship ?? 'default';
+    acc[type] = (acc[type] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const edgeTypesSorted = Object.keys(edgeTypeCounts).sort((a, b) =>
+    edgeTypeLabel(a).localeCompare(edgeTypeLabel(b), 'ru'),
+  );
+
   return (
     <div className="graph-view">
       <PageHeader title={t('graph.title')} description={t('graph.page_desc')} />
@@ -111,43 +137,48 @@ export function GraphView({ active }: Props) {
 
       <div className="graph-layout">
         <aside className="graph-sidebar">
-          <h3>{t('graph.filters')}</h3>
-          <select value={viewMode} onChange={(e) => setViewMode(e.target.value)} className="graph-select" aria-label={t('graph.filters')}>
+          <h3>{t('graph.view_mode')}</h3>
+          <select value={viewMode} onChange={(e) => setViewMode(e.target.value)} className="graph-select" aria-label={t('graph.view_mode')}>
             <option value="all">{t('graph.view_all')}</option>
             <option value="materials">{t('graph.view_materials')}</option>
             <option value="properties">{t('graph.view_properties')}</option>
             <option value="synthesis">{t('graph.view_synthesis')}</option>
           </select>
 
-          <div className="type-filters">
-            {Object.keys(loadStatus?.nodeTypes ?? {}).map((type) => (
-              <label key={type} className="type-filter">
-                <input
-                  type="checkbox"
-                  checked={enabledTypes.has(type)}
-                  onChange={(e) => {
-                    const next = new Set(enabledTypes);
-                    if (e.target.checked) next.add(type);
-                    else next.delete(type);
-                    setEnabledTypes(next);
-                  }}
-                />
-                <span className="type-swatch" style={{ background: colors?.[type] ?? '#7f8c8d' }} />
-                {nodeTypeLabel(type)}
-              </label>
+          <h3>{t('graph.node_legend')}</h3>
+          <ul className="node-legend type-filters">
+            {nodeTypesSorted.map((type) => (
+              <li key={type}>
+                <label className="type-filter">
+                  <input
+                    type="checkbox"
+                    checked={enabledTypes.has(type)}
+                    onChange={(e) => {
+                      const next = new Set(enabledTypes);
+                      if (e.target.checked) next.add(type);
+                      else next.delete(type);
+                      setEnabledTypes(next);
+                    }}
+                  />
+                  <span className="type-swatch" style={{ background: resolveNodeColor(type) }} />
+                  <span className="legend-label">{nodeTypeLabel(type)}</span>
+                  <span className="legend-count">{loadStatus?.nodeTypes[type] ?? 0}</span>
+                </label>
+              </li>
             ))}
-          </div>
+          </ul>
 
-          {edgeTypes.length > 0 && (
+          {edgeTypesSorted.length > 0 && (
             <>
               <h3>{t('graph.edge_legend')}</h3>
               <ul className="edge-legend">
-                {edgeTypes.map((type) => {
-                  const style = EDGE_STYLES[type] ?? EDGE_STYLES.default;
+                {edgeTypesSorted.map((type) => {
+                  const style = resolveEdgeStyle(type);
                   return (
                     <li key={type}>
                       <span className={`edge-sample${style.dashed ? ' dashed' : ''}`} style={{ borderColor: style.color }} />
-                      {edgeTypeLabel(type)}
+                      <span className="legend-label">{edgeTypeLabel(type)}</span>
+                      <span className="legend-count">{edgeTypeCounts[type]}</span>
                     </li>
                   );
                 })}
@@ -180,9 +211,18 @@ export function GraphView({ active }: Props) {
                   {t('graph.run_metrics')}
                 </Button>
               )}
+              {loadStatus.source === 'out' && (
+                <span className="hint-inline"> {t('graph.fallback_out')}</span>
+              )}
+              {loadStatus.isStale && loadStatus.source !== 'out' && (
+                <span className="hint-inline"> {t('graph.metrics_pending')}</span>
+              )}
             </div>
           )}
           <div className="graph-toolbar">
+            <Button variant="secondary" onClick={handleRefresh} disabled={refreshing || loading}>
+              {refreshing ? t('graph.refreshing') : t('graph.refresh')}
+            </Button>
             <input
               type="search"
               value={search}

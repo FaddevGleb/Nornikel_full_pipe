@@ -1,6 +1,6 @@
 {
-  "activeJobId": "dcfce7cc-7b2f-4553-8911-0a7455f00b6e",
-  "lastPipelineStage": "concepts",
+  "activeJobId": null,
+  "lastPipelineStage": "metrics",
   "selectedGraphPath": null,
   "lastDiagnosticsReportId": "C:\\NORNIKEL3\\k2-18\\viz\\logs\\offline_diagnostics_2026-07-02T15-41-38-015Z.json",
   "lastAuditReportPath": null,
@@ -2809,7 +2809,7 @@
   },
   "artifactsMetadata": {
     "lastProvider": "openrouter",
-    "lastGeneratedAt": "2026-07-03T01:31:59.848Z"
+    "lastGeneratedAt": "2026-07-04T21:29:48.220Z"
   },
   "integrationMode": "incremental"
 }

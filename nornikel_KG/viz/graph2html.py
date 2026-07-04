@@ -13,7 +13,7 @@ import minify_html
 from jinja2 import Environment, FileSystemLoader
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.utils.config import load_config
+from src.utils.config import load_viz_config
 from src.utils.console_encoding import setup_console_encoding
 from src.utils.exit_codes import (
     EXIT_CONFIG_ERROR, EXIT_INPUT_ERROR, EXIT_IO_ERROR,
@@ -244,6 +244,49 @@ def generate_style_tags(file_list, embed):
     return "\n".join(tags)
 
 
+def load_ontology_theme(viz_dir, logger):
+    """Load shared ontology theme (colors, edge styles metadata, RU labels)."""
+    theme_path = viz_dir / "shared" / "ontology_theme.json"
+    if not theme_path.exists():
+        logger.warning("ontology_theme.json not found at %s", theme_path)
+        return {}
+    try:
+        with open(theme_path, encoding="utf-8") as f:
+            theme = json.load(f)
+        logger.info("Loaded ontology_theme.json")
+        return theme
+    except Exception as e:
+        logger.warning("Failed to load ontology_theme.json: %s", e)
+        return {}
+
+
+def build_node_colors(colors_config, ontology_theme):
+    """Merge TOML color overrides onto ontology theme node colors."""
+    merged = dict(ontology_theme.get("nodeColors", {}))
+    skip_keys = {
+        "theme", "cluster_palette", "path_causal", "path_innovation",
+        "path_failure", "path_economic", "gradient_high_confidence",
+        "gradient_medium_confidence", "gradient_low_confidence",
+    }
+    for key, value in colors_config.items():
+        if key in skip_keys or not isinstance(value, str):
+            continue
+        merged[key] = value
+    return merged
+
+
+def build_node_shapes(config):
+    """Return full node shape map from [node_shapes] TOML section."""
+    shapes = config.get("node_shapes", {})
+    if isinstance(shapes, dict) and shapes:
+        return dict(shapes)
+    return {
+        "Chunk": "hexagon",
+        "Concept": "star",
+        "Assessment": "roundrectangle",
+    }
+
+
 def generate_html(graph_data, concepts_data, config, viz_dir, logger, test_mode=False):
     """Генерирует полный HTML файл для production или test режима."""
     # Настройка Jinja2
@@ -405,6 +448,20 @@ def generate_html(graph_data, concepts_data, config, viz_dir, logger, test_mode=
             logger.warning(f"Failed to load tour_mode.js: {e}")
     else:
         logger.warning("tour_mode.js not found - Tour Mode disabled")
+
+    ontology_theme = load_ontology_theme(viz_dir, logger)
+    node_colors = build_node_colors(colors_config, ontology_theme)
+    node_shapes = build_node_shapes(config)
+
+    ontology_labels_content = ""
+    ontology_labels_path = viz_dir / "static" / "ontology_labels.js"
+    if ontology_labels_path.exists():
+        try:
+            with open(ontology_labels_path, encoding="utf-8") as f:
+                ontology_labels_content = f.read()
+            logger.info("Loaded ontology_labels.js (%s bytes)", len(ontology_labels_content))
+        except Exception as e:
+            logger.warning("Failed to load ontology_labels.js: %s", e)
     
     # Добавляем скрипт регистрации cose-bilkent
     if embed:
@@ -446,16 +503,15 @@ if (typeof cytoscape !== 'undefined' && typeof cytoscapeCoseBilkent !== 'undefin
         "path_mode_config": path_mode_config,
         "text_formatting": text_formatting_config,
         "tooltip_config": tooltip_config,
-        "node_shapes": {
-            "Chunk": config.get("node_shapes", {}).get("chunk_shape", "hexagon"),
-            "Concept": config.get("node_shapes", {}).get("concept_shape", "star"),
-            "Assessment": config.get("node_shapes", {}).get("assessment_shape", "roundrectangle"),
-        },
+        "node_shapes": node_shapes,
+        "node_colors": node_colors,
+        "ontology_theme": ontology_theme,
         "embed_libraries": embed,
         "vendor_js_content": vendor_js_content,
         "vendor_css_content": vendor_css_content,
         "styles_content": styles_content,
         "edge_styles_content": edge_styles_content if embed else "",
+        "ontology_labels_content": ontology_labels_content if embed else "",
         "animation_controller_content": animation_controller_content if embed else "",
         "graph_core_content": graph_core_content if embed else "",
         "ui_controls_content": ui_controls_content if embed else "",
@@ -557,7 +613,7 @@ def main():
     
     # Загрузка конфигурации
     try:
-        config = load_config(viz_dir / "config.toml")
+        config = load_viz_config()
         logger.info("Configuration loaded")
     except Exception as e:
         logger.error(f"Failed to load config: {e}")

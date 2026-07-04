@@ -1,22 +1,26 @@
+import { getFeynmanConfig, getWebConfig, getNornikelKgRoot, getWorkspaceRoot } from '../../../../../config/loader.mjs';
 import path from 'node:path';
 import os from 'node:os';
+import { accessSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { StringDecoder } from 'node:string_decoder';
-import { configManager } from './configManager.js';
 
 const DEFAULT_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 
 export function getFeynmanSettings() {
-  return configManager.settings?.feynman ?? {};
+  return getFeynmanConfig();
 }
 
 export function getFeynmanEnrichmentSettings() {
-  return configManager.settings?.feynmanEnrichment ?? {};
+  const web = getWebConfig();
+  return web.feynmanEnrichment ?? getFeynmanConfig().enrichment ?? {};
 }
 
 export function getFeynmanRoot() {
-  const relative = getFeynmanSettings().root ?? '../feynman';
-  return path.resolve(configManager.getProjectRoot(), relative);
+  const feynman = getFeynmanConfig();
+  if (feynman.root) return feynman.root;
+  const config = getFeynmanConfig();
+  return path.join(getWorkspaceRoot(), 'Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM/feynman');
 }
 
 export function getFeynmanBinPath() {
@@ -29,16 +33,29 @@ export function getFeynmanAgentDir() {
 }
 
 export function getFeynmanCwd() {
-  const relative = getFeynmanSettings().cwd ?? '..';
-  return path.resolve(configManager.getProjectRoot(), relative);
+  const feynman = getFeynmanConfig();
+  if (feynman.cwd) return feynman.cwd;
+  return path.dirname(getNornikelKgRoot());
 }
 
 export function getIdleTimeoutMs() {
-  return getFeynmanSettings().idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
+  const feynman = getFeynmanConfig();
+  return feynman.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
 }
 
 export function getFeynmanModel() {
-  return getFeynmanSettings().model || '';
+  const feynman = getFeynmanConfig();
+  return feynman.model || '';
+}
+
+export function getFeynmanSpawnEnv() {
+  const feynman = getFeynmanConfig();
+  const env = { ...process.env };
+  const extra = feynman.env ?? {};
+  for (const [key, value] of Object.entries(extra)) {
+    if (value != null) env[key] = String(value);
+  }
+  return env;
 }
 
 export function getEnrichmentTimeoutMs() {
@@ -47,10 +64,34 @@ export function getEnrichmentTimeoutMs() {
 
 let trustEnsured = false;
 
+function resolvePiCodingAgentEntry() {
+  const feynmanRoot = getFeynmanRoot();
+  const candidates = [
+    path.join(feynmanRoot, 'node_modules', '@earendil-works', 'pi-coding-agent', 'dist', 'index.js'),
+    path.join(feynmanRoot, 'node_modules', '@mariozechner', 'pi-coding-agent', 'dist', 'index.js'),
+    path.join(feynmanRoot, '.feynman', 'npm', 'node_modules', '@earendil-works', 'pi-coding-agent', 'dist', 'index.js'),
+    path.join(feynmanRoot, '.feynman', 'npm', 'node_modules', '@mariozechner', 'pi-coding-agent', 'dist', 'index.js'),
+  ];
+  for (const candidate of candidates) {
+    try {
+      accessSync(candidate);
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+  return null;
+}
+
 export async function ensureWorkspaceTrusted() {
   if (trustEnsured) return;
   try {
-    const entryPath = path.join(getFeynmanRoot(), 'node_modules', '@earendil-works', 'pi-coding-agent', 'dist', 'index.js');
+    const entryPath = resolvePiCodingAgentEntry();
+    if (!entryPath) {
+      throw new Error(
+        `pi-coding-agent not found under ${getFeynmanRoot()}. Run: cd feynman && npm ci && npm run build`,
+      );
+    }
     const { ProjectTrustStore } = await import(pathToFileURL(entryPath).href);
     const store = new ProjectTrustStore(getFeynmanAgentDir());
     store.set(getFeynmanCwd(), true);
@@ -60,9 +101,6 @@ export async function ensureWorkspaceTrusted() {
   }
 }
 
-/**
- * Reads JSONL (one JSON object per LF-delimited line) from a stream.
- */
 export function attachJsonlReader(stream, onLine) {
   const decoder = new StringDecoder('utf8');
   let buffer = '';

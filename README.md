@@ -2,7 +2,29 @@
 
 Полный пайплайн материаловедения: **граф знаний (K2-18)** → **метрики и визуализация** → **генерация и оценка гипотез (ACCELMAT)** → **веб-дашборд** с чат-агентом **Feynman**.
 
-Репозиторий объединяет три самостоятельных проекта (через `git subtree`, история коммитов сохранена). Секреты (API-ключи) в git не входят — настраиваются локально через `.env` и `~/.feynman/agent/models.json`.
+> **Хакатон:** репозиторий содержит готовый `project.toml`, `.env` с API-ключами и демо-графы — после клонирования достаточно один раз запустить setup.
+
+## Быстрый старт (хакатон)
+
+```powershell
+git clone https://github.com/FaddevGleb/Nornikel_full_pipe.git
+cd Nornikel_full_pipe
+
+# Полная установка: venv, pip, npm build Feynman + web (~10–20 мин)
+.\scripts\setup.ps1
+
+# Запуск дашборда → http://localhost:3847
+.\scripts\start.ps1
+```
+
+**Требования:** Windows + PowerShell 5.1+, Node.js ≥ 22, Python ≥ 3.11.
+
+Конфигурация уже в репозитории:
+- `project.toml` — единый конфиг (RouterAI + Yandex ключи, модели, пути)
+- `Hypothesis-Generation-.../.env` — ACCELMAT LLM
+- `nornikel_KG/data/out/` и `viz/data/in/` — демо-граф для визуализации и ACCELMAT
+
+Dev-режим (Vite :5173 + API :3847): `.\scripts\dev.ps1`
 
 ---
 
@@ -11,6 +33,10 @@
 ```
 Nornikel_full_pipe/
 ├── README.md                          ← этот файл
+├── project.toml                       ← единый конфиг (API-ключи, пути, модели)
+├── project.example.toml               ← шаблон без секретов
+├── scripts/                           ← setup.ps1, start.ps1, dev.ps1
+├── config/                            ← loader.py / loader.mjs для project.toml
 ├── ConceptDictionary.json             ← пример словаря концептов (демо-данные)
 ├── LearningChunkGraph_longrange.json  ← пример графа после refiner (демо-данные)
 │
@@ -170,13 +196,12 @@ python src/main.py --help
 
 ## Конфигурация
 
-| Компонент | Где настраивать |
-|-----------|-----------------|
-| ACCELMAT LLM | `Hypothesis-Generation-.../.env` (из `.env.example`) |
-| Веб-дашборд | `nornikel_KG/web/settings.json` — порт, пути к Python, стадии pipeline |
-| KG / viz (legacy) | `nornikel_KG/src/config.toml`, `nornikel_KG/viz/config.toml` |
-| Feynman модели | `~/.feynman/agent/models.json` |
-| Feynman skills | `.feynman/skills/` в корне репозитория |
+| Компонент | Где |
+|-----------|-----|
+| **Всё сразу** | `project.toml` в корне (RouterAI, Yandex, KG, web, Feynman) |
+| ACCELMAT `.env` | `Hypothesis-Generation-.../.env` (дублирует ключи для CLI) |
+| Feynman skills | `.feynman/skills/` |
+| Legacy KG/viz | `nornikel_KG/src/config.toml`, `nornikel_KG/viz/config.toml` |
 
 **Требования:** Node.js ≥ 22, Python ≥ 3.11, опционально Pandoc для `doc_converter`.
 

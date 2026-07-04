@@ -4,9 +4,6 @@ refiner_longrange.py - добавление дальнодействующих �
 Ищет пропущенные связи между узлами, которые не попали в один контекст.
 Использует семантическую схожесть (FAISS) для поиска кандидатов и LLM для анализа.
 """
-from dotenv import load_dotenv
-load_dotenv()
-
 import json
 import logging
 import shutil

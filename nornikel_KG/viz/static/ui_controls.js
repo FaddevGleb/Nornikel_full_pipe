@@ -774,24 +774,27 @@ const UIControls = {
     },
     
     showGraphStats() {
-        // Collect statistics
         const nodeTypes = this.getNodeTypeCounts();
+        const edgeTypes = this.getEdgeTypeCounts();
         const totalNodes = this.cy.nodes().length;
         const totalEdges = this.cy.edges().length;
-        
-        // Count components
         const components = this.countComponents();
-        
-        // Count clusters if available
+
         const clusters = new Set();
         this.cy.nodes().forEach(node => {
             const clusterId = node.data('cluster_id');
-            if (clusterId !== undefined) {
-                clusters.add(clusterId);
-            }
+            if (clusterId !== undefined) clusters.add(clusterId);
         });
-        
-        // Generate HTML
+
+        const nodeTypeRows = Object.entries(nodeTypes)
+            .sort(([a], [b]) => this.labelNodeType(a).localeCompare(this.labelNodeType(b), 'ru'))
+            .map(([type, count]) => `
+                <div class="stat-row-detail">
+                    <span class="stat-label-sub">${this.labelNodeType(type)}:</span>
+                    <span class="stat-value-sub">${count}</span>
+                </div>
+            `).join('');
+
         const html = `
             <div class="stats-grid">
                 <div class="stat-column">
@@ -799,18 +802,7 @@ const UIControls = {
                         <span class="stat-label">Узлов:</span>
                         <span class="stat-value">${totalNodes}</span>
                     </div>
-                    <div class="stat-row-detail">
-                        <span class="stat-label-sub">Chunks:</span>
-                        <span class="stat-value-sub">${nodeTypes['Chunk'] || 0}</span>
-                    </div>
-                    <div class="stat-row-detail">
-                        <span class="stat-label-sub">Concepts:</span>
-                        <span class="stat-value-sub">${nodeTypes['Concept'] || 0}</span>
-                    </div>
-                    <div class="stat-row-detail">
-                        <span class="stat-label-sub">Assessments:</span>
-                        <span class="stat-value-sub">${nodeTypes['Assessment'] || 0}</span>
-                    </div>
+                    ${nodeTypeRows}
                 </div>
                 <div class="stat-column">
                     <div class="stat-row">
@@ -829,112 +821,96 @@ const UIControls = {
                     ` : ''}
                 </div>
             </div>
-            
-            <div class="legend-section">
-                <h4>Легенда визуализации</h4>
-                
-                <div class="legend-subsection">
-                    <h5>Узлы</h5>
-                    <div class="legend-nodes">
-                        <div class="legend-item">
-                            <span class="legend-shape chunk">⬢</span>
-                            <span>Chunk (учебный блок)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-shape concept">★</span>
-                            <span>Concept (концепт)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-shape assessment">▬</span>
-                            <span>Assessment (тест)</span>
-                        </div>
-                    </div>
-                    <div class="encoding-note">
-                        📏 Размер узла = важность (PageRank)<br>
-                        👁 Прозрачность = сложность (1-5)
-                    </div>
-                </div>
-                
-                <div class="legend-subsection">
-                    <h5>Связи между узлами</h5>
-                    <div class="legend-edges">
-                        <div class="edge-group">
-                            <div class="edge-group-title">Сильные (4px)</div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#e74c3c" stroke-width="3"/>
-                                </svg>
-                                <span>PREREQUISITE</span>
-                            </div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#f39c12" stroke-width="3"/>
-                                </svg>
-                                <span>TESTS</span>
-                            </div>
-                        </div>
-                        
-                        <div class="edge-group">
-                            <div class="edge-group-title">Средние (2.5px)</div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#3498db" stroke-width="2" stroke-dasharray="5,2"/>
-                                </svg>
-                                <span>ELABORATES</span>
-                            </div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#9b59b6" stroke-width="2" stroke-dasharray="2,3"/>
-                                </svg>
-                                <span>EXAMPLE_OF</span>
-                            </div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#95a5a6" stroke-width="2"/>
-                                </svg>
-                                <span>PARALLEL</span>
-                            </div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#27ae60" stroke-width="2" stroke-dasharray="4,2"/>
-                                </svg>
-                                <span>REVISION_OF</span>
-                            </div>
-                        </div>
-                        
-                        <div class="edge-group">
-                            <div class="edge-group-title">Слабые (1px)</div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#5dade2" stroke-width="1" stroke-dasharray="2,4" opacity="0.6"/>
-                                </svg>
-                                <span>HINT_FORWARD</span>
-                            </div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#ec7063" stroke-width="1" stroke-dasharray="2,4" opacity="0.6"/>
-                                </svg>
-                                <span>REFER_BACK</span>
-                            </div>
-                            <div class="legend-item">
-                                <svg class="edge-svg" width="30" height="10">
-                                    <line x1="0" y1="5" x2="30" y2="5" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
-                                </svg>
-                                <span>MENTIONS</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="encoding-note">
-                        ⚡ Межкластерные связи отображаются толще
-                    </div>
-                </div>
-            </div>
+            ${this.buildLegendHtml(nodeTypes, edgeTypes)}
         `;
-        
+
         this.infoPopup.querySelector('.stats-content').innerHTML = html;
         this.infoPopup.style.display = 'block';
         this.infoPopupOverlay.style.display = 'block';
         this.state.infoPanelOpen = true;
+    },
+
+    labelNodeType(type) {
+        return window.OntologyLabels?.nodeTypeLabel(type) ?? type;
+    },
+
+    labelEdgeType(type) {
+        return window.OntologyLabels?.edgeTypeLabel(type) ?? type;
+    },
+
+    resolveNodeColor(type) {
+        const colors = window.graphCore?.config?.nodeColors
+            ?? window.ontologyTheme?.nodeColors
+            ?? {};
+        return colors[type] ?? colors.default ?? '#7f8c8d';
+    },
+
+    buildLegendHtml(nodeTypes, edgeTypes) {
+        const nodeItems = Object.keys(nodeTypes)
+            .sort((a, b) => this.labelNodeType(a).localeCompare(this.labelNodeType(b), 'ru'))
+            .map(type => `
+                <div class="legend-item">
+                    <span class="legend-swatch" style="background:${this.resolveNodeColor(type)}"></span>
+                    <span>${this.labelNodeType(type)}</span>
+                    <span class="legend-count">${nodeTypes[type]}</span>
+                </div>
+            `).join('');
+
+        const edgeGroups = {};
+        Object.keys(edgeTypes).forEach(type => {
+            const category = window.EdgeStyles?.getEdgeCategory?.(type) ?? 'other';
+            if (!edgeGroups[category]) edgeGroups[category] = [];
+            edgeGroups[category].push(type);
+        });
+
+        const categoryOrder = ['causal', 'structural', 'economic', 'analogy', 'taxonomic', 'verification', 'provenance', 'other'];
+        const edgeSections = categoryOrder
+            .filter(cat => edgeGroups[cat]?.length)
+            .map(cat => {
+                const items = edgeGroups[cat]
+                    .sort((a, b) => this.labelEdgeType(a).localeCompare(this.labelEdgeType(b), 'ru'))
+                    .map(type => {
+                        const style = window.EdgeStyles?.getEdgeStyle?.(type) ?? { lineColor: '#64748b', lineStyle: 'solid', baseWidth: 2 };
+                        const dash = style.lineStyle === 'dashed' ? ' stroke-dasharray="5,3"' : style.lineStyle === 'dotted' ? ' stroke-dasharray="2,3"' : '';
+                        return `
+                            <div class="legend-item">
+                                <svg class="edge-svg" width="30" height="10">
+                                    <line x1="0" y1="5" x2="30" y2="5" stroke="${style.lineColor}" stroke-width="${Math.min(style.baseWidth, 3)}"${dash}/>
+                                </svg>
+                                <span>${this.labelEdgeType(type)}</span>
+                                <span class="legend-count">${edgeTypes[type]}</span>
+                            </div>
+                        `;
+                    }).join('');
+                const catLabel = window.OntologyLabels?.edgeCategoryLabel?.(cat) ?? cat;
+                return `
+                    <div class="edge-group">
+                        <div class="edge-group-title">${catLabel}</div>
+                        ${items}
+                    </div>
+                `;
+            }).join('');
+
+        return `
+            <div class="legend-section">
+                <h4>Легенда визуализации</h4>
+                <div class="legend-subsection">
+                    <h5>Типы узлов</h5>
+                    <div class="legend-nodes">${nodeItems}</div>
+                    <div class="encoding-note">
+                        Размер узла = важность (PageRank)<br>
+                        Прозрачность = сложность (1–5)
+                    </div>
+                </div>
+                <div class="legend-subsection">
+                    <h5>Типы связей</h5>
+                    <div class="legend-edges">${edgeSections}</div>
+                    <div class="encoding-note">
+                        Межкластерные связи отображаются толще
+                    </div>
+                </div>
+            </div>
+        `;
     },
     
     hideInfoPopup() {
@@ -1024,6 +1000,15 @@ const UIControls = {
         const counts = {};
         this.cy.nodes().forEach(node => {
             const type = node.data('type');
+            counts[type] = (counts[type] || 0) + 1;
+        });
+        return counts;
+    },
+
+    getEdgeTypeCounts() {
+        const counts = {};
+        this.cy.edges().forEach(edge => {
+            const type = edge.data('type') || 'default';
             counts[type] = (counts[type] || 0) + 1;
         });
         return counts;

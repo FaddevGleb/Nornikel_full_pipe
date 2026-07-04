@@ -1,0 +1,326 @@
+[meta]
+version = 1
+
+[paths]
+nornikel_kg = "nornikel_KG"
+hypothesis_repo = "Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM"
+feynman = "feynman"
+python_venv = "nornikel_KG/.venv"
+
+  [paths.models]
+  tokenizer = "Qwen/Qwen2.5-0.5B-Instruct"
+  llm_local = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+  embeddings = "intfloat/multilingual-e5-large"
+
+[kg.slicer]
+max_tokens = 4_000
+soft_boundary = true
+soft_boundary_max_shift = 500
+allowed_extensions = [ "txt", "md", "html" ]
+tokenizer_path = "Qwen/Qwen2.5-0.5B-Instruct"
+log_level = "info"
+
+[kg.itext2kg_concepts]
+provider = "openrouter"
+local_model_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+base_url = "https://routerai.ru/api/v1"
+api_key = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+model = "deepseek/deepseek-v4-pro"
+tpm_limit = 100_000
+max_completion = 16_384
+temperature = 0.6
+timeout = 1_200
+max_retries = 3
+log_level = "info"
+request_delay_seconds = 10
+
+[kg.itext2kg_graph]
+provider = "openrouter"
+local_model_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+base_url = "https://routerai.ru/api/v1"
+api_key = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+model = "deepseek/deepseek-v4-pro"
+tpm_limit = 1_000_000
+max_completion = 32_768
+temperature = 0.6
+timeout = 1_200
+max_retries = 3
+log_level = "info"
+auto_mentions_weight = 0.35
+request_delay_seconds = 10
+
+[kg.dedup]
+embedding_model = "intfloat/multilingual-e5-large"
+sim_threshold = 0.85
+len_ratio_min = 0.8
+faiss_M = 32
+faiss_efC = 200
+faiss_metric = "INNER_PRODUCT"
+k_neighbors = 5
+
+[kg.refiner]
+run = true
+provider = "openrouter"
+local_model_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+base_url = "https://routerai.ru/api/v1"
+api_key = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+model = "deepseek/deepseek-v4-pro"
+tpm_limit = 100_000
+max_completion = 4_096
+temperature = 0.6
+timeout = 1_200
+max_retries = 3
+embedding_model = "intfloat/multilingual-e5-large"
+sim_threshold = 0.75
+max_pairs_per_node = 5
+faiss_M = 32
+faiss_metric = "INNER_PRODUCT"
+enable_backward_pass = false
+log_level = "info"
+request_delay_seconds = 10
+
+[viz.graph2metrics]
+use_edge_weights = true
+educational_edge_types = [ "PREREQUISITE", "ELABORATES", "TESTS", "EXAMPLE_OF" ]
+pagerank_damping = 0.85
+pagerank_max_iter = 100
+betweenness_normalized = true
+closeness_harmonic = true
+min_bridge_score = 0.7
+louvain_resolution = 1.2
+louvain_random_state = 42
+bridge_weight_betweenness = 0.7
+bridge_weight_inter_ratio = 0.3
+bridge_top_gap_min = 0.05
+
+[viz.path_mode]
+alpha_step = 0
+beta_difficulty = 1
+sigma_confidence = 0.5
+default_difficulty = 3
+edge_type_ladder = [
+  [
+  "PREREQUISITE",
+  "ELABORATES",
+  "EXAMPLE_OF",
+  "PARALLEL",
+  "REVISION_OF",
+  "TESTS"
+],
+  [ "REFER_BACK", "HINT_FORWARD" ],
+  [ "MENTIONS" ]
+]
+
+[viz.edge_filter]
+mode = "auto"
+auto_quantile = 0.2
+baseline_min = 0.3
+
+  [viz.edge_filter.manual_thresholds]
+  MENTIONS = 0.2
+  HINT_FORWARD = 0.3
+  REFER_BACK = 0.3
+
+[viz.prereq_closure]
+enabled = false
+max_depth = 0
+
+[viz.demo_path]
+strategy = 2
+max_nodes = 100
+
+  [viz.demo_path.strategy_names]
+  1 = "Educational Journey"
+  2 = "Cluster Tour"
+  3 = "Dependency Chain"
+
+[viz.node_shapes]
+chunk_shape = "hexagon"
+concept_shape = "star"
+assessment_shape = "roundrectangle"
+
+[viz.graph2html]
+output_filename = "knowledge_graph.html"
+minify_json = true
+minify_html = true
+embed_libraries = true
+vendor_js = [
+  "vendor/cytoscape.min.js",
+  "vendor/layout-base.js",
+  "vendor/cose-base.js",
+  "vendor/cytoscape-cose-bilkent.js",
+  "vendor/cytoscape-navigator.js",
+  "vendor/marked.min.js",
+  "vendor/highlight.min.js",
+  "vendor/mathjax-tex-mml-chtml.js"
+]
+vendor_css = [
+  "vendor/cytoscape.js-navigator.css",
+  "vendor/github-dark.min.css"
+]
+default_language = "ru"
+enable_language_switch = true
+
+[viz.visualization]
+initial_layout = "cose-bilkent"
+animation_duration = 500
+tour_speed = 3_000
+tour_auto_loop = true
+node_size_min = 20
+node_size_max = 60
+physics_enabled = false
+physics_duration = 0
+
+[viz.colors]
+theme = "modern"
+cluster_palette = [
+  "#3498db",
+  "#e74c3c",
+  "#2ecc71",
+  "#f39c12",
+  "#9b59b6",
+  "#1abc9c",
+  "#34495e",
+  "#e67e22",
+  "#16a085",
+  "#8e44ad",
+  "#2c3e50",
+  "#27ae60"
+]
+chunk_color = "#3498db"
+concept_color = "#2ecc71"
+assessment_color = "#f39c12"
+path_fast = "#0066cc"
+path_easy = "#00aa44"
+gradient_easy = "#4ade80"
+gradient_medium = "#fbbf24"
+gradient_hard = "#ef4444"
+
+[viz.ui]
+sidebar_width = 320
+sidebar_position = "right"
+search_debounce = 300
+max_popup_width = 600
+show_fps_counter = false
+show_legend = true
+show_minimap = true
+show_stats = true
+
+[viz.filters]
+show_chunks = true
+show_concepts = true
+show_assessments = true
+min_pagerank = 0
+max_difficulty = 5
+
+[viz.performance]
+viewport_culling = true
+max_nodes_animated = 500
+batch_animations = true
+progressive_loading = false
+
+[viz.text_formatting]
+enable_markdown = true
+enable_code_highlighting = true
+enable_math = true
+math_renderer = "mathjax"
+
+[viz.tooltip]
+max_width = 400
+preview_length = 300
+show_delay = 500
+hide_delay = 200
+
+[viz.anomaly_detection]
+pagerank_sum_tolerance = 0.01
+educational_sum_tolerance = 0.01
+min_modularity = 0.1
+min_bridge_correlation = 0.3
+outlier_method = "iqr"
+outlier_threshold = 1.5
+strict_mode = false
+save_json_report = true
+
+[web]
+port = 3_847
+mode = "online"
+
+  [web.providers]
+  online = "openrouter"
+  offline = "local_transformers"
+
+  [web.paths]
+  pythonVenv = "../.venv"
+  projectRoot = ".."
+
+  [web.pipeline]
+  stages = [ "slicer", "concepts", "graph", "dedup", "refiner", "metrics" ]
+  autoRunMetrics = true
+  syncOnGraphStages = [ "graph", "dedup", "refiner" ]
+  autoMetricsOnExternalChange = true
+  watchDataOut = true
+
+  [web.hypothesis]
+  minConfidence = 0.4
+  maxResults = 20
+  focusAreas = [ "Material", "Property", "SynthesisMethod" ]
+
+  [web.accelmat]
+  projectDir = "../Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM"
+  pythonExecutable = ""
+
+    [web.accelmat.defaults]
+    maxRefinementIterations = 1
+    numHypotheses = 5
+
+  [web.security]
+  apiKey = ""
+
+  [web.ui]
+  defaultTheme = "dark"
+  graphMaxNodesLOD = 2_000
+
+[accelmat]
+projectDir = "Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM"
+
+  [accelmat.llm]
+  provider = "routerai"
+  routerai_api_key = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+  routerai_base_url = "https://routerai.ru/api/v1"
+  yandex_api_key = "b64:QVFWTjBnZEpqb21lSjhtLUhoaDZLU3BjRHA1SFpSenZGNDhHdEFfOQ=="
+  yandex_folder_id = "b1ggusvist6c2sia1dno"
+  yandex_base_url = "https://llm.api.cloud.yandex.net/v1"
+  openrouter_api_key = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+
+    [accelmat.llm.models]
+    HGA = "qwen/qwen3.6-flash"
+    CRITIC = "qwen/qwen3.6-flash"
+    CRITIC_2 = "qwen/qwen3.6-flash"
+    CRITIC_3 = "qwen/qwen3.6-flash"
+    CRITIC_4 = "qwen/qwen3.6-flash"
+    SUMMARIZER = "qwen/qwen3.6-flash"
+    EVALUATION = "qwen/qwen3.6-flash"
+    KG = "qwen/qwen3.6-flash"
+
+[feynman]
+root = "{paths.feynman}"
+cwd = "{paths.hypothesis_repo}"
+idleTimeoutMs = 900_000
+model = "yandex-ai-studio/gpt://b1ggusvist6c2sia1dno/qwen3-235b-a22b-fp8/latest"
+
+  [feynman.env]
+  OPENROUTER_API_KEY = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+  ROUTERAI_API_KEY = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+  YANDEX_API_KEY = "b64:QVFWTjBnZEpqb21lSjhtLUhoaDZLU3BjRHA1SFpSenZGNDhHdEFfOQ=="
+  YANDEX_FOLDER_ID = "b1ggusvist6c2sia1dno"
+
+  [feynman.enrichment]
+  enabledByDefault = false
+  timeoutMs = 900_000
+  maxSearchesPerHypothesis = 2
+  autoRerunOnReject = true
+
+[doc_converter]
+vlm_backend = "off"
+ocr_lang = "ru"
+openai_vlm_model = "gpt-4o-mini"

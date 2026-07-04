@@ -21,7 +21,7 @@ except ImportError:
     LOUVAIN_AVAILABLE = False
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.utils.config import ConfigValidationError, load_config
+from src.utils.config import ConfigValidationError, load_viz_config
 from src.utils.console_encoding import setup_console_encoding
 from src.utils.exit_codes import (
     EXIT_CONFIG_ERROR, EXIT_INPUT_ERROR, EXIT_IO_ERROR,
@@ -34,19 +34,16 @@ from src.utils.validation import (
 
 # Онтологические типы рёбер для материаловедения
 ONTOLOGICAL_EDGE_TYPES = {
-    "IMPROVES", "DEGRADES", "CAUSES", "MITIGATES", "REQUIRES_CONDITION",
-    "SYNTHESIZED_BY", "CHARACTERIZED_BY", "HAS_FAILURE_MODE", "APPLIED_IN",
-    "SUPPORTED_BY", "SUBCLASS_OF",
-    "REQUIRES_EQUIPMENT", "USES_FEEDSTOCK", "IMPACTS_COST", "HAS_REGULATION",
-    "SUBSTITUTE_FOR", "ANALOGOUS_TO",
-    "TESTED_BY", "CONFIRMS", "REFUTES"
+    "SYNTHESIZED_BY", "CHARACTERIZED_BY", "IMPROVES", "DEGRADES",
+    "CAUSES", "REQUIRES_CONDITION", "HAS_FAILURE_MODE", "MITIGATES",
+    "APPLIED_IN", "SUBCLASS_OF", "MENTIONS",
 }
 
 ONTOLOGICAL_NODE_TYPES = {
     "Material", "Property", "SynthesisMethod", "CharacterizationMethod",
-    "FailureMode", "Mechanism", "Condition", "Application", "Source",
-    "Equipment", "BusinessMetric", "Constraint", "InternalExperiment", "HypothesisRecord"
+    "FailureMode", "Mechanism", "Condition", "Application", "Source"
 }
+
 def setup_logging(log_file, test_mode=False):
     log_file.parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
@@ -102,41 +99,34 @@ def safe_metric_value(value):
 def normalize_node_types(graph_data, logger=None):
     """
     Синхронизирует поле `type` с `ontology_class` во всех узлах.
-    
-    Логика:
-    - Если `ontology_class` задан и не пустой → записываем его в `type`
-    - Иначе оставляем `type` как есть (для Chunk, Assessment и пр.)
-    
-    Это гарантирует, что после graph2metrics все онтологические узлы
-    имеют корректный тип (Material, Property, SynthesisMethod и т.д.),
-    независимо от того, как они были созданы в itext2kg_graph.py.
+
+    - Если `type` пустой, а `ontology_class` задан — записываем ontology_class в type
+    - Если `ontology_class` задан и отличается от type — перезаписываем type
+    - Если оба пустые — fallback на Concept
     """
     normalized_count = 0
     skipped_count = 0
-    
+
     for node in graph_data.get("nodes", []):
         ontology_class = (node.get("ontology_class") or "").strip()
         node_type = (node.get("type") or "").strip()
-        
-        # Если ontology_class задан и не пустой — используем его
+
         if ontology_class:
             if node_type != ontology_class:
                 node["type"] = ontology_class
                 normalized_count += 1
         elif not node_type:
-            # Ни type, ни ontology_class не заданы — fallback на Concept
             node["type"] = "Concept"
             normalized_count += 1
         else:
-            # type уже задан, ontology_class пустой — оставляем как есть
             skipped_count += 1
-    
+
     if logger:
         logger.info(
             f"Node types normalized: {normalized_count} updated, "
             f"{skipped_count} kept as-is"
         )
-    
+
     return normalized_count, skipped_count
 
 def sanitize_graph_weights(G, eps=1e-9):
@@ -351,16 +341,12 @@ def mark_inter_cluster_edges(G, cluster_map):
 def compute_all_metrics(G, graph_data, config, logger):
     if logger:
         logger.info("Computing all domain-specific graph metrics")
-    
-    # === НОВОЕ: Синхронизация type с ontology_class ===
+
     normalize_node_types(graph_data, logger)
-    
-    # Обновляем типы в NetworkX графе после нормализации
     for node in graph_data["nodes"]:
         if node["id"] in G.nodes():
             G.nodes[node["id"]]["type"] = node["type"]
-    
-    # 1. Санитизируем веса рёбер (нужно для всех distance-метрик)
+
     sanitize_graph_weights(G)
     for edge in graph_data.get("edges", []):
         source, target = edge["source"], edge["target"]
@@ -583,7 +569,7 @@ def main():
         
         config_path = viz_dir / "config.toml"
         logger.info(f"Loading configuration from {config_path}")
-        config = load_config(str(config_path))
+        config = load_viz_config()
         
         if args.test_mode:
             input_dir = viz_dir / "data" / "test"

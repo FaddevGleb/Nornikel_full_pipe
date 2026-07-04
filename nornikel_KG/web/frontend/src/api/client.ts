@@ -1,13 +1,16 @@
 export interface LoadStatus {
   graphPath: string;
   conceptsPath: string;
-  source: 'wow' | 'in' | 'test' | 'error';
+  source: 'wow' | 'in' | 'out' | 'test' | 'error';
   nodeCount: number;
   edgeCount: number;
   nodeTypes: Record<string, number>;
   hasChunkNodes: boolean;
   hasAssessmentNodes: boolean;
   warnings: string[];
+  syncedAt?: string | null;
+  graphModifiedAt?: string | null;
+  isStale?: boolean;
 }
 
 export interface GraphBundle {
@@ -106,6 +109,11 @@ export interface AccelmatResult {
     feynman_enriched?: boolean;
     feynman_rerun_slug?: string;
     feynman_parent_slug?: string;
+    supplementary_document_count?: number;
+  };
+  supplementary_context?: {
+    documents: { filename: string; path: string; sheets: string[]; char_count: number }[];
+    formatted_text: string;
   };
 }
 
@@ -117,6 +125,7 @@ export interface AccelmatRunRequest {
   numHypotheses?: number;
   slug?: string;
   feynmanEnrichment?: boolean;
+  documents?: File[];
 }
 
 export interface AccelmatResultSummary {
@@ -157,6 +166,11 @@ function headers(): HeadersInit {
     'Content-Type': 'application/json',
     ...(sessionId ? { 'X-Session-Id': sessionId } : {}),
   };
+}
+
+function sessionHeaders(): HeadersInit {
+  const sessionId = localStorage.getItem(SESSION_KEY);
+  return sessionId ? { 'X-Session-Id': sessionId } : {};
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -204,6 +218,11 @@ export const api = {
   getVizConfig: () => request<{ nodeShapes: Record<string, string>; nodeColors: Record<string, string> }>('/viz-config'),
   listFiles: () => request<{ files: { name: string; size: number }[] }>('/files'),
   getGraph: () => request<GraphBundle>('/graph'),
+  syncGraph: (runMetrics = false) =>
+    request<GraphBundle & { sync: { synced: boolean; syncedAt?: string } }>('/graph/sync', {
+      method: 'POST',
+      body: JSON.stringify({ runMetrics }),
+    }),
   listJobs: () => request<{ jobs: Job[] }>('/jobs'),
   runPipeline: (stages?: string[], incremental = false) =>
     request<{ job: Job }>('/pipeline/run', {
@@ -255,8 +274,35 @@ export const api = {
   listAccelmatGraphs: () => request<{ graphs: string[] }>('/accelmat/graphs'),
   listAccelmatResults: () => request<{ results: AccelmatResultSummary[] }>('/accelmat/results'),
   getAccelmatResult: (slug: string) => request<{ result: AccelmatResult }>(`/accelmat/results/${encodeURIComponent(slug)}`),
-  runAccelmat: (body: AccelmatRunRequest) =>
-    request<{ job: Job }>('/accelmat/run', { method: 'POST', body: JSON.stringify(body) }),
+  runAccelmat: async (body: AccelmatRunRequest) => {
+    const formData = new FormData();
+    formData.append('goal', body.goal);
+    formData.append('constraints', JSON.stringify(body.constraints));
+    formData.append('graphPath', body.graphPath);
+    if (body.maxRefinementIterations !== undefined) {
+      formData.append('maxRefinementIterations', String(body.maxRefinementIterations));
+    }
+    if (body.numHypotheses !== undefined) {
+      formData.append('numHypotheses', String(body.numHypotheses));
+    }
+    if (body.slug) formData.append('slug', body.slug);
+    if (body.feynmanEnrichment !== undefined) {
+      formData.append('feynmanEnrichment', String(body.feynmanEnrichment));
+    }
+    for (const file of body.documents ?? []) {
+      formData.append('documents', file);
+    }
+    const response = await fetch('/api/accelmat/run', {
+      method: 'POST',
+      headers: sessionHeaders(),
+      body: formData,
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error((payload as { error?: string }).error ?? `HTTP ${response.status}`);
+    }
+    return response.json() as Promise<{ job: Job; supplementaryDocuments?: { originalName: string }[] }>;
+  },
 
   createFeynmanSession: () => request<{ conversationId: string }>('/feynman/sessions', { method: 'POST', body: JSON.stringify({}) }),
   sendFeynmanMessage: (conversationId: string, message: string) =>
@@ -295,6 +341,16 @@ export function subscribeFeynmanSession(conversationId: string, handlers: {
   source.addEventListener('closed', () => {
     handlers.onClosed?.();
     source.close();
+  });
+  return () => source.close();
+}
+
+export function subscribeGraphStream(handlers: {
+  onUpdate: (payload: { type: string; loadStatus?: LoadStatus; reason?: string }) => void;
+}): () => void {
+  const source = new EventSource('/api/graph/stream');
+  source.addEventListener('graph_updated', (e) => {
+    handlers.onUpdate(JSON.parse(e.data));
   });
   return () => source.close();
 }

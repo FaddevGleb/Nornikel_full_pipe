@@ -1,0 +1,9 @@
+{
+  "graph_path": "Examples_prev_step/LearningChunkGraphNORNIKEL.schema (2).json",
+  "goal": "Генерация энергиии на основе Цыган",
+  "constraints": [
+    "Не должно использовать золото, платину и серебро, цыгане украдут"
+  ],
+  "max_refinement_iterations": 1,
+  "num_hypotheses": 5
+}

@@ -1,0 +1,125 @@
+[meta]
+version = 1
+
+[paths]
+nornikel_kg = "nornikel_KG"
+hypothesis_repo = "Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM"
+feynman = "feynman"
+python_venv = "nornikel_KG/.venv"
+
+[paths.models]
+tokenizer = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+llm_local = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+  embeddings = "intfloat/multilingual-e5-large"
+
+[kg.slicer]
+max_tokens = 4000
+soft_boundary = true
+soft_boundary_max_shift = 500
+allowed_extensions = [
+    "txt",
+    "md",
+    "html",
+]
+tokenizer_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+log_level = "info"
+
+[kg.itext2kg_concepts]
+provider = "openrouter"
+local_model_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+base_url = "https://routerai.ru/api/v1"
+api_key = ""
+model = "deepseek/deepseek-v4-pro"
+tpm_limit = 100000
+max_completion = 16384
+temperature = 0.6
+timeout = 1200
+max_retries = 3
+log_level = "info"
+request_delay_seconds = 10
+
+[kg.itext2kg_graph]
+provider = "openrouter"
+local_model_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+base_url = "https://routerai.ru/api/v1"
+api_key = ""
+model = "deepseek/deepseek-v4-pro"
+tpm_limit = 1000000
+max_completion = 32768
+temperature = 0.6
+timeout = 1200
+max_retries = 3
+log_level = "info"
+auto_mentions_weight = 0.35
+request_delay_seconds = 10
+
+[kg.dedup]
+embedding_model = "intfloat/multilingual-e5-large"
+sim_threshold = 0.85
+len_ratio_min = 0.8
+faiss_M = 32
+faiss_efC = 200
+faiss_metric = "INNER_PRODUCT"
+k_neighbors = 5
+
+[kg.refiner]
+run = true
+provider = "openrouter"
+local_model_path = "{paths.nornikel_kg}/src/qwen2.5-0.5b-instruct"
+base_url = "https://routerai.ru/api/v1"
+api_key = ""
+model = "deepseek/deepseek-v4-pro"
+tpm_limit = 100000
+max_completion = 4096
+temperature = 0.6
+timeout = 1200
+max_retries = 3
+embedding_model = "intfloat/multilingual-e5-large"
+sim_threshold = 0.75
+max_pairs_per_node = 5
+faiss_M = 32
+faiss_metric = "INNER_PRODUCT"
+enable_backward_pass = false
+log_level = "info"
+request_delay_seconds = 10
+
+[viz]
+
+[web]
+_deprecated = "Use workspace root project.toml [web] section instead"
+
+[accelmat.llm]
+provider = "routerai"
+routerai_api_key = "YOUR_SECRET_HERE"
+routerai_base_url = "https://routerai.ru/api/v1"
+yandex_api_key = "YOUR_SECRET_HERE"
+yandex_folder_id = "YOUR_SECRET_HERE"
+yandex_base_url = "https://llm.api.cloud.yandex.net/v1"
+openrouter_api_key = "YOUR_SECRET_HERE"
+
+[accelmat.llm.models]
+HGA = "qwen/qwen3.6-flash"
+CRITIC = "qwen/qwen3.6-flash"
+CRITIC_2 = "qwen/qwen3.6-flash"
+CRITIC_3 = "qwen/qwen3.6-flash"
+CRITIC_4 = "qwen/qwen3.6-flash"
+SUMMARIZER = "qwen/qwen3.6-flash"
+EVALUATION = "qwen/qwen3.6-flash"
+KG = "qwen/qwen3.6-flash"
+
+[feynman]
+root = "{paths.feynman}"
+cwd = "{paths.hypothesis_repo}"
+idleTimeoutMs = 900000
+model = ""
+
+[feynman.env]
+OPENROUTER_API_KEY = "YOUR_SECRET_HERE"
+ROUTERAI_API_KEY = "YOUR_SECRET_HERE"
+YANDEX_API_KEY = "YOUR_SECRET_HERE"
+YANDEX_FOLDER_ID = "YOUR_SECRET_HERE"
+
+[doc_converter]
+vlm_backend = "off"
+ocr_lang = "ru"
+openai_vlm_model = "gpt-4o-mini"

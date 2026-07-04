@@ -5,6 +5,7 @@ tokenizer.py - умная токенизация с поиском семант�
 import logging
 import os
 import re
+from pathlib import Path
 from transformers import AutoTokenizer
 
 # Отключаем предупреждения о symlinks на Windows
@@ -12,6 +13,50 @@ os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
 logger = logging.getLogger(__name__)
 TOKENIZER = None
+
+HF_DEFAULT_TOKENIZER = "Qwen/Qwen2.5-0.5B-Instruct"
+LOCAL_TOKENIZER_MARKERS = ("tokenizer_config.json", "tokenizer.json", "config.json")
+
+
+def _is_hf_repo_id(value: str) -> bool:
+    if not value or "\\" in value:
+        return False
+    if value.startswith(("C:", "c:", "D:", "d:", "/", "~")):
+        return False
+    return "/" in value and ".." not in value
+
+
+def _local_model_ready(path: Path) -> bool:
+    return path.is_dir() and any((path / name).is_file() for name in LOCAL_TOKENIZER_MARKERS)
+
+
+def _resolve_tokenizer_source(model_name: str | None, is_offline: bool) -> tuple[str, bool]:
+    if not model_name:
+        if is_offline:
+            raise ValueError(
+                "tokenizer_path is required when is_offline=True. "
+                "Please specify tokenizer_path in config.toml [slicer] section."
+            )
+        return HF_DEFAULT_TOKENIZER, False
+
+    if _is_hf_repo_id(model_name):
+        return model_name, is_offline
+
+    local_path = Path(model_name).expanduser()
+    try:
+        local_path = local_path.resolve(strict=False)
+    except OSError:
+        local_path = local_path.absolute()
+
+    if _local_model_ready(local_path):
+        return str(local_path), True
+
+    logger.warning(
+        "Local tokenizer not found at %s; using HuggingFace model %s",
+        local_path,
+        HF_DEFAULT_TOKENIZER,
+    )
+    return HF_DEFAULT_TOKENIZER, False
 
 
 def choice_the_tokenizer(is_offline=True, model_name=None, encoding_model=None):
@@ -26,39 +71,29 @@ def choice_the_tokenizer(is_offline=True, model_name=None, encoding_model=None):
     global TOKENIZER
     
     if TOKENIZER is None:
-        # Если model_name не задан - пытаемся взять из глобального конфига
         tokenizer_path = model_name or encoding_model
-        
-        if not tokenizer_path:
-            # Если путь не указан и is_offline=True - ошибка
-            if is_offline:
-                raise ValueError(
-                    "tokenizer_path is required when is_offline=True. "
-                    "Please specify tokenizer_path in config.toml [slicer] section."
-                )
-            # Fallback на базовый GPT-2 токенизатор (только если is_offline=False)
-            tokenizer_path = "gpt2"
-            logger.warning("No tokenizer path provided, falling back to 'gpt2'")
-        
-        logger.info(f"Loading tokenizer from: {tokenizer_path} (offline={is_offline})")
-        
+        source, local_only = _resolve_tokenizer_source(tokenizer_path, is_offline)
+
+        logger.info(f"Loading tokenizer from: {source} (offline={local_only})")
+
         try:
             TOKENIZER = AutoTokenizer.from_pretrained(
-                tokenizer_path,
+                source,
                 trust_remote_code=True,
-                local_files_only=is_offline
+                local_files_only=local_only,
             )
         except Exception as e:
-            logger.error(f"Failed to load tokenizer '{tokenizer_path}': {e}")
-            # Если is_offline=True - не пытаемся качать из интернета
-            if is_offline:
-                raise ValueError(
-                    f"Failed to load tokenizer '{tokenizer_path}' in offline mode. "
-                    "Please check the path or download the model manually."
+            logger.error(f"Failed to load tokenizer '{source}': {e}")
+            if local_only:
+                logger.info(f"Retrying tokenizer download from HuggingFace: {HF_DEFAULT_TOKENIZER}")
+                TOKENIZER = AutoTokenizer.from_pretrained(
+                    HF_DEFAULT_TOKENIZER,
+                    trust_remote_code=True,
+                    local_files_only=False,
                 )
-            # Fallback на gpt2 (только если is_offline=False)
-            logger.info("Falling back to default gpt2 tokenizer")
-            TOKENIZER = AutoTokenizer.from_pretrained("gpt2")
+            else:
+                logger.info("Falling back to default gpt2 tokenizer")
+                TOKENIZER = AutoTokenizer.from_pretrained("gpt2")
     
     return TOKENIZER
 

@@ -88,7 +88,7 @@ const EdgeInspector = {
                     <div class="edge-arrow-head edge-arrow-head-left" style="border-right-color: ${edgeColor}"></div>
                     <div class="edge-arrow-line" style="background: ${edgeColor}; height: ${thickness}px; width: 40px"></div>
                     <span class="edge-label-center" style="color: ${edgeColor}">
-                        ${edge.type}
+                        ${window.OntologyLabels?.edgeTypeLabel(edge.type) ?? edge.type}
                         <span class="edge-metrics">(вес: ${(edge.weight || 1).toFixed(2)}${isInterCluster ? ', межкластерное: true' : ''})</span>
                     </span>
                     <div class="edge-arrow-line" style="background: ${edgeColor}; height: ${thickness}px; width: 40px"></div>
@@ -106,7 +106,7 @@ const EdgeInspector = {
                     </span>
                     <div class="edge-arrow-line" style="background: ${edgeColor}; height: ${thickness}px; width: 40px"></div>
                     <span class="edge-label-center" style="color: ${edgeColor}">
-                        ${edge.type}
+                        ${window.OntologyLabels?.edgeTypeLabel(edge.type) ?? edge.type}
                         <span class="edge-metrics">(вес: ${(edge.weight || 1).toFixed(2)}${isInterCluster ? ', межкластерное: true' : ''})</span>
                     </span>
                     <div class="edge-arrow-line" style="background: ${edgeColor}; height: ${thickness}px; width: 40px"></div>
@@ -215,7 +215,7 @@ const EdgeInspector = {
                 <div class="node-content">
                     <div class="node-header">
                         <span class="node-type-badge badge-${(node.type || 'unknown').toLowerCase()}">
-                            ${node.type || 'Unknown'}
+                            ${window.OntologyLabels?.nodeTypeLabel(node.type) ?? node.type ?? 'Unknown'}
                         </span>
                         <span class="node-id">${node.id}</span>
                     </div>
@@ -256,28 +256,11 @@ const EdgeInspector = {
 
     // Helper methods
     getNodeTypeShort(type) {
-        const typeMap = {
-            'Chunk': 'CHUNK',
-            'Concept': 'CONCEPT',
-            'Assessment': 'ASMNT'
-        };
-        return typeMap[type] || type;
+        return window.OntologyLabels?.nodeTypeLabel(type) ?? type ?? 'Unknown';
     },
 
     getEdgeColor(type) {
-        // Match colors from edge_styles.js
-        const colors = {
-            'PREREQUISITE': '#e74c3c',  // Red - strong dependency
-            'ELABORATES': '#3498db',     // Blue - elaboration/detail
-            'EXAMPLE_OF': '#9b59b6',     // Purple - example
-            'PARALLEL': '#95a5a6',       // Gray - parallel topic
-            'TESTS': '#f39c12',          // Orange - assessment
-            'REVISION_OF': '#27ae60',    // Green - revision/update
-            'HINT_FORWARD': '#95a5a6',   // Light gray - weak forward reference
-            'REFER_BACK': '#95a5a6',     // Light gray - weak backward reference
-            'MENTIONS': '#bdc3c7'        // Lighter gray - mention
-        };
-        return colors[type] || '#bdc3c7';
+        return window.EdgeStyles?.getEdgeColor?.(type) ?? '#64748b';
     },
 
     getLineThickness(weight) {

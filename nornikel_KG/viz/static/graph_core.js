@@ -189,28 +189,20 @@ class GraphCore {
                     'transition-timing-function': 'ease-out'
                 }
             },
-            // Type-specific styles
-            {
-                selector: 'node.chunk',
-                style: {
-                    'shape': this.config.nodeShapes['Chunk'] || 'hexagon',
-                    'background-color': this.config.nodeColors['Chunk']
-                }
-            },
-            {
-                selector: 'node.concept',
-                style: {
-                    'shape': this.config.nodeShapes['Concept'] || 'star',
-                    'background-color': this.config.nodeColors['Concept']
-                }
-            },
-            {
-                selector: 'node.assessment',
-                style: {
-                    'shape': this.config.nodeShapes['Assessment'] || 'roundrectangle',
-                    'background-color': this.config.nodeColors['Assessment']
-                }
-            },
+            // Type-specific styles (dynamic for all ontology node types)
+            ...Object.entries(this.config.nodeColors || {}).flatMap(([type, color]) => {
+                if (type === 'default') return [];
+                const className = type.toLowerCase().replace(/_/g, '_');
+                const shape = this.config.nodeShapes?.[type] || 'ellipse';
+                const rule = {
+                    selector: `node.${className}, node[type="${type}"]`,
+                    style: {
+                        'shape': shape,
+                        'background-color': color,
+                    },
+                };
+                return [rule];
+            }),
             {
                 selector: 'node:selected',
                 style: {

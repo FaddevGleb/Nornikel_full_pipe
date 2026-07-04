@@ -9,6 +9,7 @@ import {
   getFeynmanBinPath,
   getFeynmanCwd,
   getFeynmanModel,
+  getFeynmanSpawnEnv,
   getIdleTimeoutMs,
 } from './feynmanShared.js';
 
@@ -41,7 +42,7 @@ class FeynmanSession extends EventEmitter {
     this.child = spawn(process.execPath, args, {
       cwd,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env },
+      env: getFeynmanSpawnEnv(),
     });
 
     attachJsonlReader(this.child.stdout, (line) => this.handleLine(line));

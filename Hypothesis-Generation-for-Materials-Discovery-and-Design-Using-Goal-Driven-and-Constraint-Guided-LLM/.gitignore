@@ -1,5 +1,4 @@
-.env
-project.toml
+# Hackathon: .env with API keys is committed for out-of-box run.
 __pycache__/
 *.pyc
 .ipynb_checkpoints/

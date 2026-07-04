@@ -11,8 +11,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import tomli
-
 try:
     from colorama import Fore, Style, init
 
@@ -28,6 +26,9 @@ except ImportError:
 
     class Style:
         BRIGHT = DIM = NORMAL = RESET_ALL = ""
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from src.utils.config import load_viz_config
 
 
 class AnomalyDetector:
@@ -50,9 +51,12 @@ class AnomalyDetector:
     # Optional metrics
     OPTIONAL_NODE_METRICS = ["cluster_id", "bridge_score"]
 
-    def __init__(self, config_path: Path = Path("viz/config.toml")):
+    def __init__(self, config_path: Optional[Path] = None):
         """Initialize detector with configuration."""
-        self.config = self._load_config(config_path)
+        if config_path is not None:
+            self.config = self._load_config_from_file(config_path)
+        else:
+            self.config = self._load_config_from_project()
         self.graph_data: Optional[Dict] = None
         self.graph_file: Optional[str] = None
 
@@ -64,16 +68,28 @@ class AnomalyDetector:
         # Statistics storage
         self.statistics: Dict[str, Dict] = {}
 
-    def _load_config(self, config_path: Path) -> Dict:
-        """Load configuration from TOML file."""
+    def _load_config_from_project(self) -> Dict:
+        """Load anomaly_detection section from workspace project.toml [viz]."""
+        viz = load_viz_config()
+        return self._parse_anomaly_config(viz)
+
+    def _load_config_from_file(self, config_path: Path) -> Dict:
+        """Load configuration from legacy TOML file (tests)."""
         if not config_path.exists():
             self._log("ERROR", f"Config file not found: {config_path}", error=True)
             sys.exit(1)
 
-        with open(config_path, "rb") as f:
-            config = tomli.load(f)
+        if sys.version_info >= (3, 11):
+            import tomllib
+        else:
+            import tomli as tomllib
 
-        # Extract anomaly_detection section with defaults
+        with open(config_path, "rb") as f:
+            config = tomllib.load(f)
+        return self._parse_anomaly_config(config)
+
+    def _parse_anomaly_config(self, config: Dict) -> Dict:
+        """Extract anomaly_detection section with defaults."""
         ad_config = config.get("anomaly_detection", {})
         return {
             "pagerank_sum_tolerance": ad_config.get("pagerank_sum_tolerance", 0.01),

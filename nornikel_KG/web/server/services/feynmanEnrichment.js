@@ -37,29 +37,33 @@ export function buildCriticPrompt(result) {
   const constraintText = formatConstraints(result.constraints);
   const suggestionsText = hypothesesToText(result.hypotheses);
   const suggestionCount = Object.keys(result.hypotheses ?? {}).length;
+  const supplementaryText = result.supplementary_context?.formatted_text?.trim() ?? '';
+  const supplementarySection = supplementaryText
+    ? `\nДополнительные Excel-документы (операционные данные пользователя):\n${supplementaryText}\n`
+    : '';
 
   return `[accelmat-web-critic skill]
 
-You are reviewing ${suggestionCount} ACCELMAT hypotheses with literature-backed web search.
+Ты проверяешь ${suggestionCount} гипотез ACCELMAT с опорой на поиск по литературе в интернете.
 
-Goal statement:
+Формулировка цели:
 ${result.goal}
 
-Constraints:
+Ограничения:
 ${constraintText}
-
-Hypotheses:
+${supplementarySection}
+Гипотезы:
 ${suggestionsText}
 
-Instructions:
-1. Follow the accelmat-web-critic skill: use web_search (max ${maxSearches} searches per Suggestion_N) to validate materials, methods, cost, equipment, and regulatory claims.
-2. Do NOT use bash, read, write, or run_pipeline.
-3. Return ONLY a JSON object matching the ACCELMAT critic schema:
-   - Feedback_for_suggestion_1 through Feedback_for_suggestion_${suggestionCount}
-   - Each feedback object: Meets_the_goal_statement_and_satisfies_all_constraints_strictly ("YES" or "NO"), Reasoning, web_sources (array of URLs)
-   - Overall_Feedback_for_improvement_for_future_suggestion_generation
+Инструкции:
+1. Следуй навыку accelmat-web-critic: используй web_search (не более ${maxSearches} запросов на каждый Suggestion_N) для проверки материалов, методов, затрат, оборудования и нормативных утверждений. Если приложены Excel-таблицы, считай их цифры приоритетными; web_search дополняет, но не отменяет явные значения из таблиц.
+2. НЕ используй bash, read, write или run_pipeline.
+3. Верни ТОЛЬКО JSON-объект по схеме ACCELMAT:
+   - Feedback_for_suggestion_1 … Feedback_for_suggestion_${suggestionCount}
+   - В каждом объекте: Meets_the_goal_statement_and_satisfies_all_constraints_strictly ("YES" или "NO"), Reasoning (на русском), web_sources (массив URL)
+   - Overall_Feedback_for_improvement_for_future_suggestion_generation (на русском)
 
-No markdown fences. No text outside the JSON object.`;
+Без markdown-ограждений. Без текста вне JSON-объекта.`;
 }
 
 /**

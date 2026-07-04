@@ -1,15 +1,13 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { configManager } from './configManager.js';
-
-async function fileExists(targetPath) {
-  try {
-    await fs.access(targetPath);
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { readJsonFile } from '../utils/readJson.js';
+import {
+  findBestGraphArtifact,
+  getArtifactTimestamps,
+  isDataOutNewerThanViz,
+  isWowStale,
+  syncDataOutToVizIn,
+  fileExists,
+} from './graphSyncService.js';
 
 function countNodeTypes(nodes) {
   const counts = {};
@@ -20,7 +18,17 @@ function countNodeTypes(nodes) {
   return counts;
 }
 
-function buildLoadStatus({ graphPath, conceptsPath, source, graph, concepts, warnings }) {
+function buildLoadStatus({
+  graphPath,
+  conceptsPath,
+  source,
+  graph,
+  concepts,
+  warnings,
+  syncedAt,
+  graphModifiedAt,
+  isStale,
+}) {
   const nodes = graph?.nodes ?? [];
   const edges = graph?.edges ?? [];
   return {
@@ -33,13 +41,16 @@ function buildLoadStatus({ graphPath, conceptsPath, source, graph, concepts, war
     hasChunkNodes: nodes.some((n) => n.type === 'Chunk'),
     hasAssessmentNodes: nodes.some((n) => n.type === 'Assessment'),
     warnings,
+    syncedAt: syncedAt ?? null,
+    graphModifiedAt: graphModifiedAt ?? null,
+    isStale: isStale ?? false,
   };
 }
 
 /**
- * Load graph + concepts with explicit source tracking and atomic wow pair loading.
+ * Load graph + concepts with freshness-aware sync from data/out.
  */
-export async function loadGraphBundle() {
+export async function loadGraphBundle({ autoSync = true } = {}) {
   const wowGraph = configManager.resolveProjectPath('viz/data/out/LearningChunkGraph_wow.json');
   const wowConcepts = configManager.resolveProjectPath('viz/data/out/ConceptDictionary_wow.json');
   const fallbackGraph = configManager.resolveProjectPath('viz/data/in/LearningChunkGraph.json');
@@ -47,17 +58,29 @@ export async function loadGraphBundle() {
   const testGraph = configManager.resolveProjectPath('viz/data/test/tiny_html_data.json');
   const testConcepts = configManager.resolveProjectPath('viz/data/test/tiny_html_concepts.json');
 
+  let syncedAt = null;
+  if (autoSync && (await isDataOutNewerThanViz())) {
+    const syncResult = await syncDataOutToVizIn({ merge: true });
+    if (syncResult.synced) {
+      syncedAt = syncResult.syncedAt;
+    }
+  }
+
+  const { timestamps } = await getArtifactTimestamps();
+  const graphModifiedAt = timestamps.dataOutGraph
+    ? new Date(timestamps.dataOutGraph).toISOString()
+    : null;
+
   const warnings = [];
   const wowGraphExists = await fileExists(wowGraph);
   const wowConceptsExists = await fileExists(wowConcepts);
+  const wowStale = await isWowStale();
 
-  if (wowGraphExists && wowConceptsExists) {
-    const [graphRaw, conceptsRaw] = await Promise.all([
-      fs.readFile(wowGraph, 'utf8'),
-      fs.readFile(wowConcepts, 'utf8'),
+  if (wowGraphExists && wowConceptsExists && !wowStale) {
+    const [graph, concepts] = await Promise.all([
+      readJsonFile(wowGraph),
+      readJsonFile(wowConcepts),
     ]);
-    const graph = JSON.parse(graphRaw);
-    const concepts = JSON.parse(conceptsRaw);
     if ((graph.nodes ?? []).length === 0) {
       warnings.push('empty_wow_graph');
     }
@@ -77,10 +100,16 @@ export async function loadGraphBundle() {
         graph,
         concepts,
         warnings,
+        syncedAt,
+        graphModifiedAt,
+        isStale: false,
       }),
     };
   }
 
+  if (wowStale) {
+    warnings.push('stale_wow_overridden');
+  }
   if (wowGraphExists && !wowConceptsExists) {
     warnings.push('wow_concepts_missing');
   }
@@ -95,12 +124,10 @@ export async function loadGraphBundle() {
   const inConceptsExists = await fileExists(fallbackConcepts);
   if (inGraphExists && inConceptsExists) {
     warnings.push('fallback_to_in_data');
-    const [graphRaw, conceptsRaw] = await Promise.all([
-      fs.readFile(fallbackGraph, 'utf8'),
-      fs.readFile(fallbackConcepts, 'utf8'),
+    const [graph, concepts] = await Promise.all([
+      readJsonFile(fallbackGraph),
+      readJsonFile(fallbackConcepts),
     ]);
-    const graph = JSON.parse(graphRaw);
-    const concepts = JSON.parse(conceptsRaw);
     return {
       graph,
       concepts,
@@ -111,17 +138,44 @@ export async function loadGraphBundle() {
         graph,
         concepts,
         warnings,
+        syncedAt,
+        graphModifiedAt,
+        isStale: wowStale,
+      }),
+    };
+  }
+
+  const outDir = configManager.resolveProjectPath('data/out');
+  const best = await findBestGraphArtifact(outDir);
+  const outConcepts = configManager.resolveProjectPath('data/out/ConceptDictionary.json');
+  if (best && (await fileExists(outConcepts))) {
+    warnings.push('fallback_to_data_out');
+    const [graph, concepts] = await Promise.all([
+      readJsonFile(best.path),
+      readJsonFile(outConcepts),
+    ]);
+    return {
+      graph,
+      concepts,
+      loadStatus: buildLoadStatus({
+        graphPath: best.path,
+        conceptsPath: outConcepts,
+        source: 'out',
+        graph,
+        concepts,
+        warnings,
+        syncedAt,
+        graphModifiedAt,
+        isStale: true,
       }),
     };
   }
 
   warnings.push('fallback_to_test_data');
-  const [graphRaw, conceptsRaw] = await Promise.all([
-    fs.readFile(testGraph, 'utf8'),
-    fs.readFile(testConcepts, 'utf8'),
+  const [graph, concepts] = await Promise.all([
+    readJsonFile(testGraph),
+    readJsonFile(testConcepts),
   ]);
-  const graph = JSON.parse(graphRaw);
-  const concepts = JSON.parse(conceptsRaw);
   return {
     graph,
     concepts,
@@ -132,6 +186,9 @@ export async function loadGraphBundle() {
       graph,
       concepts,
       warnings,
+      syncedAt,
+      graphModifiedAt,
+      isStale: true,
     }),
   };
 }

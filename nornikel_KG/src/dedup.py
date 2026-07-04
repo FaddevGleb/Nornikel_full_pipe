@@ -4,9 +4,6 @@ dedup.py - удаление дубликатов узлов из графа зн
 Использует векторные эмбеддинги и FAISS для поиска похожих Chunk/Assessment узлов.
 Автоматически обогащает граф недостающими полями перед валидацией схемы.
 """
-from dotenv import load_dotenv
-load_dotenv()
-
 import csv
 import json
 import logging

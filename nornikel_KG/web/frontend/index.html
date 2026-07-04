@@ -9,7 +9,61 @@
     <title>Норникель — Граф знаний материалов</title>
   </head>
   <body>
+    <style>
+      #boot-fallback {
+        font-family: system-ui, sans-serif;
+        padding: 2rem;
+        max-width: 42rem;
+        line-height: 1.5;
+        color: #1f2937;
+      }
+      #boot-fallback h1 { font-size: 1.25rem; margin: 0 0 0.75rem; }
+      #boot-fallback code { background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 4px; }
+    </style>
+    <div id="boot-fallback">
+      <h1>Загрузка панели Норникель…</h1>
+      <p>Подождите несколько секунд.</p>
+    </div>
     <div id="root"></div>
+    <script>
+      (function () {
+        var fallback = document.getElementById('boot-fallback');
+        var root = document.getElementById('root');
+        function showError(title, detail) {
+          fallback.innerHTML = '<h1>' + title + '</h1><p>' + detail + '</p>';
+          fallback.style.color = '#b91c1c';
+        }
+        window.addEventListener('error', function (e) {
+          if (e.filename && /\/assets\//.test(e.filename)) {
+            showError(
+              'Не удалось загрузить JavaScript',
+              'Файл <code>' + e.filename + '</code>: ' + e.message +
+              '. Очистите данные сайта для localhost:3847 (Chrome → F12 → Application → Clear site data) и перезапустите <code>scripts\\start.bat</code>.'
+            );
+          }
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var msg = (e.reason && e.reason.message) || String(e.reason);
+          showError('Ошибка приложения', msg);
+        });
+        var obs = new MutationObserver(function () {
+          if (root && root.childElementCount > 0) {
+            fallback.remove();
+            obs.disconnect();
+          }
+        });
+        if (root) obs.observe(root, { childList: true });
+        setTimeout(function () {
+          if (root && !root.childElementCount && fallback.parentNode) {
+            showError(
+              'Приложение не запустилось',
+              'Откройте DevTools (F12) → Network и обновите страницу. Файл <code>/assets/index-*.js</code> должен быть <b>200</b> и тип <b>application/javascript</b>. ' +
+              'Если 404 или JSON — закройте терминал с сервером и запустите <code>scripts\\start.bat</code> заново.'
+            );
+          }
+        }, 10000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

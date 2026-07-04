@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { loadProjectConfig } from '../../../../../config/loader.mjs';
 import { configManager } from './configManager.js';
 import { fileExists } from './graphLoader.js';
 
@@ -93,41 +94,52 @@ async function parseTomlSections(filePath) {
 
 async function checkConfiguration() {
   const rows = [];
-  const srcConfig = await parseTomlSections(configManager.resolveProjectPath('src/config.toml'));
-  const vizConfig = await parseTomlSections(configManager.resolveProjectPath('viz/config.toml'));
-
-  rows.push(checkRow('config', 'src_config', srcConfig.exists ? 'pass' : 'fail', srcConfig.exists ? 'src/config.toml found' : 'src/config.toml missing'));
-
-  const requiredSrc = ['slicer', 'itext2kg_concepts', 'itext2kg_graph', 'dedup', 'refiner'];
-  for (const section of requiredSrc) {
-    const found = srcConfig.sections.includes(section);
-    rows.push(checkRow('config', `src_${section}`, found ? 'pass' : 'fail', found ? `Section [${section}] present` : `Section [${section}] missing`));
+  let config;
+  try {
+    config = loadProjectConfig();
+  } catch (err) {
+    rows.push(checkRow('config', 'project_toml', 'fail', err.message));
+    return rows;
   }
 
-  rows.push(checkRow('config', 'viz_config', vizConfig.exists ? 'pass' : 'fail', vizConfig.exists ? 'viz/config.toml found' : 'viz/config.toml missing'));
+  rows.push(checkRow('config', 'project_toml', 'pass', 'project.toml loaded'));
 
+  const kg = config.kg ?? {};
+  const requiredKg = ['slicer', 'itext2kg_concepts', 'itext2kg_graph', 'dedup', 'refiner'];
+  for (const section of requiredKg) {
+    const found = Object.prototype.hasOwnProperty.call(kg, section);
+    rows.push(checkRow(
+      'config',
+      `kg_${section}`,
+      found ? 'pass' : 'fail',
+      found ? `Section kg.${section} present` : `Section kg.${section} missing`,
+    ));
+  }
+
+  const viz = config.viz ?? {};
   const requiredViz = ['graph2metrics', 'graph2html', 'visualization'];
   for (const section of requiredViz) {
-    const found = vizConfig.sections.includes(section);
-    rows.push(checkRow('config', `viz_${section}`, found ? 'pass' : 'fail', found ? `Section [${section}] present` : `Section [${section}] missing`));
+    const found = Object.prototype.hasOwnProperty.call(viz, section);
+    rows.push(checkRow(
+      'config',
+      `viz_${section}`,
+      found ? 'pass' : 'fail',
+      found ? `Section viz.${section} present` : `Section viz.${section} missing`,
+    ));
   }
 
-  if (srcConfig.exists) {
-    const providerMatch = srcConfig.content.match(/\[itext2kg_concepts\][\s\S]*?provider\s*=\s*"([^"]+)"/);
-    const provider = providerMatch?.[1] ?? 'unknown';
-    const valid = ['local_transformers', 'openrouter', 'ollama', 'vllm', 'local'].includes(provider);
-    rows.push(checkRow('config', 'provider', valid ? 'pass' : 'warn', `Provider: ${provider}`, { provider }));
+  const provider = kg.itext2kg_concepts?.provider ?? 'unknown';
+  const valid = ['local_transformers', 'openrouter', 'ollama', 'vllm', 'local', 'yandex', 'routerai'].includes(provider);
+  rows.push(checkRow('config', 'provider', valid ? 'pass' : 'warn', `Provider: ${provider}`, { provider }));
 
-    const modelPathMatch = srcConfig.content.match(/local_model_path\s*=\s*"([^"]+)"/);
-    if (modelPathMatch) {
-      const modelPath = modelPathMatch[1].replace(/NORNIKEL2/gi, 'NORNIKEL3');
-      const resolved = path.isAbsolute(modelPath) ? modelPath : configManager.resolveProjectPath(modelPath);
-      const hasConfig = await fileExists(path.join(resolved, 'config.json'));
-      const hasTokenizer = await fileExists(path.join(resolved, 'tokenizer.json'));
-      const hasModel = await fileExists(path.join(resolved, 'model.safetensors'));
-      const ok = hasConfig && hasTokenizer && hasModel;
-      rows.push(checkRow('config', 'local_llm_model', ok ? 'pass' : 'fail', ok ? 'Local LLM model files present' : 'Local LLM model incomplete', { path: resolved, hasConfig, hasTokenizer, hasModel }));
-    }
+  const modelPath = kg.itext2kg_concepts?.local_model_path;
+  if (modelPath) {
+    const resolved = path.isAbsolute(modelPath) ? modelPath : configManager.resolveProjectPath(modelPath);
+    const hasConfig = await fileExists(path.join(resolved, 'config.json'));
+    const hasTokenizer = await fileExists(path.join(resolved, 'tokenizer.json'));
+    const hasModel = await fileExists(path.join(resolved, 'model.safetensors'));
+    const ok = hasConfig && hasTokenizer && hasModel;
+    rows.push(checkRow('config', 'local_llm_model', ok ? 'pass' : 'fail', ok ? 'Local LLM model files present' : 'Local LLM model incomplete', { path: resolved, hasConfig, hasTokenizer, hasModel }));
   }
 
   return rows;

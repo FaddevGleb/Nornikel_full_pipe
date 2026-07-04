@@ -2,9 +2,6 @@
 """
 iText2KG Concepts - извлекает концепты из текстовых слайсов используя LLM
 """
-from dotenv import load_dotenv
-load_dotenv()
-
 import json
 import logging
 import sys
@@ -23,7 +20,6 @@ from src.utils.validation import ValidationError, validate_concept_dictionary_in
 
 setup_console_encoding()
 
-CONFIG_PATH = Path(__file__).parent / "config.toml"
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 SCHEMAS_DIR = Path(__file__).parent / "schemas"
 STAGING_DIR = Path(__file__).parent.parent / "data" / "staging"
@@ -62,6 +58,8 @@ class SliceProcessor:
         self.concept_id_map = {}  # concept_id -> index
         self.previous_response_id = None
         self.api_usage = {"total_requests": 0, "total_input_tokens": 0, "total_output_tokens": 0}
+        self.total_source_tokens = 0
+        self.source_slug = "unknown"
         
         self.extraction_prompt = self._load_extraction_prompt()
     
@@ -607,7 +605,7 @@ class SliceProcessor:
 
 def main():
     try:
-        config = load_config(CONFIG_PATH)
+        config = load_config()
         
         max_context = config["itext2kg_concepts"].get("max_context_tokens", 128000)
         if not isinstance(max_context, int) or max_context < 1000:

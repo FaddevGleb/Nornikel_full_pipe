@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.utils.config import ConfigValidationError, load_config
+from src.utils.config import ConfigValidationError, load_viz_config
 from src.utils.console_encoding import setup_console_encoding
 from src.utils.exit_codes import (
     EXIT_CONFIG_ERROR, EXIT_INPUT_ERROR, EXIT_IO_ERROR,
@@ -334,8 +334,7 @@ def main():
     
     try:
         # Загрузка конфигурации (для валидации)
-        config_path = viz_dir / "config.toml"
-        load_config(config_path)
+        load_viz_config()
         logger.info("Configuration loaded")
     
     except (ConfigValidationError, FileNotFoundError) as e:

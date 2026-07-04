@@ -31,17 +31,40 @@ Frontend dev server: http://localhost:5173 (proxies API to :3847)
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/graph` | Graph + concepts + `loadStatus` metadata |
+| `GET /api/graph` | Graph + concepts + `loadStatus` (auto-sync from `data/out` when newer) |
+| `POST /api/graph/sync` | Force sync `data/out` → `viz/data/in`; optional `runMetrics` |
+| `GET /api/graph/stream` | SSE: `graph_updated` when graph files change (CLI or pipeline) |
 | `POST /api/diagnostics/offline` | 8-step offline graph diagnostics |
 | `POST /api/audit/full` | Full system audit |
-| `GET /api/viz-config` | Node shapes/colors from `viz/config.toml` |
+| `GET /api/viz-config` | Node shapes/colors from `project.toml` `[viz]` |
 | `GET /generated/viewer/...` | Served `knowledge_graph_viewer.html` |
 
 ## Configuration
 
-- `webapp.config.json` — web app settings (port, locale, paths)
-- `settings.json` — runtime user settings (auto-created)
-- `runtime/config.toml` — patched Python config for provider switching
+All settings live in **`project.toml`** at the workspace root (`c:\Хакатоны\Nornikel\`).
+
+1. Copy `project.example.toml` → `project.toml` (gitignored; contains API keys).
+2. Run `python scripts/consolidate_config.py` to migrate legacy `.env`, `src/config.toml`, `viz/config.toml`, and `web/settings.json`.
+3. Loaders: `config/loader.py` (Python), `config/loader.mjs` (Node web server).
+
+Deprecated stubs (do not edit): `web/settings.json`, `web/config.default.json`, `src/config.toml`, `viz/config.toml`.
+
+Web reads `[web]` — port, mode, pipeline, feynman, hypothesis. Python pipeline reads `[kg.*]`; viz reads `[viz.*]`.
+
+### Автоподхват графов (web ↔ data/out)
+
+```
+data/out/LearningChunkGraph_*.json
+        ↓ graphSyncService (on request / watcher / after pipeline stage)
+viz/data/in/LearningChunkGraph.json
+        ↓ metrics stage (auto-queued when graph changes)
+viz/data/out/LearningChunkGraph_wow.json  →  GET /api/graph
+```
+
+- **`graphSyncService.js`** — выбор артефакта (`longrange` > `dedup` > `raw`), merge в `viz/data/in/`, инвалидация устаревших `_wow.json`.
+- **`graphWatcher.js`** — следит за `data/out/` при CLI-прогонах (`watchDataOut` в `project.toml` → `[web.pipeline]`).
+- После этапов `graph`, `dedup`, `refiner` web автоматически синхронизирует файлы и ставит job **metrics-only**, если метрики ещё не в текущем pipeline.
+- UI подписан на `/api/graph/stream` и обновляет Dashboard / GraphView без перезагрузки страницы.
 
 ---
 

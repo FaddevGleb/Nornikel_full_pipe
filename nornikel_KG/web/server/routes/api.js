@@ -25,13 +25,21 @@ import {
   exportHypothesesPdf,
 } from '../services/hypothesisEngine.js';
 import { fileExists } from '../services/graphLoader.js';
+import { syncDataOutToVizIn } from '../services/graphSyncService.js';
+import { graphEventBus } from '../services/graphWatcher.js';
 import {
   sanitizeSlug,
   listResults as listAccelmatResults,
   readResult as readAccelmatResult,
   listGraphs as listAccelmatGraphs,
   getAccelmatDefaults,
+  getAccelmatDir,
 } from '../services/accelmatRunner.js';
+import { saveAccelmatDocuments } from '../services/accelmatDocuments.js';
+import {
+  sanitizeUploadFilename,
+  uploadFileExtension,
+} from '../utils/uploadFilename.js';
 
 const router = Router();
 const upload = multer({
@@ -68,6 +76,49 @@ const upload = multer({
     }
   },
 });
+
+const accelmatUpload = multer({
+  storage: multer.diskStorage({
+    destination: async (_req, _file, cb) => {
+      const dir = path.join(getAccelmatDir(), 'inputs', 'accelmat_upload_tmp');
+      await fs.mkdir(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: (_req, file, cb) => {
+      cb(null, `${Date.now()}_${sanitizeUploadFilename(file.originalname)}`);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024, files: 5 },
+  fileFilter: (_req, file, cb) => {
+    const ext = uploadFileExtension(file.originalname);
+    if (ext === 'xlsx') {
+      cb(null, true);
+    } else {
+      cb(new Error('ACCELMAT supplementary documents must be .xlsx files'));
+    }
+  },
+});
+
+function parseAccelmatConstraints(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw !== 'string' || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return raw.split('\n').map((line) => line.trim()).filter(Boolean);
+  }
+}
+
+function parseAccelmatBoolean(raw, fallback = false) {
+  if (typeof raw === 'boolean') return raw;
+  if (typeof raw === 'string') {
+    const normalized = raw.trim().toLowerCase();
+    if (normalized === 'true' || normalized === '1' || normalized === 'yes') return true;
+    if (normalized === 'false' || normalized === '0' || normalized === 'no') return false;
+  }
+  return fallback;
+}
 
 function getSessionId(req) {
   return req.headers['x-session-id'] ?? null;
@@ -327,37 +378,56 @@ router.get('/accelmat/results/:slug', async (req, res, next) => {
   }
 });
 
-router.post('/accelmat/run', accelmatRunLimiter, async (req, res, next) => {
+router.post(
+  '/accelmat/run',
+  accelmatRunLimiter,
+  accelmatUpload.array('documents', 5),
+  async (req, res, next) => {
   try {
-    const { goal, constraints, graphPath, maxRefinementIterations, numHypotheses, feynmanEnrichment } = req.body ?? {};
+    const body = req.body ?? {};
+    const goal = body.goal;
+    const graphPath = body.graphPath;
+    const constraints = parseAccelmatConstraints(body.constraints);
+    const maxRefinementIterations = body.maxRefinementIterations
+      ? Number(body.maxRefinementIterations)
+      : undefined;
+    const numHypotheses = body.numHypotheses ? Number(body.numHypotheses) : undefined;
+    const enrichmentDefault = configManager.settings?.feynmanEnrichment?.enabledByDefault ?? false;
+    const feynmanEnrichment = parseAccelmatBoolean(body.feynmanEnrichment, enrichmentDefault);
+
     if (!goal || !graphPath) {
       res.status(400).json({ error: 'goal and graphPath are required' });
       return;
     }
-    const slug = sanitizeSlug(req.body?.slug || goal.slice(0, 40));
-    const enrichmentDefault = configManager.settings?.feynmanEnrichment?.enabledByDefault ?? false;
+    const slug = sanitizeSlug(body.slug || goal.slice(0, 40));
+    const { saved, relativePaths } = await saveAccelmatDocuments(slug, req.files ?? []);
+
     const job = jobQueue.createJob({
       type: 'accelmat',
       payload: {
         slug,
         goal,
-        constraints: constraints ?? [],
+        constraints,
         graphPath,
         maxRefinementIterations,
         numHypotheses,
-        feynmanEnrichment: feynmanEnrichment ?? enrichmentDefault,
+        feynmanEnrichment,
+        supplementaryDocumentPaths: relativePaths,
+        supplementaryDocuments: saved,
       },
     });
     await auditLog.record('accelmat_started', {
       jobId: job.id,
       slug,
+      supplementaryDocuments: saved.length,
       sessionId: getSessionId(req),
     });
-    res.status(202).json({ job });
+    res.status(202).json({ job, supplementaryDocuments: saved });
   } catch (error) {
     next(error);
   }
-});
+  },
+);
 
 router.get('/graph', async (_req, res, next) => {
   try {
@@ -367,6 +437,51 @@ router.get('/graph', async (_req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.post('/graph/sync', async (req, res, next) => {
+  try {
+    const runMetrics = req.body?.runMetrics ?? false;
+    const syncResult = await syncDataOutToVizIn({ merge: true, force: true });
+    let metricsJob = null;
+    if (runMetrics) {
+      metricsJob = jobQueue.enqueueMetricsJob('manual_sync');
+    }
+    const runner = new PipelineRunner();
+    const bundle = await runner.getGraphBundle();
+    res.json({
+      sync: syncResult,
+      metricsJob,
+      ...bundle,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/graph/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
+  });
+
+  const send = (event, data) => {
+    res.write(`event: ${event}\n`);
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  };
+
+  const onGraphUpdated = (payload) => {
+    send('graph_updated', payload);
+  };
+
+  graphEventBus.on('graph:updated', onGraphUpdated);
+
+  send('connected', { timestamp: new Date().toISOString() });
+
+  req.on('close', () => {
+    graphEventBus.off('graph:updated', onGraphUpdated);
+  });
 });
 
 router.post('/diagnostics/offline', async (req, res, next) => {

@@ -16,7 +16,6 @@ alpha_step = 0
 beta_difficulty = 1
 sigma_confidence = 0.5
 default_difficulty = 3
-# ALL edge types are allowed — no ladder filtering
 edge_type_ladder = []
 
 [edge_filter]
@@ -29,12 +28,6 @@ max_depth = 0
 [demo_path]
 strategy = 2
 max_nodes = 100
-
-[demo_path.strategy_names]
-1 = "Causal Chain"
-2 = "Material Journey"
-3 = "Failure Analysis"
-4 = "Innovation Path"
 
 [node_shapes]
 Material = "round-rectangle"
@@ -76,7 +69,7 @@ vendor_css = [
     "vendor/github-dark.min.css"
 ]
 default_language = "ru"
-enable_language_switch = true
+enable_language_switch = false
 
 [visualization]
 initial_layout = "cose-bilkent"
@@ -95,24 +88,25 @@ cluster_palette = [
     "#9b59b6", "#1abc9c", "#34495e", "#e67e22",
     "#16a085", "#8e44ad", "#2c3e50", "#27ae60"
 ]
-Material = "#3498db"
-Property = "#2ecc71"
-SynthesisMethod = "#9b59b6"
-CharacterizationMethod = "#1abc9c"
+Material = "#c87941"
+Property = "#3d9970"
+SynthesisMethod = "#e67e22"
+CharacterizationMethod = "#4a90d9"
+Mechanism = "#8e7cc3"
 FailureMode = "#e74c3c"
-Mechanism = "#f39c12"
 Condition = "#95a5a6"
-Application = "#16a085"
-Source = "#34495e"
-Equipment = "#2c3e50"
-BusinessMetric = "#f39c12"
-InternalExperiment = "#8e44ad"
+Application = "#1abc9c"
+Source = "#bdc3c7"
+Equipment = "#546e7a"
+BusinessMetric = "#16a085"
+InternalExperiment = "#9b59b6"
 Constraint = "#d35400"
-HypothesisRecord = "#c0392b"
-KPI_Target = "#27ae60"
+HypothesisRecord = "#e84393"
+KPI_Target = "#f1c40f"
 Concept = "#2ecc71"
 Chunk = "#3498db"
-Assessment = "#f39c12"
+Assessment = "#ff7043"
+Unknown = "#78909c"
 path_causal = "#e67e22"
 path_innovation = "#27ae60"
 path_failure = "#c0392b"

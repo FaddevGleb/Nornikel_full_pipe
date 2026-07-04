@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, type Job } from '../api/client';
+import { useGraphRefresh } from '../context/GraphRefreshContext';
 import { ModeKpiCard } from './ModeIndicator';
 import { PageHeader } from './PageHeader';
 import { Button, Modal } from './ui';
 import type { ConfigStatus } from '../utils/modeLabel';
 
-const PIPELINE_STAGES = ['slicer', 'concepts', 'graph', 'refiner', 'metrics'];
+const PIPELINE_STAGES = ['slicer', 'concepts', 'graph', 'dedup', 'refiner', 'metrics'];
 
 type ConfirmAction = { type: 'full' } | { type: 'stage'; stage: string } | null;
 
@@ -18,6 +19,7 @@ function jobStatusLabel(status: string, t: (key: string) => string): string {
 
 export function PipelineView({ runRequest = 0 }: { runRequest?: number }) {
   const { t } = useTranslation();
+  const { bumpRevision } = useGraphRefresh();
   const [activeJob, setActiveJob] = useState<Job | null>(null);
   const [log, setLog] = useState('');
   const [integrationMode, setIntegrationMode] = useState<'new' | 'incremental'>('new');
@@ -61,6 +63,9 @@ export function PipelineView({ runRequest = 0 }: { runRequest?: number }) {
     source.addEventListener('update', (e) => {
       const job = JSON.parse(e.data) as Job;
       setActiveJob(job);
+      if (job.status === 'completed') {
+        bumpRevision();
+      }
     });
     source.addEventListener('log', (e) => {
       const entry = JSON.parse(e.data) as { message: string };
@@ -208,6 +213,7 @@ export function PipelineView({ runRequest = 0 }: { runRequest?: number }) {
 
 export function DashboardView({ config, onConfigRefresh }: { config: ConfigStatus; onConfigRefresh?: () => void }) {
   const { t } = useTranslation();
+  const { revision } = useGraphRefresh();
   const [files, setFiles] = useState<{ name: string; size: number }[]>([]);
   const [graphStats, setGraphStats] = useState({ nodes: 0, edges: 0 });
   const [integrationMode, setIntegrationMode] = useState<'new' | 'incremental'>('new');
@@ -233,8 +239,11 @@ export function DashboardView({ config, onConfigRefresh }: { config: ConfigStatu
 
   useEffect(() => {
     refreshData().catch(() => {});
+  }, [revision, refreshData]);
+
+  useEffect(() => {
     onConfigRefresh?.();
-  }, [onConfigRefresh, refreshData]);
+  }, [onConfigRefresh]);
 
   function pickFiles(fileList: FileList | null) {
     if (!fileList?.length) return;

@@ -3,9 +3,6 @@
 iText2KG Graph - incremental knowledge graph construction.
 Supports both full rebuild and incremental mode (adding new files).
 """
-from dotenv import load_dotenv
-load_dotenv()
-
 import argparse
 import json
 import logging
@@ -27,7 +24,6 @@ from src.utils.exit_codes import (
 
 setup_console_encoding()
 
-CONFIG_PATH = Path(__file__).parent / "config.toml"
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 SCHEMAS_DIR = Path(__file__).parent / "schemas"
 STAGING_DIR = Path(__file__).parent.parent / "data" / "staging"
@@ -93,6 +89,36 @@ class SliceProcessor:
             self._load_existing_graph()
         
         self.extraction_prompt = self._load_extraction_prompt()
+        self.total_source_tokens = 0
+        self.source_slug = "unknown"
+
+    def _init_source_metadata(self):
+        """Populate source slug/token stats for metadata (all staging slices or existing graph)."""
+        slice_files = sorted(STAGING_DIR.glob("*.slice.json"))
+        self.total_source_tokens = 0
+        self.source_slug = "unknown"
+
+        if slice_files:
+            try:
+                first_slice_data = json.loads(slice_files[0].read_text(encoding="utf-8"))
+                self.source_slug = first_slice_data.get("slug", "unknown")
+                last_slice_data = json.loads(slice_files[-1].read_text(encoding="utf-8"))
+                self.total_source_tokens = last_slice_data.get("slice_token_end", 0)
+            except Exception:
+                pass
+            return
+
+        graph_path = OUTPUT_DIR / "LearningChunkGraph_raw.json"
+        if not graph_path.exists():
+            return
+
+        try:
+            meta = json.loads(graph_path.read_text(encoding="utf-8")).get("_meta", {}).get("itext2kg_graph", {})
+            source = meta.get("source", {})
+            self.total_source_tokens = source.get("total_tokens", 0)
+            self.source_slug = source.get("slug", "unknown")
+        except Exception:
+            pass
 
     def _load_existing_graph(self):
         """Загружает существующий граф для incremental режима."""
@@ -571,22 +597,12 @@ class SliceProcessor:
         if not slice_files:
             self.logger.info("No new slices to process - graph is up to date")
             print("No new slices to process - graph is up to date")
-            # Всё равно сохраняем граф (с обновлёнными метаданными)
+            self._init_source_metadata()
             return self._finalize_and_save()
         
         self.stats.total_slices = len(slice_files)
-        
-        self.total_source_tokens = 0
-        self.source_slug = "unknown"
-        if slice_files:
-            try:
-                first_slice_data = json.loads(slice_files[0].read_text(encoding="utf-8"))
-                self.source_slug = first_slice_data.get("slug", "unknown")
-                last_slice_data = json.loads(slice_files[-1].read_text(encoding="utf-8"))
-                self.total_source_tokens = last_slice_data.get("slice_token_end", 0)
-            except Exception:
-                pass
-        
+
+        self._init_source_metadata()
         model = self.config["model"]
         tpm_limit = self.config["tpm_limit"]
         mode = "incremental" if self.incremental else "full"
@@ -649,6 +665,7 @@ class SliceProcessor:
             return ""
 
     def _finalize_and_save(self):
+        self._init_source_metadata()
         output_path = OUTPUT_DIR / "LearningChunkGraph_raw.json"
         
         try:
@@ -716,7 +733,9 @@ class SliceProcessor:
                 json.dump(output_data, f, ensure_ascii=False, indent=2)
             
             timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"[{timestamp}] SUCCESS  | ✅ Results saved to /data/out/LearningChunkGraph_raw.json")
+            print(
+                f"[{timestamp}] SUCCESS  | Results saved to /data/out/LearningChunkGraph_raw.json"
+            )
             print(f"                    | - Nodes: {len(self.graph_nodes)} | Edges: {len(self.graph_edges)}")
             return EXIT_SUCCESS
         
@@ -739,7 +758,7 @@ def main():
     args = parser.parse_args()
     
     try:
-        config = load_config(CONFIG_PATH)
+        config = load_config()
         
         # === АВТООПРЕДЕЛЕНИЕ INCREMENTAL РЕЖИМА ===
         graph_path = OUTPUT_DIR / "LearningChunkGraph_raw.json"

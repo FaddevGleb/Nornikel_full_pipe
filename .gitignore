@@ -1,0 +1,35 @@
+# Hackathon deploy: secrets and graph data ARE committed. Ignore only build/runtime artifacts.
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Logs and ephemeral runtime (web job queue, chat sessions)
+*.log
+nornikel_KG/logs/*
+!nornikel_KG/logs/.gitkeep
+nornikel_KG/web/runtime/jobs/*
+nornikel_KG/web/runtime/sessions/*
+nornikel_KG/web/runtime/checkpoints/*
+nornikel_KG/web/runtime/feynman-sessions/
+nornikel_KG/web/runtime/feynman-turn-sessions/
+nornikel_KG/web/runtime/feynman-accelmat-logs/*
+!nornikel_KG/web/runtime/**/.gitkeep
+
+# doc_converter generated output
+nornikel_KG/doc_converter/out/
+nornikel_KG/doc_converter/tests/
+nornikel_KG/doc_converter/examples/

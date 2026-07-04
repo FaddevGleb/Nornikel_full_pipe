@@ -59,6 +59,8 @@
         window.colorsConfig = {{ colors_config|tojson|safe }};
         window.uiConfig = {{ ui_config|tojson|safe }};
         window.nodeShapes = {{ node_shapes|tojson|safe }};
+        window.nodeColors = {{ node_colors|tojson|safe }};
+        window.ontologyTheme = {{ ontology_theme|tojson|safe }};
         window.pathModeConfig = {{ path_mode_config|tojson|safe }};
         window.textFormattingConfig = {{ text_formatting|tojson|safe }};
         window.tooltipConfig = {{ tooltip_config|tojson|safe }};
@@ -88,6 +90,10 @@
         // Edge styles module (if available)
         {% if edge_styles_content %}
         {{ edge_styles_content|safe }}
+        {% endif %}
+
+        {% if ontology_labels_content %}
+        {{ ontology_labels_content|safe }}
         {% endif %}
         
         // Animation controller module (if available)
@@ -126,6 +132,7 @@
     {% else %}
     <!-- External modules in correct order -->
     <script src="../static/edge_styles.js"></script>
+    <script src="../static/ontology_labels.js"></script>
     <script src="../static/animation_controller.js"></script>
     <script src="../static/graph_core.js"></script>
     <script src="../static/ui_controls.js"></script>
@@ -166,19 +173,8 @@
             
             // Prepare configuration
             const graphConfig = {
-                // Node shapes from config
-                nodeShapes: window.nodeShapes || {
-                    'Chunk': 'hexagon',
-                    'Concept': 'star',
-                    'Assessment': 'roundrectangle'
-                },
-                // Colors from config
-                nodeColors: {
-                    'Chunk': window.colorsConfig?.chunk_color || '#3498db',
-                    'Concept': window.colorsConfig?.concept_color || '#2ecc71',
-                    'Assessment': window.colorsConfig?.assessment_color || '#f39c12'
-                },
-                // Size mapping
+                nodeShapes: window.nodeShapes || {},
+                nodeColors: window.nodeColors || window.ontologyTheme?.nodeColors || {},
                 minNodeSize: window.vizConfig?.node_size_min || 20,
                 maxNodeSize: window.vizConfig?.node_size_max || 60,
                 // Animation settings

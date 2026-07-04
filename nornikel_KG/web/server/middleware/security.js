@@ -11,7 +11,7 @@ export function getConfiguredApiKey() {
 /**
  * Optional shared-secret gate for high-impact routes (ACCELMAT pipeline runs,
  * Feynman chat sessions with full bash/read/write access). Disabled by default
- * for local-only development; set `security.apiKey` in settings.json or the
+ * for local-only development; set `security.apiKey` in project.toml `[web.security]` or the
  * K2_18_WEB_API_KEY env var to require `X-Api-Key` on these routes.
  */
 export function requireApiKey(req, res, next) {

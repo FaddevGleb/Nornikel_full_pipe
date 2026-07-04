@@ -60,7 +60,34 @@ export function AccelmatView({ onDiscussHypothesis }: AccelmatViewProps) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [loadingList, setLoadingList] = useState(true);
+  const [selectedExcelFiles, setSelectedExcelFiles] = useState<File[]>([]);
+  const [excelDragOver, setExcelDragOver] = useState(false);
+  const excelInputRef = useRef<HTMLInputElement>(null);
   const streamCleanup = useRef<(() => void) | null>(null);
+
+  const EXCEL_ACCEPT = '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+  function pickExcelFiles(fileList: FileList | null) {
+    if (!fileList?.length) return;
+    const valid = Array.from(fileList).filter((file) => file.name.toLowerCase().endsWith('.xlsx'));
+    if (valid.length !== fileList.length) {
+      setError(t('accelmat.excel_upload_invalid'));
+    }
+    if (valid.length > 0) {
+      setSelectedExcelFiles((prev) => {
+        const seen = new Set(prev.map((f) => `${f.name}:${f.size}`));
+        const merged = [...prev];
+        for (const file of valid) {
+          const key = `${file.name}:${file.size}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            merged.push(file);
+          }
+        }
+        return merged.slice(0, 5);
+      });
+    }
+  }
 
   useEffect(() => {
     api.getAccelmatDefaults().then(({ defaults }) => {
@@ -143,6 +170,7 @@ export function AccelmatView({ onDiscussHypothesis }: AccelmatViewProps) {
         numHypotheses,
         maxRefinementIterations,
         feynmanEnrichment,
+        documents: selectedExcelFiles,
       });
       setActiveJob(job);
       setLog('');
@@ -206,6 +234,57 @@ export function AccelmatView({ onDiscussHypothesis }: AccelmatViewProps) {
             {t('accelmat.feynman_enrichment')}
           </label>
 
+          <div className="panel upload-panel">
+            <h2>{t('accelmat.excel_upload_title')}</h2>
+            <div
+              className={`upload-dropzone${excelDragOver ? ' drag-over' : ''}`}
+              onDragOver={(e) => { e.preventDefault(); setExcelDragOver(true); }}
+              onDragLeave={() => setExcelDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setExcelDragOver(false);
+                pickExcelFiles(e.dataTransfer.files);
+              }}
+              onClick={() => excelInputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') excelInputRef.current?.click(); }}
+              aria-label={t('accelmat.excel_upload_hint')}
+            >
+              <p className="upload-hint">{t('accelmat.excel_upload_hint')}</p>
+              <p className="upload-formats">{t('accelmat.excel_upload_formats')}</p>
+              <Button variant="secondary" className="upload-browse" onClick={(e) => { e.stopPropagation(); excelInputRef.current?.click(); }}>
+                {t('accelmat.excel_upload_browse')}
+              </Button>
+              <input
+                ref={excelInputRef}
+                type="file"
+                accept={EXCEL_ACCEPT}
+                multiple
+                hidden
+                onChange={(e) => pickExcelFiles(e.target.files)}
+              />
+            </div>
+            {selectedExcelFiles.length > 0 && (
+              <ul className="upload-queue">
+                {selectedExcelFiles.map((file) => (
+                  <li key={`${file.name}-${file.size}`}>
+                    <span>{file.name}</span>
+                    <span className="upload-size">{(file.size / 1024).toFixed(1)} KB</span>
+                    <button
+                      type="button"
+                      className="upload-remove"
+                      aria-label={t('common.close')}
+                      onClick={() => setSelectedExcelFiles((prev) => prev.filter((f) => f !== file))}
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <Button onClick={runAccelmat} disabled={isRunning}>
             {isRunning ? t('accelmat.running') : t('accelmat.run')}
           </Button>
@@ -262,6 +341,21 @@ export function AccelmatView({ onDiscussHypothesis }: AccelmatViewProps) {
                 </Badge>
               </p>
             )}
+            {selectedResult.supplementary_context?.documents?.length ? (
+              <p>
+                <Badge variant="primary">
+                  {t('accelmat.excel_documents_badge', {
+                    count: selectedResult.supplementary_context.documents.length,
+                  })}
+                </Badge>
+              </p>
+            ) : null}
+            {selectedResult.supplementary_context?.formatted_text ? (
+              <details>
+                <summary>{t('accelmat.excel_context_title')}</summary>
+                <pre className="log-console">{selectedResult.supplementary_context.formatted_text}</pre>
+              </details>
+            ) : null}
             {sortedSuggestionKeys(selectedResult).map((key) => {
               const hypothesis = selectedResult.hypotheses[key];
               const score = selectedResult.evaluation?.scores?.[key];

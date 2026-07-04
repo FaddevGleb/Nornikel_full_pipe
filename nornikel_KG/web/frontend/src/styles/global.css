@@ -62,11 +62,15 @@ body {
   background: linear-gradient(90deg, #0077C8 0%, #004C97 100%);
 }
 
-.sidebar-logo {
-  width: 100%;
-  max-width: 168px;
-  height: auto;
+.sidebar-logo,
+.sidebar-wordmark {
   display: block;
+  max-width: 168px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary, #626262);
+  line-height: 1.2;
 }
 
 .sidebar-nav {
@@ -697,12 +701,36 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: var(--font-size-sm);
+  width: 100%;
 }
 
 .type-swatch {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.node-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.node-legend li {
+  list-style: none;
+}
+
+.legend-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.legend-count {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 .edge-legend {

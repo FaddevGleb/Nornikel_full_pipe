@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { configManager } from './configManager.js';
+import { getPythonExecutable, loadProjectConfig } from '../../../../../config/loader.mjs';
 
 const REQUEST_PREFIX = 'pipeline_request_';
 const RESULT_PREFIX = 'hypotheses_';
@@ -27,13 +28,26 @@ function getAccelmatSettings() {
 }
 
 export function getAccelmatDir() {
+  const config = loadProjectConfig();
+  const hypothesisRepo = config.paths?.hypothesis_repo;
+  if (hypothesisRepo) {
+    return hypothesisRepo;
+  }
   const relative = getAccelmatSettings().projectDir
-    ?? '../Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM';
-  return path.resolve(configManager.getProjectRoot(), relative);
+    ?? 'Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM';
+  return path.resolve(configManager.getWorkspaceRoot(), relative);
 }
 
 export function getAccelmatPythonExecutable() {
-  return getAccelmatSettings().pythonExecutable ?? 'python';
+  const configured = getAccelmatSettings().pythonExecutable;
+  if (configured && configured !== 'python') {
+    return configured;
+  }
+  try {
+    return getPythonExecutable();
+  } catch {
+    return configured ?? 'python';
+  }
 }
 
 export function getAccelmatDefaults() {
@@ -54,7 +68,14 @@ function resultPath(slug) {
   return path.join(getAccelmatDir(), 'output', `${RESULT_PREFIX}${slug}.json`);
 }
 
-export async function writeRequest(slug, { graphPath, goal, constraints, maxRefinementIterations, numHypotheses }) {
+export async function writeRequest(slug, {
+  graphPath,
+  goal,
+  constraints,
+  maxRefinementIterations,
+  numHypotheses,
+  supplementaryDocumentPaths,
+}) {
   const target = requestPath(slug);
   await fs.mkdir(path.dirname(target), { recursive: true });
   const defaults = getAccelmatDefaults();
@@ -65,6 +86,9 @@ export async function writeRequest(slug, { graphPath, goal, constraints, maxRefi
     max_refinement_iterations: maxRefinementIterations ?? defaults.maxRefinementIterations,
     num_hypotheses: numHypotheses ?? defaults.numHypotheses,
   };
+  if (supplementaryDocumentPaths?.length) {
+    payload.supplementary_document_paths = supplementaryDocumentPaths;
+  }
   await fs.writeFile(target, JSON.stringify(payload, null, 2), 'utf8');
   return { requestPath: target, payload };
 }

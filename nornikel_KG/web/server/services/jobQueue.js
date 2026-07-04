@@ -6,6 +6,8 @@ import { configManager } from './configManager.js';
 import { PipelineRunner, STAGE_LABELS } from './pipelineRunner.js';
 import { runOfflineDiagnostics } from './diagnosticsService.js';
 import { stateStore } from './stateStore.js';
+import { syncDataOutToVizIn } from './graphSyncService.js';
+import { emitGraphUpdated, setMetricsJobPending, isMetricsJobPending } from './graphWatcher.js';
 import {
   writeRequest as writeAccelmatRequest,
   runAccelmat,
@@ -124,6 +126,49 @@ export class JobQueue extends EventEmitter {
     return job;
   }
 
+  enqueueMetricsJob(source = 'auto_metrics') {
+    const pipeline = configManager.settings?.pipeline ?? {};
+    if (!pipeline.autoRunMetrics) return null;
+
+    const activeMetricsJob = [...this.jobs.values()].find(
+      (j) => (j.status === 'queued' || j.status === 'running')
+        && j.type === 'pipeline'
+        && (j.payload?.stages?.includes('metrics') || j.payload?.source === 'auto_metrics'),
+    );
+    if (activeMetricsJob || isMetricsJobPending()) {
+      return null;
+    }
+
+    setMetricsJobPending(true);
+    const job = this.createJob({
+      type: 'pipeline',
+      payload: {
+        stages: ['metrics'],
+        incremental: true,
+        source,
+      },
+    });
+    return job;
+  }
+
+  async syncAfterGraphStage(job, stage) {
+    const syncStages = configManager.settings?.pipeline?.syncOnGraphStages
+      ?? ['graph', 'dedup', 'refiner'];
+    if (!syncStages.includes(stage)) return;
+
+    await syncDataOutToVizIn({
+      merge: true,
+      force: true,
+      onLog: (entry) => this.appendLog(job, entry),
+    });
+    await emitGraphUpdated(`stage_${stage}`);
+
+    const stages = job.payload?.stages ?? configManager.settings.pipeline.stages;
+    if (!stages.includes('metrics')) {
+      this.enqueueMetricsJob();
+    }
+  }
+
   appendLog(job, entry) {
     job.logs.push({ ...entry, timestamp: new Date().toISOString() });
     if (job.logs.length > 500) {
@@ -173,6 +218,12 @@ export class JobQueue extends EventEmitter {
       nextJob.completedAt = new Date().toISOString();
       if (nextJob.type === 'pipeline') {
         await stateStore.recordPipelineComplete(nextJob);
+        try {
+          await syncDataOutToVizIn({ merge: true, force: true });
+          await emitGraphUpdated('pipeline_complete');
+        } catch (syncError) {
+          this.appendLog(nextJob, { level: 'warn', message: `Graph sync failed: ${syncError.message}` });
+        }
         if (configManager.getMode() === 'offline') {
           try {
             const diagReport = await runOfflineDiagnostics();
@@ -187,6 +238,9 @@ export class JobQueue extends EventEmitter {
       nextJob.status = nextJob.status === 'paused' ? 'paused' : 'failed';
       nextJob.error = error.message;
     } finally {
+      if (nextJob.type === 'pipeline' && nextJob.payload?.source === 'auto_metrics') {
+        setMetricsJobPending(false);
+      }
       nextJob.updatedAt = new Date().toISOString();
       await this.persistJob(nextJob);
       this.emit('job:updated', nextJob);
@@ -204,7 +258,9 @@ export class JobQueue extends EventEmitter {
       ? Math.max(0, stages.indexOf(job.checkpoint.stage) + 1)
       : 0;
 
-    if (startIndex === 0 && !incremental) {
+    const isMetricsOnly = stages.length === 1 && stages[0] === 'metrics';
+
+    if (startIndex === 0 && !incremental && !isMetricsOnly) {
       await this.runner.clearPipelineArtifacts();
       this.appendLog(job, {
         level: 'info',
@@ -238,6 +294,7 @@ export class JobQueue extends EventEmitter {
       }
 
       await this.runner.runStage(stage);
+      await this.syncAfterGraphStage(job, stage);
       await this.saveCheckpoint(job, stage);
       job.progress = Math.round(((startIndex + index + 1) / stages.length) * 100);
       await this.persistJob(job);
@@ -262,6 +319,7 @@ export class JobQueue extends EventEmitter {
       maxRefinementIterations,
       numHypotheses,
       feynmanEnrichment,
+      supplementaryDocumentPaths,
     } = job.payload ?? {};
     if (!slug) {
       throw new Error('accelmat job payload is missing "slug"');
@@ -270,7 +328,14 @@ export class JobQueue extends EventEmitter {
     job.progress = 5;
     job.stage = 'accelmat';
     this.appendLog(job, { level: 'info', message: `Writing ACCELMAT request for slug "${slug}"` });
-    await writeAccelmatRequest(slug, { graphPath, goal, constraints, maxRefinementIterations, numHypotheses });
+    await writeAccelmatRequest(slug, {
+      graphPath,
+      goal,
+      constraints,
+      maxRefinementIterations,
+      numHypotheses,
+      supplementaryDocumentPaths,
+    });
     await this.persistJob(job);
 
     job.progress = 10;

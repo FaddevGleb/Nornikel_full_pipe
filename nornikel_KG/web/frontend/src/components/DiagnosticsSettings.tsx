@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, type DiagnosticStep } from '../api/client';
+import { formatNodeTypesSummary } from '../utils/ontologyLabels';
 import { PageHeader } from './PageHeader';
 import { Button, EmptyState, Spinner } from './ui';
 
 function formatDiagDetails(details: Record<string, unknown>): { key: string; value: string }[] {
-  return Object.entries(details).map(([key, value]) => ({
-    key,
-    value: typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value),
-  }));
+  return Object.entries(details).map(([key, value]) => {
+    if (key === 'nodeTypes' && value && typeof value === 'object' && !Array.isArray(value)) {
+      return { key, value: formatNodeTypesSummary(value as Record<string, number>) };
+    }
+    return {
+      key,
+      value: typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value),
+    };
+  });
 }
 
 export function DiagnosticsView() {

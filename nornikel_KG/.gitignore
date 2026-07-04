@@ -24,8 +24,9 @@ venv/
 *.swp
 *.swo
 
-# Environment
-.env
+# Hackathon: graph artifacts and .env are committed for out-of-box demo.
+
+# Environment (legacy local overrides only)
 .env.local
 .env.*.local
 
@@ -50,14 +51,13 @@ tmp/
 temp/
 *.tmp
 
-# Project specific
-data/out/*
+# Project specific — demo graphs committed; raw uploads and staging ignored
 data/raw/*
 data/staging/*
 !data/**/.gitkeep
-viz/data/in/*
 viz/data/out/*
-!viz/**/.gitkeep
+!viz/data/in/*.json
+!viz/data/out/*.json
 viz/logs/*
 !viz/logs/.gitkeep
 

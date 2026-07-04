@@ -13,7 +13,7 @@ import minify_html
 from jinja2 import Environment, FileSystemLoader
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.utils.config import load_config
+from src.utils.config import load_viz_config
 from src.utils.console_encoding import setup_console_encoding
 from src.utils.exit_codes import (
     EXIT_CONFIG_ERROR, EXIT_INPUT_ERROR, EXIT_IO_ERROR,
@@ -387,7 +387,7 @@ def main():
     logger.info(f"Starting HTML viewer generation (mode: {'test' if args.test else 'production'})")
     
     try:
-        config = load_config(viz_dir / "config.toml")
+        config = load_viz_config()
         logger.info("Configuration loaded")
     except Exception as e:
         logger.error(f"Failed to load config: {e}")
