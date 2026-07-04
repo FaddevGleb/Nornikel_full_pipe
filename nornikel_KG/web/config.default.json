@@ -2,7 +2,7 @@
   "port": 3847,
   "mode": "online",
   "providers": {
-    "online": "openrouter",
+    "online": "yandex",
     "offline": "local_transformers"
   },
   "paths": {
@@ -17,34 +17,13 @@
       "refiner",
       "metrics"
     ],
-    "autoRunMetrics": true
+    "autoRunMetrics": true,
+    "autoConvertIncoming": true
   },
   "hypothesis": {
     "minConfidence": 0.4,
     "maxResults": 20,
     "focusAreas": ["Material", "Property", "SynthesisMethod"]
-  },
-  "accelmat": {
-    "projectDir": "../Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goal-Driven-and-Constraint-Guided-LLM",
-    "pythonExecutable": "python",
-    "defaults": {
-      "maxRefinementIterations": 1,
-      "numHypotheses": 5
-    }
-  },
-  "feynman": {
-    "root": "../feynman",
-    "cwd": "..",
-    "idleTimeoutMs": 900000
-  },
-  "feynmanEnrichment": {
-    "enabledByDefault": false,
-    "timeoutMs": 900000,
-    "maxSearchesPerHypothesis": 2,
-    "autoRerunOnReject": true
-  },
-  "security": {
-    "apiKey": ""
   },
   "ui": {
     "defaultTheme": "light",

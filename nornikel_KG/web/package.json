@@ -8,6 +8,7 @@
     "start": "node server/index.js",
     "dev:server": "node --watch server/index.js",
     "dev:frontend": "vite --config frontend/vite.config.ts",
+    "predev": "node scripts/check-dev-ports.mjs",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:frontend\"",
     "build": "vite build --config frontend/vite.config.ts",
     "preview": "vite preview --config frontend/vite.config.ts"
@@ -26,8 +27,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.4.1",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
