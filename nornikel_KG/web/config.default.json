@@ -15,12 +15,11 @@
       "slicer",
       "concepts",
       "graph",
-      "dedup",
       "refiner",
       "metrics"
     ],
     "autoRunMetrics": true,
-    "syncOnGraphStages": ["graph", "dedup", "refiner"],
+    "syncOnGraphStages": ["graph", "refiner"],
     "autoMetricsOnExternalChange": true,
     "watchDataOut": true
   },

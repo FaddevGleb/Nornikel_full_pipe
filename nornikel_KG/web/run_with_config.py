@@ -11,7 +11,7 @@ from pathlib import Path
 
 WEB_DIR = Path(__file__).resolve().parent
 NKG_ROOT = WEB_DIR.parent
-WORKSPACE_ROOT = NKG_ROOT.parent.parent
+WORKSPACE_ROOT = NKG_ROOT.parent
 
 STAGE_MODULES = {
     "slicer": "src.slicer",

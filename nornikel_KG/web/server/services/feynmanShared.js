@@ -1,11 +1,20 @@
-import { getFeynmanConfig, getWebConfig, getNornikelKgRoot, getWorkspaceRoot } from '../../../../config/loader.mjs';
+import { getFeynmanConfig, getWebConfig, getNornikelKgRoot, getWorkspaceRoot, decodeSecret } from '../../../../config/loader.mjs';
 import path from 'node:path';
 import os from 'node:os';
-import { accessSync } from 'node:fs';
+import { accessSync, chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { StringDecoder } from 'node:string_decoder';
 
 const DEFAULT_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+const ROUTERAI_PROVIDER_ID = 'routerai';
+const DEFAULT_ROUTERAI_BASE_URL = 'https://routerai.ru/api/v1';
+const FEYNMAN_KNOWN_PROVIDERS = new Set([
+  ROUTERAI_PROVIDER_ID,
+  'openrouter',
+  'yandex-ai-studio',
+  'litellm',
+  'lm-studio',
+]);
 
 export function getFeynmanSettings() {
   return getFeynmanConfig();
@@ -43,9 +52,82 @@ export function getIdleTimeoutMs() {
   return feynman.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
 }
 
-export function getFeynmanModel() {
+export function getFeynmanBaseUrl() {
   const feynman = getFeynmanConfig();
-  return feynman.model || '';
+  return feynman.base_url ?? feynman.routerai_base_url ?? DEFAULT_ROUTERAI_BASE_URL;
+}
+
+function parseFeynmanModelSpec(model) {
+  const trimmed = String(model ?? '').trim();
+  if (!trimmed) {
+    return { provider: ROUTERAI_PROVIDER_ID, modelId: 'qwen/qwen3.6-flash' };
+  }
+  const slash = trimmed.indexOf('/');
+  if (slash === -1) {
+    return { provider: ROUTERAI_PROVIDER_ID, modelId: trimmed };
+  }
+  const prefix = trimmed.slice(0, slash);
+  if (FEYNMAN_KNOWN_PROVIDERS.has(prefix)) {
+    return { provider: prefix, modelId: trimmed.slice(slash + 1) };
+  }
+  return { provider: ROUTERAI_PROVIDER_ID, modelId: trimmed };
+}
+
+export function getFeynmanModel() {
+  const { provider, modelId } = parseFeynmanModelSpec(getFeynmanConfig().model);
+  return `${provider}/${modelId}`;
+}
+
+function upsertModelsJsonProvider(modelsJsonPath, providerId, patch) {
+  let value = { providers: {} };
+  if (existsSync(modelsJsonPath)) {
+    try {
+      const raw = readFileSync(modelsJsonPath, 'utf8').trim();
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') value = parsed;
+      }
+    } catch {
+      // overwrite broken models.json on next write
+    }
+  }
+
+  const providers = value.providers && typeof value.providers === 'object' ? { ...value.providers } : {};
+  const current = providers[providerId] && typeof providers[providerId] === 'object'
+    ? { ...providers[providerId] }
+    : {};
+  providers[providerId] = { ...current, ...patch };
+  const next = { ...value, providers };
+
+  mkdirSync(path.dirname(modelsJsonPath), { recursive: true });
+  writeFileSync(modelsJsonPath, `${JSON.stringify(next, null, 2)}\n`, 'utf8');
+  try {
+    chmodSync(modelsJsonPath, 0o600);
+  } catch {
+    // best-effort
+  }
+}
+
+function resolveFeynmanRouterAiApiKey() {
+  const feynman = getFeynmanConfig();
+  const fromConfig = feynman.env?.ROUTERAI_API_KEY;
+  if (fromConfig != null && String(fromConfig).trim()) {
+    return decodeSecret(fromConfig);
+  }
+  return process.env.ROUTERAI_API_KEY ?? '';
+}
+
+export function ensureRouterAiProvider() {
+  const { modelId } = parseFeynmanModelSpec(getFeynmanConfig().model);
+  const modelsJsonPath = path.join(getFeynmanAgentDir(), 'models.json');
+  const apiKey = resolveFeynmanRouterAiApiKey();
+  upsertModelsJsonProvider(modelsJsonPath, ROUTERAI_PROVIDER_ID, {
+    baseUrl: getFeynmanBaseUrl(),
+    apiKey: apiKey || 'ROUTERAI_API_KEY',
+    api: 'openai-completions',
+    authHeader: true,
+    models: [{ id: modelId }],
+  });
 }
 
 export function getFeynmanSpawnEnv() {
@@ -53,8 +135,10 @@ export function getFeynmanSpawnEnv() {
   const env = { ...process.env };
   const extra = feynman.env ?? {};
   for (const [key, value] of Object.entries(extra)) {
-    if (value != null) env[key] = String(value);
+    if (value != null) env[key] = decodeSecret(value);
   }
+  env.ROUTERAI_BASE_URL = getFeynmanBaseUrl();
+  delete env.OPENROUTER_API_KEY;
   return env;
 }
 
@@ -86,6 +170,7 @@ function resolvePiCodingAgentEntry() {
 export async function ensureWorkspaceTrusted() {
   if (trustEnsured) return;
   try {
+    ensureRouterAiProvider();
     const entryPath = resolvePiCodingAgentEntry();
     if (!entryPath) {
       throw new Error(

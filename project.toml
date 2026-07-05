@@ -254,9 +254,9 @@ mode = "online"
   projectRoot = ".."
 
   [web.pipeline]
-  stages = [ "slicer", "concepts", "graph", "dedup", "refiner", "metrics" ]
+  stages = [ "slicer", "concepts", "graph", "refiner", "metrics" ]
   autoRunMetrics = true
-  syncOnGraphStages = [ "graph", "dedup", "refiner" ]
+  syncOnGraphStages = [ "graph", "refiner" ]
   autoMetricsOnExternalChange = true
   watchDataOut = true
 
@@ -306,11 +306,12 @@ projectDir = "Hypothesis-Generation-for-Materials-Discovery-and-Design-Using-Goa
 root = "{paths.feynman}"
 cwd = "{paths.hypothesis_repo}"
 idleTimeoutMs = 900_000
-model = "yandex-ai-studio/gpt://b1ggusvist6c2sia1dno/qwen3-235b-a22b-fp8/latest"
+base_url = "https://routerai.ru/api/v1"
+model = "routerai/qwen/qwen3.6-flash"
 
   [feynman.env]
-  OPENROUTER_API_KEY = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
   ROUTERAI_API_KEY = "sk-YI1VorP5NJXSDwsGNHsL2i3hsaQbzhCy"
+  ROUTERAI_BASE_URL = "https://routerai.ru/api/v1"
   YANDEX_API_KEY = "b64:QVFWTjBnZEpqb21lSjhtLUhoaDZLU3BjRHA1SFpSenZGNDhHdEFfOQ=="
   YANDEX_FOLDER_ID = "b1ggusvist6c2sia1dno"
 

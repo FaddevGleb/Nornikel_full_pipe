@@ -212,7 +212,9 @@ async function checkEmbeddingModel() {
       path.join(configManager.getWebRoot(), 'runtime', 'config.toml'),
       'utf8',
     );
-    const match = runtimeConfig.match(/\[dedup\][\s\S]*?embedding_model\s*=\s*"([^"]+)"/);
+    const match =
+      runtimeConfig.match(/\[refiner\][\s\S]*?embedding_model\s*=\s*"([^"]+)"/)
+      ?? runtimeConfig.match(/\[dedup\][\s\S]*?embedding_model\s*=\s*"([^"]+)"/);
     const modelPath = match?.[1] ?? '';
     if (!modelPath) {
       return step('embedding_model', 'diagnostics.steps.embedding', 'fail', 'diagnostics.messages.embedding_not_configured', {});

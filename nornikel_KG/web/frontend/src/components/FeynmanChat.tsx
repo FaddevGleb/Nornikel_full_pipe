@@ -155,10 +155,11 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, isThinking]);
 
-  function connect() {
+  function connect(): Promise<void> {
     setConnecting(true);
     setError(null);
-    api.createFeynmanSession().then(({ conversationId: id }) => {
+    streamCleanup.current?.();
+    return api.createFeynmanSession().then(({ conversationId: id }) => {
       conversationIdRef.current = id;
       setConversationId(id);
       setConnecting(false);
@@ -183,6 +184,8 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
         onClosed: () => {
           setIsStreaming(false);
           setIsThinking(false);
+          conversationIdRef.current = null;
+          setConversationId(null);
         },
       });
     }).catch((err) => {
@@ -215,16 +218,35 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
     });
   }
 
-  async function sendMessage(text: string) {
-    if (!conversationId || !text.trim()) return;
+  async function sendMessage(text: string, allowReconnect = true) {
+    if (!text.trim()) return;
+
+    let activeConversationId = conversationIdRef.current;
+    if (!activeConversationId) {
+      if (allowReconnect && !connecting) {
+        await connect();
+        activeConversationId = conversationIdRef.current;
+      }
+      if (!activeConversationId) return;
+    }
+
     setMessages((prev) => [...prev, { role: 'user', text, tools: [] }]);
     setIsStreaming(true);
     setIsThinking(true);
     setError(null);
     try {
-      await api.sendFeynmanMessage(conversationId, text);
+      await api.sendFeynmanMessage(activeConversationId, text);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
+      const message = err instanceof Error ? err.message : t('errors.generic');
+      if (allowReconnect && /session not found/i.test(message)) {
+        setMessages((prev) => prev.slice(0, -1));
+        await connect();
+        if (conversationIdRef.current) {
+          await sendMessage(text, false);
+          return;
+        }
+      }
+      setError(message);
       setIsStreaming(false);
       setIsThinking(false);
     }
@@ -265,7 +287,7 @@ export function FeynmanChat({ seedContext, onNavigateToAccelmat }: FeynmanChatPr
     setIsStreaming(false);
     setIsThinking(false);
     setError(null);
-    connect();
+    void connect();
     loadLatestAccelmatResult();
   }
 

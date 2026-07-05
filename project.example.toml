@@ -111,11 +111,12 @@ KG = "qwen/qwen3.6-flash"
 root = "{paths.feynman}"
 cwd = "{paths.hypothesis_repo}"
 idleTimeoutMs = 900000
-model = ""
+base_url = "https://routerai.ru/api/v1"
+model = "routerai/qwen/qwen3.6-flash"
 
 [feynman.env]
-OPENROUTER_API_KEY = "YOUR_SECRET_HERE"
 ROUTERAI_API_KEY = "YOUR_SECRET_HERE"
+ROUTERAI_BASE_URL = "https://routerai.ru/api/v1"
 YANDEX_API_KEY = "YOUR_SECRET_HERE"
 YANDEX_FOLDER_ID = "YOUR_SECRET_HERE"
 

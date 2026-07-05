@@ -7,7 +7,7 @@ import { PageHeader } from './PageHeader';
 import { Button, Modal } from './ui';
 import type { ConfigStatus } from '../utils/modeLabel';
 
-const PIPELINE_STAGES = ['slicer', 'concepts', 'graph', 'dedup', 'refiner', 'metrics'];
+const PIPELINE_STAGES = ['slicer', 'concepts', 'graph', 'refiner', 'metrics'];
 
 type ConfirmAction = { type: 'full' } | { type: 'stage'; stage: string } | null;
 

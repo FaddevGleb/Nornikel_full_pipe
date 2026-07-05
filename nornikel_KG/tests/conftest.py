@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from dotenv import load_dotenv
 
-WORKSPACE_ROOT = Path(__file__).resolve().parents[3]
+WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
 os.environ.setdefault("NORNIKEL_PROJECT_ROOT", str(WORKSPACE_ROOT))
 
 # Legacy .env fallback for integration tests that still read env vars directly

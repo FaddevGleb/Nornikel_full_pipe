@@ -22,6 +22,18 @@ test('findBestGraphArtifact prefers longrange over dedup over raw', async () => 
   }
 });
 
+test('findBestGraphArtifact uses raw when only graph stage has run', async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'graph-sync-raw-'));
+  try {
+    await fs.writeFile(path.join(tmp, 'LearningChunkGraph_raw.json'), '{"nodes":[],"edges":[]}');
+
+    const best = await findBestGraphArtifact(tmp);
+    assert.equal(best.name, 'LearningChunkGraph_raw.json');
+  } finally {
+    await fs.rm(tmp, { recursive: true, force: true });
+  }
+});
+
 test('findBestGraphArtifact returns null when data/out is empty', async () => {
   const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'graph-sync-empty-'));
   try {
@@ -32,7 +44,7 @@ test('findBestGraphArtifact returns null when data/out is empty', async () => {
   }
 });
 
-test('GRAPH_CANDIDATES order is longrange, dedup, raw', () => {
+test('GRAPH_CANDIDATES order is longrange, dedup legacy, raw', () => {
   assert.deepEqual(GRAPH_CANDIDATES, [
     'LearningChunkGraph_longrange.json',
     'LearningChunkGraph_dedup.json',

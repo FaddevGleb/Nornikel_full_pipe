@@ -25,6 +25,7 @@ class FeynmanSession extends EventEmitter {
     this.idleTimer = null;
     this.child = null;
     this.pendingRequestId = 0;
+    this.startupComplete = false;
   }
 
   async start() {
@@ -39,27 +40,71 @@ class FeynmanSession extends EventEmitter {
     const args = [binPath, '--mode', 'rpc', '--session-dir', sessionDir, '--cwd', cwd];
     if (model) args.push('--model', model);
 
-    this.child = spawn(process.execPath, args, {
-      cwd,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      env: getFeynmanSpawnEnv(),
+    const stderrLines = [];
+
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      let readyTimer = null;
+      const finish = (error, session) => {
+        if (settled) return;
+        settled = true;
+        if (readyTimer) clearTimeout(readyTimer);
+        if (error) reject(error);
+        else resolve(session);
+      };
+
+      this.child = spawn(process.execPath, args, {
+        cwd,
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: getFeynmanSpawnEnv(),
+      });
+
+      attachJsonlReader(this.child.stdout, (line) => this.handleLine(line));
+      attachJsonlReader(this.child.stderr, (line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        stderrLines.push(trimmed);
+        this.emit('log', { level: 'warn', message: trimmed });
+        if (/Unknown model|Pro-class model disabled/i.test(trimmed)) {
+          if (this.startupComplete) {
+            this.emit('error', { message: trimmed });
+            this.stop();
+          } else {
+            finish(new Error(trimmed));
+            this.child?.kill();
+          }
+        }
+      });
+
+      this.child.on('error', (error) => {
+        finish(new Error(`Failed to launch Feynman: ${error.message}`));
+      });
+
+      const onStartupExit = (code) => {
+        const detail = stderrLines.join('\n').trim() || `Feynman exited during startup (code ${code})`;
+        finish(new Error(detail));
+      };
+
+      this.child.once('exit', onStartupExit);
+
+      readyTimer = setTimeout(() => {
+        this.child?.off('exit', onStartupExit);
+        if (this.child?.exitCode !== null) {
+          finish(new Error(stderrLines.at(-1) ?? `Feynman exited with code ${this.child.exitCode}`));
+          return;
+        }
+
+        this.child.on('close', (code) => {
+          this.clearIdleTimer();
+          this.emit('closed', { code });
+        });
+
+        this.resetIdleTimer();
+        this.startupComplete = true;
+        finish(null, this);
+      }, 2000);
     });
 
-    attachJsonlReader(this.child.stdout, (line) => this.handleLine(line));
-    attachJsonlReader(this.child.stderr, (line) => {
-      if (line.trim()) this.emit('log', { level: 'warn', message: line.trim() });
-    });
-
-    this.child.on('error', (error) => {
-      this.emit('error', { message: `Failed to launch Feynman: ${error.message}` });
-    });
-
-    this.child.on('close', (code) => {
-      this.clearIdleTimer();
-      this.emit('closed', { code });
-    });
-
-    this.resetIdleTimer();
     return this;
   }
 
@@ -88,6 +133,10 @@ class FeynmanSession extends EventEmitter {
       }
       case 'agent_end': {
         this.isStreaming = false;
+        const last = Array.isArray(event.messages) ? event.messages.at(-1) : null;
+        if (last?.role === 'assistant' && last.stopReason === 'error') {
+          this.emit('error', { message: last.errorMessage ?? 'Model request failed with no response.' });
+        }
         this.emit('turn_end', {});
         break;
       }
@@ -104,7 +153,7 @@ class FeynmanSession extends EventEmitter {
       }
       case 'turn_end': {
         const message = event.message;
-        if (message?.role === 'assistant' && message.stopReason === 'error' && (!message.content || message.content.length === 0)) {
+        if (message?.role === 'assistant' && message.stopReason === 'error') {
           this.emit('error', { message: message.errorMessage ?? 'Model request failed with no response.' });
         }
         break;

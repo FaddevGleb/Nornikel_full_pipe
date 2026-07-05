@@ -105,7 +105,7 @@ async function checkConfiguration() {
   rows.push(checkRow('config', 'project_toml', 'pass', 'project.toml loaded'));
 
   const kg = config.kg ?? {};
-  const requiredKg = ['slicer', 'itext2kg_concepts', 'itext2kg_graph', 'dedup', 'refiner'];
+  const requiredKg = ['slicer', 'itext2kg_concepts', 'itext2kg_graph', 'refiner'];
   for (const section of requiredKg) {
     const found = Object.prototype.hasOwnProperty.call(kg, section);
     rows.push(checkRow(
@@ -233,7 +233,9 @@ async function checkOfflineModels() {
   const rows = [];
   try {
     const runtimeConfig = await fs.readFile(path.join(configManager.getWebRoot(), 'runtime', 'config.toml'), 'utf8');
-    const embeddingMatch = runtimeConfig.match(/\[dedup\][\s\S]*?embedding_model\s*=\s*"([^"]+)"/);
+    const embeddingMatch =
+      runtimeConfig.match(/\[refiner\][\s\S]*?embedding_model\s*=\s*"([^"]+)"/)
+      ?? runtimeConfig.match(/\[dedup\][\s\S]*?embedding_model\s*=\s*"([^"]+)"/);
     const embeddingPath = embeddingMatch?.[1]?.replace(/NORNIKEL2/gi, 'NORNIKEL3') ?? '';
     if (embeddingPath) {
       const resolved = path.isAbsolute(embeddingPath) ? embeddingPath : configManager.resolveProjectPath(embeddingPath);

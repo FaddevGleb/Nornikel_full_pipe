@@ -8,10 +8,10 @@ import {
   getVizConfig,
   getWebConfig,
   loadProjectConfig,
-} from '../../../../config/loader.mjs';
+} from '../../../config/loader.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const WORKSPACE = path.resolve(__dirname, '../../../..');
+const WORKSPACE = path.resolve(__dirname, '../../..');
 
 test('findWorkspaceRoot resolves NORNIKEL workspace', () => {
   process.env.NORNIKEL_PROJECT_ROOT = WORKSPACE;

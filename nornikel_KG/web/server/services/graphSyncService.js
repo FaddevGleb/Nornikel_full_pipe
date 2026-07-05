@@ -34,7 +34,7 @@ async function getMtime(targetPath) {
 }
 
 /**
- * Pick the best graph artifact from data/out (longrange > dedup > raw).
+ * Pick the best graph artifact from data/out (longrange > dedup legacy > raw).
  */
 export async function findBestGraphArtifact(outDir = configManager.resolveProjectPath('data/out')) {
   for (const candidate of GRAPH_CANDIDATES) {

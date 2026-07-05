@@ -125,10 +125,11 @@ def build_project_config() -> dict:
         "root": "{paths.feynman}",
         "cwd": "{paths.hypothesis_repo}",
         "idleTimeoutMs": feynman_settings.get("idleTimeoutMs", 900000),
-        "model": feynman_settings.get("model", ""),
+        "base_url": env.get("ROUTERAI_BASE_URL", "https://routerai.ru/api/v1"),
+        "model": feynman_settings.get("model", "routerai/qwen/qwen3.6-flash"),
         "env": {
-            "OPENROUTER_API_KEY": env.get("ROUTERAI_API_KEY", env.get("OPENROUTER_API_KEY", "")),
             "ROUTERAI_API_KEY": env.get("ROUTERAI_API_KEY", ""),
+            "ROUTERAI_BASE_URL": env.get("ROUTERAI_BASE_URL", "https://routerai.ru/api/v1"),
             "YANDEX_API_KEY": env.get("YANDEX_API_KEY", ""),
             "YANDEX_FOLDER_ID": env.get("YANDEX_FOLDER_ID", ""),
         },

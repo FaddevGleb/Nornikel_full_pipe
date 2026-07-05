@@ -699,6 +699,20 @@ def add_refiner_meta(graph, config, stats_forward, stats_backward, api_usage_for
     }
 
 
+REFINER_GRAPH_INPUT_CANDIDATES = (
+    Path("data/out/LearningChunkGraph_raw.json"),
+    Path("data/out/LearningChunkGraph_dedup.json"),
+)
+
+
+def resolve_refiner_input_path() -> Path:
+    """Resolve graph input after pipeline graph stage (raw preferred; dedup kept for legacy runs)."""
+    for candidate in REFINER_GRAPH_INPUT_CANDIDATES:
+        if candidate.exists():
+            return candidate
+    return REFINER_GRAPH_INPUT_CANDIDATES[0]
+
+
 def main():
     try:
         config = load_config()
@@ -706,7 +720,7 @@ def main():
         
         if not refiner_config.get("run", True):
             print("Refiner longrange is disabled (run=false), copying file without changes")
-            input_path = Path("data/out/LearningChunkGraph_dedup.json")
+            input_path = resolve_refiner_input_path()
             output_path = Path("data/out/LearningChunkGraph_longrange.json")
             if not input_path.exists():
                 return EXIT_INPUT_ERROR
@@ -716,8 +730,12 @@ def main():
         logger = setup_json_logging(refiner_config)
         validate_refiner_longrange_config(refiner_config)
         
-        input_path = Path("data/out/LearningChunkGraph_dedup.json")
+        input_path = resolve_refiner_input_path()
         output_path = Path("data/out/LearningChunkGraph_longrange.json")
+        if not input_path.exists():
+            logger.error(f"Input graph not found: {input_path}")
+            return EXIT_INPUT_ERROR
+        logger.info(f"Using graph input: {input_path}")
         
         graph = load_and_validate_graph(input_path)
         target_nodes = extract_target_nodes(graph)

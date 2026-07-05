@@ -31,6 +31,7 @@ export class JobQueue extends EventEmitter {
     this.jobs = new Map();
     this.runningJobId = null;
     this.runner = null;
+    this.persistChains = new Map();
   }
 
   async init() {
@@ -42,9 +43,30 @@ export class JobQueue extends EventEmitter {
   async loadPersistedJobs() {
     const files = await fs.readdir(JOBS_DIR).catch(() => []);
     for (const file of files) {
-      if (!file.endsWith('.json')) continue;
-      const raw = await fs.readFile(path.join(JOBS_DIR, file), 'utf8');
-      const job = JSON.parse(raw);
+      if (!file.endsWith('.json') || file.includes('.corrupted') || file.endsWith('.tmp')) continue;
+      const filePath = path.join(JOBS_DIR, file);
+      let raw;
+      try {
+        raw = await fs.readFile(filePath, 'utf8');
+      } catch (error) {
+        console.warn(`[jobQueue] Could not read job file ${file}: ${error.message}`);
+        continue;
+      }
+
+      let job;
+      try {
+        job = JSON.parse(raw);
+      } catch (error) {
+        const quarantined = `${file}.corrupted`;
+        console.warn(`[jobQueue] Skipping corrupted job file ${file}: ${error.message}`);
+        try {
+          await fs.rename(filePath, path.join(JOBS_DIR, quarantined));
+        } catch (renameError) {
+          console.warn(`[jobQueue] Could not quarantine ${file}: ${renameError.message}`);
+        }
+        continue;
+      }
+
       if (['running', 'paused'].includes(job.status)) {
         job.status = 'interrupted';
         job.error = 'Recovered after server restart';
@@ -54,8 +76,20 @@ export class JobQueue extends EventEmitter {
   }
 
   async persistJob(job) {
+    const previous = this.persistChains.get(job.id) ?? Promise.resolve();
+    const next = previous
+      .catch(() => {})
+      .then(() => this.writeJobFile(job));
+    this.persistChains.set(job.id, next);
+    await next;
+  }
+
+  async writeJobFile(job) {
     const target = path.join(JOBS_DIR, `${job.id}.json`);
-    await fs.writeFile(target, JSON.stringify(job, null, 2), 'utf8');
+    const temp = path.join(JOBS_DIR, `${job.id}.${process.pid}.${Date.now()}.tmp`);
+    const body = JSON.stringify(job, null, 2);
+    await fs.writeFile(temp, body, 'utf8');
+    await fs.rename(temp, target);
   }
 
   listJobs() {
@@ -153,7 +187,7 @@ export class JobQueue extends EventEmitter {
 
   async syncAfterGraphStage(job, stage) {
     const syncStages = configManager.settings?.pipeline?.syncOnGraphStages
-      ?? ['graph', 'dedup', 'refiner'];
+      ?? ['graph', 'refiner'];
     if (!syncStages.includes(stage)) return;
 
     await syncDataOutToVizIn({

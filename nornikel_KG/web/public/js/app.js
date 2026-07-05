@@ -5,7 +5,6 @@ const STAGES = [
   { id: 'slicer', label: 'Slice' },
   { id: 'concepts', label: 'Concepts' },
   { id: 'graph', label: 'Graph' },
-  { id: 'dedup', label: 'Dedup' },
   { id: 'refiner', label: 'Refiner' },
   { id: 'metrics', label: 'Metrics' },
 ];
