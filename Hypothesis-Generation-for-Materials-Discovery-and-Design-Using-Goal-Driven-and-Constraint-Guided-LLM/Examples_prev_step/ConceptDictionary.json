@@ -1,0 +1,723 @@
+{
+  "_meta": {
+    "itext2kg_concepts": {
+      "generated_at": "2026-07-02 13:03:28",
+      "config": {
+        "model": "deepseek/deepseek-v4-pro",
+        "temperature": 0.6,
+        "max_output_tokens": 8192,
+        "reasoning_effort": null,
+        "overlap": 0,
+        "slice_size": 4000
+      },
+      "source": {
+        "total_slices": 4,
+        "processed_slices": 4,
+        "total_tokens": 12776,
+        "slug": "sample_large"
+      },
+      "api_usage": {
+        "total_requests": 5,
+        "total_input_tokens": 43064,
+        "total_output_tokens": 36682,
+        "total_tokens": 79746
+      },
+      "concepts_stats": {
+        "total_concepts": 48,
+        "concepts_with_aliases": 48,
+        "total_aliases": 155,
+        "avg_aliases_per_concept": 3.23
+      },
+      "processing_time": {
+        "start": "2026-07-02 12:55:51",
+        "end": "2026-07-02 13:03:28",
+        "duration_minutes": 7.62
+      }
+    }
+  },
+  "concepts": [
+    {
+      "concept_id": "mat_PT-7M",
+      "term": {
+        "primary": "PT-7M",
+        "aliases": [
+          "Ti-2.2Al-2.5Zr",
+          "ПТ-7М",
+          "α-сплав ПТ-7М",
+          "titanium alloy PT-7M"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Деформируемый α-титановый сплав состава Ti-2.2Al-2.5Zr (мас. %), используемый для производства труб, эксплуатируемых при комнатной и повышенных (до 400–450 °C) температурах в агрессивных средах.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_expanding",
+      "term": {
+        "primary": "Expanding",
+        "aliases": [
+          "экспандирование",
+          "расширение",
+          "расширение центрального отверстия",
+          "expanding process"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Горячая пластическая деформация, осуществляемая на прошивных прессах, заключающаяся в расширении центрального отверстия предварительно сверленой трубной заготовки с помощью наконечника иглы специальной формы; приводит к измельчению зерна и рекристаллизации.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_microhardness",
+      "term": {
+        "primary": "Microhardness",
+        "aliases": [
+          "микротвердость",
+          "твердость по Виккерсу",
+          "microhardness Vickers",
+          "HV"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Способность материала сопротивляться пластической деформации при вдавливании индентора в микрообъемах, измеряемая методом Виккерса; варьирует в зависимости от направления и структуры.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_young_modulus",
+      "term": {
+        "primary": "Young Modulus",
+        "aliases": [
+          "модуль упругости",
+          "модуль Юнга",
+          "elastic modulus",
+          "E"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Физическая константа, характеризующая сопротивление материала упругой деформации при растяжении/сжатии; в титановых сплавах проявляет анизотропию из-за кристаллографической текстуры.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_contact_elastic_modulus",
+      "term": {
+        "primary": "Contact Elastic Modulus",
+        "aliases": [
+          "контактный модуль упругости",
+          "indentation modulus",
+          "E_r"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Модуль упругости, определяемый при инструментальном индентировании по методике Оливера-Фарра; отражает упругие свойства материала в зоне контакта индентора с поверхностью.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mech_recrystallization",
+      "term": {
+        "primary": "Recrystallization",
+        "aliases": [
+          "primary recrystallization",
+          "динамическая рекристаллизация",
+          "первичная рекристаллизация",
+          "рекристаллизация"
+        ]
+      },
+      "ontology_class": "Mechanism",
+      "definition": "Процесс зарождения и роста новых зерен с низкой плотностью дислокаций в деформированном металле при горячей обработке; приводит к измельчению зеренной структуры и снятию наклепа.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_texture",
+      "term": {
+        "primary": "Texture",
+        "aliases": [
+          "текстура",
+          "кристаллографическая текстура",
+          "crystallographic texture"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Преимущественная ориентировка кристаллитов в поликристаллическом материале; в α-титановых сплавах часто формируется текстура тангенциальной призмы {0001}TH<10-10> ОН + {0001}TH <11-20> ОН, вызывающая анизотропию механических свойств.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "char_macrostructural_analysis",
+      "term": {
+        "primary": "Macrostructural Analysis",
+        "aliases": [
+          "макроструктурный анализ",
+          "макроструктура",
+          "шкала макроструктур",
+          "visual macro-analysis"
+        ]
+      },
+      "ontology_class": "CharacterizationMethod",
+      "definition": "Метод оценки структуры металла невооруженным глазом или при небольшом увеличении, с использованием эталонных шкал для определения балла макроструктуры; применяется для контроля однородности и качества заготовок.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "char_optical_microscopy",
+      "term": {
+        "primary": "Optical Microscopy",
+        "aliases": [
+          "микроскопия",
+          "микроструктурный анализ",
+          "OLYMPUS GX51",
+          "световая микроскопия"
+        ]
+      },
+      "ontology_class": "CharacterizationMethod",
+      "definition": "Исследование микроструктуры с помощью светового микроскопа; позволяет оценить размер зерна, наличие рекристаллизации и зубчатость границ.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "char_XRD",
+      "term": {
+        "primary": "X-ray Diffraction",
+        "aliases": [
+          "рентгеноструктурный фазовый анализ",
+          "РСФА",
+          "XRD",
+          "Bruker D8 Advance",
+          "дифрактометрия"
+        ]
+      },
+      "ontology_class": "CharacterizationMethod",
+      "definition": "Метод определения кристаллической структуры, фазового состава и текстуры материалов путем анализа дифракционной картины от рентгеновских лучей; используется для уточнения периодов решетки α-фазы.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "char_instrumented_indentation",
+      "term": {
+        "primary": "Instrumented Indentation Testing",
+        "aliases": [
+          "микроиндентирование",
+          "метод Оливера-Фарра",
+          "Oliver-Pharr method",
+          "MHTX CSM",
+          "инструментальное индентирование"
+        ]
+      },
+      "ontology_class": "CharacterizationMethod",
+      "definition": "Методика определения микротвердости и модуля упругости путем непрерывной записи усилия и глубины вдавливания индентора; расчет свойств выполняется по алгоритму, предложенному В. С. Оливером и Г. М. Фарром.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT-20",
+      "term": {
+        "primary": "ВТ-20",
+        "aliases": [
+          "VT-20",
+          "титановый сплав ВТ-20",
+          "VT-20 alloy"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Титановый сплав, исследованный после многослойной наплавки; в процессе аддитивного производства формирует зоны сплавления, термического влияния и литого состояния с различной микротвердостью и микроструктурой.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_multilayer_surfacing",
+      "term": {
+        "primary": "Multilayer Surfacing",
+        "aliases": [
+          "многослойная наплавка",
+          "аддитивные технологии",
+          "additive manufacturing",
+          "наплавка"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Процесс послойного нанесения расплавленного металла для создания объемных деталей; приводит к формированию характерных зон (сплавления, термического влияния, литого состояния) и микродефектов.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "fail_microdefects",
+      "term": {
+        "primary": "Microdefects",
+        "aliases": [
+          "micropores",
+          "microscopic defects",
+          "дефекты микроструктуры",
+          "микродефекты",
+          "микропоры"
+        ]
+      },
+      "ontology_class": "FailureMode",
+      "definition": "Локальные несовершенства структуры (поры, микротрещины), возникающие в процессе многослойной наплавки титанового сплава и влияющие на механические свойства.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "cond_fusion_zone",
+      "term": {
+        "primary": "Fusion Zone",
+        "aliases": [
+          "зона сплавления",
+          "fusion area"
+        ]
+      },
+      "ontology_class": "Condition",
+      "definition": "Область сплавления основного и наплавляемого металла при многослойной дуговой наплавке; характеризуется наличием микропор и прорастанием зерен из наплавки в подложку.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "cond_heat_affected_zone",
+      "term": {
+        "primary": "Heat-Affected Zone",
+        "aliases": [
+          "зона термического влияния",
+          "HAZ"
+        ]
+      },
+      "ontology_class": "Condition",
+      "definition": "Область основного металла, примыкающая к зоне сплавления, в которой под воздействием термического цикла наплавки формируется структура бывших зерен β-фазы с α-оторочкой по границам.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "cond_cast_state_zone",
+      "term": {
+        "primary": "Cast-State Zone",
+        "aliases": [
+          "зона литого состояния",
+          "cast state zone"
+        ]
+      },
+      "ontology_class": "Condition",
+      "definition": "Наплавленный слой, затвердевший после расплавления; структура характеризуется корзиночным плетением α-фазы, типичным для литого состояния титанового сплава.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "fail_structural_inhomogeneity",
+      "term": {
+        "primary": "Structural Inhomogeneity",
+        "aliases": [
+          "структурная неоднородность",
+          "полосы структурной неоднородности",
+          "structural non-uniformity"
+        ]
+      },
+      "ontology_class": "FailureMode",
+      "definition": "Неравномерность структуры в виде полос, возникающая в титановом сплаве ВТ-20 при многослойной наплавке из-за различий в скоростях кристаллизации; может снижать однородность механических свойств.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_impact_toughness",
+      "term": {
+        "primary": "Impact Toughness",
+        "aliases": [
+          "ударная вязкость",
+          "impact strength"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Свойство материала поглощать энергию удара без разрушения, измеряемое в Дж/см²; ключевой параметр для оценки бронезащиты.",
+      "is_kpi": true
+    },
+    {
+      "concept_id": "prop_weldability",
+      "term": {
+        "primary": "Weldability",
+        "aliases": [
+          "свариваемость",
+          "welding ability"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Технологическое свойство материала образовывать качественное сварное соединение без дефектов; критично для изготовления крупногабаритных бронеэлементов.",
+      "is_kpi": true
+    },
+    {
+      "concept_id": "prop_technological_plasticity",
+      "term": {
+        "primary": "Technological Plasticity",
+        "aliases": [
+          "технологическая пластичность",
+          "cold formability"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Способность материала к пластической деформации без разрушения в холодном состоянии; необходимое свойство для формообразования броневых листов.",
+      "is_kpi": true
+    },
+    {
+      "concept_id": "kpi_protection_class",
+      "term": {
+        "primary": "Protection Class",
+        "aliases": [
+          "класс защиты",
+          "armor protection class"
+        ]
+      },
+      "ontology_class": "KPI_Target",
+      "definition": "Нормативный уровень баллистической защиты по ГОСТ 50963–96, определяемый типом и калибром выдерживаемого боеприпаса; целевой показатель для бронеавтомобилей.",
+      "is_kpi": true
+    },
+    {
+      "concept_id": "mat_UHMWPE",
+      "term": {
+        "primary": "Ultra-high molecular weight polyethylene",
+        "aliases": [
+          "сверхмолекулярный полиэтилен высокой плотности",
+          "UHMWPE"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Термопластичный полимер с очень высокой молекулярной массой, обладающий высокой плотностью; используется в качестве подложки для улавливания фрагментов пуль в комбинированных бронеэлементах.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_high_alloyed_alpha_beta_Ti",
+      "term": {
+        "primary": "High-alloyed (α+β) Titanium Alloy",
+        "aliases": [
+          "высоколегированный (a+b)-титановый сплав",
+          "high-alloyed (a+b) titanium alloy"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Титановые сплавы, содержащие алюминий и другие элементы, обеспечивающие молибденовый и алюминиевый эквиваленты в диапазоне 8–17; имеют двухфазную (α+β) структуру, обладают высокими прочностными свойствами.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_pseudo_beta_Ti",
+      "term": {
+        "primary": "Pseudo-β Titanium Alloy",
+        "aliases": [
+          "псевдо-β-титановый сплав",
+          "pseudo-b titanium alloy"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Титановые сплавы, преимущественно состоящие из β-фазы при комнатной температуре, с эквивалентами Mo и Al в диапазоне 8–17; характеризуются высокой технологической пластичностью и хорошей свариваемостью.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "app_armor_element",
+      "term": {
+        "primary": "Armor Element",
+        "aliases": [
+          "броневой элемент",
+          "бронеэлемент",
+          "armor component"
+        ]
+      },
+      "ontology_class": "Application",
+      "definition": "Конструктивный элемент броневой защиты транспортного средства, состоящий из титанового металлического слоя и полимерной подложки, предназначенный для деформации и остановки боеприпасов.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT6",
+      "term": {
+        "primary": "ВТ6",
+        "aliases": [
+          "VT6",
+          "титановый сплав ВТ6",
+          "(α+β)-титановый сплав ВТ6",
+          "Ti-6Al-4V (ВТ6)"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 3.2% и алюминиевым 6.8%, обладающий пределом прочности около 1030 МПа, относительным сужением 25%, ударной вязкостью 0.25 МДж/м²; предназначен для горячей деформации и обладает хорошей свариваемостью.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT16",
+      "term": {
+        "primary": "ВТ16",
+        "aliases": [
+          "VT16",
+          "титановый сплав ВТ16",
+          "(α+β)-титановый сплав ВТ16"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 8.2% и алюминиевым 4.3%, обладающий пределом прочности 1150 МПа, относительным сужением 50%, ударной вязкостью 0.30 МДж/м²; предназначен для холодной деформации и обладает хорошей свариваемостью.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT23",
+      "term": {
+        "primary": "ВТ23",
+        "aliases": [
+          "VT23",
+          "титановый сплав ВТ23",
+          "(α+β)-титановый сплав ВТ23"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 8.1% и алюминиевым 6.5%, обладающий пределом прочности 1100 МПа, относительным сужением 35%, ударной вязкостью 0.40 МДж/м²; предназначен для горячей деформации и обладает хорошей свариваемостью.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT22I",
+      "term": {
+        "primary": "ВТ22И",
+        "aliases": [
+          "VT22I",
+          "титановый сплав ВТ22И",
+          "(α+β)-титановый сплав ВТ22И"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Двухфазный (α+β)-титановый сплав с молибденовым эквивалентом 12.3% и алюминиевым 4.1%, обладающий пределом прочности 1300 МПа, относительным сужением 20%, ударной вязкостью 0.30 МДж/м²; предназначен для горячей деформации и имеет удовлетворительную свариваемость.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT35",
+      "term": {
+        "primary": "ВТ35",
+        "aliases": [
+          "VT35",
+          "титановый сплав ВТ35",
+          "псевдо-β-титановый сплав ВТ35"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Псевдо-β-титановый сплав с молибденовым эквивалентом 16.7% и алюминиевым 5.2%, обладающий пределом прочности 1220 МПа, низким относительным сужением 6%, ударной вязкостью 0.30 МДж/м²; предназначен для холодной деформации и обладает хорошей свариваемостью.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_VT1-0",
+      "term": {
+        "primary": "ВТ1-0",
+        "aliases": [
+          "VT1-0",
+          "технический титан ВТ1-0",
+          "титановый сплав ВТ1-0",
+          "сплав технического титана ВТ1-0"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Технически чистый титановый сплав, широко используемый для получения деформированных полуфабрикатов, в частности холоднокатаных труб; модуль упругости при комнатной температуре составляет около 109 ГПа.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "fail_wall_thickness_difference",
+      "term": {
+        "primary": "Wall Thickness Difference",
+        "aliases": [
+          "разностенность",
+          "difference of wall thickness",
+          "поперечная разностенность",
+          "wall thickness variation"
+        ]
+      },
+      "ontology_class": "FailureMode",
+      "definition": "Неравномерность толщины стенки трубной заготовки, возникающая при горячем прессовании из-за несоосности инструмента или неоднородности деформации; затрудняет последующую холодную обработку и требует учёта анизотропии свойств.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_anisotropy",
+      "term": {
+        "primary": "Anisotropy of Properties",
+        "aliases": [
+          "анизотропия свойств",
+          "анизотропия",
+          "anisotropy"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Зависимость механических свойств материала от направления приложения нагрузки, наследующаяся от операций горячего прессования и обусловленная кристаллографической текстурой; особенно заметна в α-титановых сплавах.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_hot_direct_extrusion",
+      "term": {
+        "primary": "Hot Direct Extrusion",
+        "aliases": [
+          "горячее прямое прессование",
+          "hot direct pressing",
+          "прямое прессование труб",
+          "прессование сплошной заготовки"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Процесс горячей обработки давлением, при котором сплошная заготовка продавливается через матрицу с одновременной прошивкой отверстия иглой; может приводить к поперечной разностенности из-за отсутствия центровки иглы.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_backward_extrusion",
+      "term": {
+        "primary": "Backward Extrusion",
+        "aliases": [
+          "обратное прессование",
+          "метод обратного прессования",
+          "backward pressing"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Способ прессования, при котором металл течёт в направлении, противоположном движению пресс-штемпеля; упоминается как более экономичный по энергозатратам метод по сравнению с прямым прессованием.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "char_DMA",
+      "term": {
+        "primary": "Dynamic Mechanical Analysis",
+        "aliases": [
+          "DMA",
+          "динамический механический анализ",
+          "ДМА",
+          "DMA 242 C"
+        ]
+      },
+      "ontology_class": "CharacterizationMethod",
+      "definition": "Метод термического анализа, измеряющий изменение механических свойств (модуля упругости) материала при циклическом нагружении в зависимости от температуры; используется для определения температурных интервалов релаксации напряжений и начала рекристаллизации.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mech_stress_relaxation",
+      "term": {
+        "primary": "Stress Relaxation",
+        "aliases": [
+          "релаксация остаточных напряжений",
+          "релаксация напряжений",
+          "relaxation of residual stresses"
+        ]
+      },
+      "ontology_class": "Mechanism",
+      "definition": "Процесс постепенного уменьшения внутренних напряжений в материале под воздействием температуры без существенной пластической деформации, наблюдаемый при нагреве холоднодеформированных титановых сплавов в интервале 275–340 °C.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_Ti-10V-2Fe-3Al",
+      "term": {
+        "primary": "Ti-10V-2Fe-3Al",
+        "aliases": [
+          "сплав Ti-10V-2Fe-3Al",
+          "титановый сплав Ti-10V-2Fe-3Al",
+          "Ti-10V-2Fe-3Al alloy"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Титановый сплав с высоким содержанием ванадия (10%), железа (2%) и алюминия (3%), применяемый в авиастроении для высокопрочных элементов планера и шасси; упрочняется термической обработкой за счет выделения дисперсной вторичной α-фазы.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mat_secondary_alpha_phase",
+      "term": {
+        "primary": "Secondary α-phase",
+        "aliases": [
+          "вторичная α-фаза",
+          "вторичная альфа-фаза",
+          "secondary alpha phase"
+        ]
+      },
+      "ontology_class": "Material",
+      "definition": "Дисперсные выделения α-Ti, образующиеся в β-матрице титановых сплавов при старении; увеличение дисперсности этой фазы приводит к повышению прочности за счет дисперсионного упрочнения.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mech_dispersion_strengthening",
+      "term": {
+        "primary": "Dispersion Strengthening",
+        "aliases": [
+          "дисперсионное упрочнение",
+          "дисперсионного упрочнения",
+          "dispersion hardening"
+        ]
+      },
+      "ontology_class": "Mechanism",
+      "definition": "Упрочняющий механизм, при котором мелкодисперсные частицы второй фазы блокируют движение дислокаций, повышая прочность и твердость материала.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "mech_solid_solution_strengthening",
+      "term": {
+        "primary": "Solid Solution Strengthening",
+        "aliases": [
+          "твердорастворное упрочнение",
+          "твердорастворного упрочнения",
+          "solid solution hardening"
+        ]
+      },
+      "ontology_class": "Mechanism",
+      "definition": "Упрочнение сплава за счет искажения кристаллической решетки атомами легирующих элементов, находящихся в твердом растворе, что затрудняет скольжение дислокаций.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_isothermal_heat_treatment",
+      "term": {
+        "primary": "Isothermal Heat Treatment",
+        "aliases": [
+          "изотермическая обработка",
+          "изотермическая термообработка"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Вид термической обработки, заключающийся в выдержке материала при постоянной температуре для осуществления фазовых превращений, например, распада β-фазы в титановых сплавах.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_aging",
+      "term": {
+        "primary": "Aging",
+        "aliases": [
+          "старение",
+          "ageing",
+          "aging heat treatment"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Этап упрочняющей термической обработки, при котором пересыщенный твердый раствор нагревают до промежуточной температуры для выделения дисперсных частиц вторичных фаз, повышая прочность.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "synth_quenching",
+      "term": {
+        "primary": "Quenching",
+        "aliases": [
+          "закалка",
+          "закалка с охлаждением в воде",
+          "quenching in water"
+        ]
+      },
+      "ontology_class": "SynthesisMethod",
+      "definition": "Быстрое охлаждение сплава с высокой температуры (например, из α+β-области) в воду для подавления диффузионных превращений и фиксации пересыщенного твердого раствора.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "prop_coherent_scattering_region_size",
+      "term": {
+        "primary": "Coherent Scattering Region Size",
+        "aliases": [
+          "ОКР",
+          "область когерентного рассеяния",
+          "размер ОКР",
+          "crystallite size"
+        ]
+      },
+      "ontology_class": "Property",
+      "definition": "Характеристический размер областей когерентного рассеяния в кристалле, определяемый из уширения дифракционных пиков по формуле Шеррера; используется для оценки дисперсности вторичных фаз.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "app_aircraft_structural_component",
+      "term": {
+        "primary": "Aircraft Structural Component",
+        "aliases": [
+          "высокопрочные конструкционные элементы планера",
+          "узлы шасси",
+          "airframe structural component",
+          "landing gear component"
+        ]
+      },
+      "ontology_class": "Application",
+      "definition": "Детали конструкций летательных аппаратов, такие как элементы планера и стойки шасси, требующие высокой удельной прочности и надежности; изготавливаются из высокопрочных титановых сплавов.",
+      "is_kpi": false
+    },
+    {
+      "concept_id": "char_SEM",
+      "term": {
+        "primary": "Scanning Electron Microscopy",
+        "aliases": [
+          "SEM",
+          "РЭМ",
+          "растровая электронная микроскопия",
+          "Quanta 3D FEG"
+        ]
+      },
+      "ontology_class": "CharacterizationMethod",
+      "definition": "Метод исследования микроструктуры, основанный на сканировании поверхности образца сфокусированным пучком электронов, позволяющий получать изображения с высоким разрешением и анализировать геометрию фаз.",
+      "is_kpi": false
+    }
+  ]
+}
